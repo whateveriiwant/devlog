@@ -14,7 +14,7 @@ module.exports = {
   messages: {
     type: '커밋 타입을 선택하세요:',
     subject: '커밋 제목을 입력하세요 (짧고 간결하게):',
-    body: '커밋 본문을 입력하세요 (줄바꿈은 "|" 사용, 선택 사항):\\n',
+    body: '커밋 본문을 입력하세요 (줄바꿈은 "|" 사용, 선택 사항):',
     confirmCommit: '이대로 커밋하시겠습니까?'
   },
   skipQuestions: ['scope', 'customScope', 'breaking', 'footer'],

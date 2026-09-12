@@ -1,7 +1,8 @@
 /* Inspired by Kabarza's Day → Night Toggle, adapted to a compact, accessible control.
    Reference: https://designervsdeveloper.webflow.io/ */
 .theme-switch {
-  --switch-unit: 18px;
+  /* Scale every em-based illustration layer with the 32px control height. */
+  --switch-unit: .8889rem;
   --switch-ease: cubic-bezier(.22, 1, .36, 1);
   --orb-travel: 3.7em;
   appearance: none;
@@ -9,8 +10,8 @@
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 6em;
-  height: 44px;
+  width: 5.333rem;
+  height: 2rem;
   margin-inline: 5px;
   padding: 0;
   border: 0;
@@ -26,8 +27,8 @@
 .theme-switch__scene {
   display: block;
   position: relative;
-  width: 6em;
-  height: 2.25em;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   border-radius: 8em;
   background: #509be2;
@@ -117,7 +118,7 @@
   12%, 65% { opacity: 1; }
   100% { opacity: 0; transform: translate(1.1em, -3.2em) rotate(38deg); }
 }
-@media (max-width: 639px) { .theme-switch { --switch-unit: 13px; margin-inline: 3px; } }
+@media (max-width: 639px) { .theme-switch { --switch-unit: .64rem; margin-inline: 3px; } }
 @media (max-width: 359px) { header .brand > span:last-child { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .theme-switch *, .theme-switch { transition: none !important; animation: none !important; }
