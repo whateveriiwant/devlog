@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "36fcb5cd-2010-4f67-80d6-c3b775d18a6b",
+    "title": "첫 게시물",
+    "released_at": "2022-01-22T07:17:58.481Z",
+    "updated_at": "2026-08-27T14:43:46.411Z",
+    "body": "\n// 처음으로 맥북 들고 스타벅스 온 나,,\n## 넌 누구냐?!\n(22년 1월 기준) 대학 입학을 앞둔 새내기 학부생\n\n## 앞으로의 목표\n주기적으로 공부한 것 올리기\n과제의 해결 과정과 결과 올리기\n글 올린거 보고 뿌듯해하기",
+    "short_description": "학부생으로써 쓰는 첫 게시물",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://images.velog.io/images/jsj9620/post/8e8c548f-715f-4058-b3d6-9cb9de03833a/IMG_1421.jpeg",
+    "url_slug": "첫-게시물",
+    "series": {
+      "id": "558a9a36-14d1-40a5-aaa1-0f0ed880df53",
+      "name": "학교생활",
+      "url_slug": "학교생활"
+    }
+  }
+}

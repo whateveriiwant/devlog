@@ -1,0 +1,21 @@
+{
+  "verifiedAt": "2026-09-12T03:47:22.218Z",
+  "htmlPages": 325,
+  "articles": 125,
+  "articleHeadings": 1046,
+  "articleImages": 238,
+  "codeBlocks": 282,
+  "codeComparison": "Exact text and internal whitespace; terminal LF normalized. Raw Markdown is separately SHA-256 verified.",
+  "terminalNewlineDifferences": 282,
+  "internalLinksChecked": 14046,
+  "archiveUniquePosts": 125,
+  "seriesChecked": 23,
+  "sourceLinkWarnings": [
+    {
+      "file": "blog/코드잇과-함께-성장하는-여정/index.html",
+      "href": "codeit.kr",
+      "error": "Missing target /blog/%EC%BD%94%EB%93%9C%EC%9E%87%EA%B3%BC-%ED%95%A8%EA%BB%98-%EC%84%B1%EC%9E%A5%ED%95%98%EB%8A%94-%EC%97%AC%EC%A0%95/codeit.kr"
+    }
+  ],
+  "failures": []
+}

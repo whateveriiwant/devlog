@@ -1,0 +1,6 @@
+---
+interface Props { src: string; alt: string; caption?: string; width?: number; height?: number; srcset?: string; sizes?: string; camera?: string; lens?: string; focalLength?: string; shutter?: string; aperture?: string; iso?: string }
+const { src, alt, caption, width, height, srcset, sizes = '(max-width: 767px) 100vw, 768px', camera, lens, focalLength, shutter, aperture, iso } = Astro.props;
+const exif = [camera, lens, focalLength, shutter, aperture, iso && `ISO ${iso}`].filter(Boolean).join(' · ');
+---
+<figure class="photo"><img src={src} alt={alt} width={width} height={height} srcset={srcset} sizes={srcset ? sizes : undefined} loading="lazy" decoding="async" data-lightbox />{(caption || exif) && <figcaption>{caption && <span>{caption}</span>}{exif && <span class="photo-exif">{exif}</span>}</figcaption>}</figure>

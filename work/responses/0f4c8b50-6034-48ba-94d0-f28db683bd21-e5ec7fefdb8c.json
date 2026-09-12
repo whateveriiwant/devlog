@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "0f4c8b50-6034-48ba-94d0-f28db683bd21",
+    "title": "DOM 파서",
+    "released_at": "2025-07-26T03:21:38.082Z",
+    "updated_at": "2026-09-04T17:58:22.719Z",
+    "body": "\n\n> 웹 브라우저 DOM 파서가 HTML을 분석하는 방식, Document를 재구성하는 방식에 대해 학습\n\n> ### DOM\n>\n> HTML 문서의 계층적 구조를 표현하는 객체 모델\n> DOM 파서는 이러한 DOM 트리를 생성하는 핵심 구성 요소\n\n# 브라우저가 HTML을 처리하는 과정\n\n브라우저가 HTML 문서를 받아서 화면에 그리기까지의 과정을 **Critical Rendering Path**라고 한다.\n\n## 1단계: 토큰화\n\n> HTML 문자열 -> 한 글자씩 읽기 -> 토큰으로 변환\n\n예시:\n\n```xml\n<div>Hello</div>\n```\n\n↓\n\n```text\n토큰 1: <div> (시작 태그)\n토큰 2: Hello (텍스트)\n토큰 3: </div> (종료 태그)\n```\n\n## 2단계: 파싱\n\n> 토큰들 -> 문법 규칙 적용 -> DOM 트리 생성\n\n예시:\n\n```text\ndiv 노드\n└── 텍스트 노드: \"Hello\"\n```\n\n## 3단계: DOM 트리 완성\n\n```text\nHTML 요소들 -> 계층적 객체 구조 -> DOM 트리\n```\n\n# DOM 파서의 주요 특징\n\n1. 스트리밍 방식\n   - 전체 HTML을 다 받기 전에 받은 부분부터 바로 파싱 시작\n   - 사용자가 더 빠르게 화면을 볼 수 있음\n2. 오류 허용\n   - HTML 문법 오류가 있어도 자동으로 교정해서 처리\n   - 태그가 안 닫혀있으면 브라우저가 자동으로 닫아줌\n3. 파싱 중단\n   - `<script>` 태그를 만나면 HTML 파싱을 일시 중단\n   - 스크립트가 DOM을 수정할 수 있기 때문\n\n## 컴파일러 이론과 연결\n\n| 단계       | 역할                   | 입력        | 출력      |\n| :--------- | :--------------------- | :---------- | :-------- |\n| 토크나이저 | HTML을 토큰으로 쪼개기 | HTML 문자열 | 토큰 배열 |\n| 파서       | 토큰을 구조화          | 토큰 배열   | DOM 트리  |\n\n## DOM 파서가 Document를 재구성하는 방식\n\n> #### Document?\n>\n> 웹 브라우저에서 HTML 문서 전체를 나타내는 객체\n> 즉, `<html>` 태그를 포함한 전체 웹페이지\n> 모든 HTML 요소들은 이 Document 아래에 계층적으로 구성된다\n\n### 1. 초기 Document 생성\n\n브라우저가 HTML을 처음 받으면 아래와 같은 과정이 진행된다.\n\n> HTML 문자열 -> 토큰화 -> 파싱 -> DOM 트리 -> Document 객체 생성\n\n### 2. 재구성이 필요한 상황\n\nJS를 통해 DOM을 변경할 때 Document가 재구성된다.\ne.g.) 요소 추가: `document.createElement()`\n\n### 3. 재구성 과정\n\n1. 변경 감지\n\n   - 브라우저가 DOM 조작을 감지 (e.g. JS 코드에 의한 조작)\n\n2. DOM 트리 업데이트\n\n   - 메모리에 있는 DOM 트리 구조를 새로운 내용으로 갱신\n   - 변경된 노드와 그 부모/자식 노드들의 관계 재정립\n\n3. 렌더 트리 재구성\n\n   - DOM 트리 + CSS 정보 -> 새로운 렌더 트리 생성\n   - 화면에 실제로 표시될 요소들의 구조 결정\n\n4. 레이아웃 계산 (리플로우)\n\n   - 각 요소의 크기와 위치를 다시 계산\n   - 변경된 요소가 다른 요소들에 미치는 영향 계산\n\n5. 화면 그리기 (리페인트)\n   - 계산된 정보를 바탕으로 실제 화면에 픽셀 그리기",
+    "short_description": "DOM 파서에 대해 알아보고 웹페이지를 어떻게 재구성 하는지도 보자",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/4fb91e8b-a0e5-40dd-8f08-300f614b6610/image.jpg",
+    "url_slug": "DOM-파서",
+    "series": {
+      "id": "37ef3aea-e9ea-45da-a659-474fe2ff11e3",
+      "name": "JavaScript",
+      "url_slug": "JavaScript"
+    }
+  }
+}

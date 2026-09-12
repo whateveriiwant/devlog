@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "748fa571-dc8a-425f-aef5-121bb09d50ed",
+    "title": "C언어 Express 9장 #09",
+    "released_at": "2022-04-25T06:51:53.420Z",
+    "updated_at": "2026-08-31T00:56:44.820Z",
+    "body": "문제: 자리수의 합계를 계산하는 프로그램을 재귀를 이용해 작성\n예) 123의 경우 6이 출력됨 \n\n```\n#include <stdio.h>\n\nint get_digit_sum(int n) {\n    if (n / 10 != 0) {\n        return (n % 10) + get_digit_sum(n / 10);\n    }\n    return n;\n}\n\nint main() {\n    int num;\n    printf(\"정수를 입력하시오: \");\n    scanf(\"%d\", &num);\n\n    printf(\"%d\", get_digit_sum(num));\n}\n```\n\n[IDEA]\n![](https://velog.velcdn.com/images/jsj9620/post/5affb67d-b56c-4df1-a5af-300fa50ac6e2/image.jpeg)\n\n",
+    "short_description": "Recursion 활용 자릿수 합계 구하는 문제",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": null,
+    "url_slug": "C언어-Express-9장-09",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

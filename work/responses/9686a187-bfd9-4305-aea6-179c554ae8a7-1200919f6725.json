@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "9686a187-bfd9-4305-aea6-179c554ae8a7",
+    "title": "C언어 Express 8장 #14",
+    "released_at": "2022-04-17T07:55:44.942Z",
+    "updated_at": "2026-08-19T05:54:12.407Z",
+    "body": "두 점 사이의 거리 계산하는 공식 이용\n\n```\n#include <stdio.h>\n#include <math.h>\n\ndouble get_distance(double x1, double y1, double x2, double y2) {\n    double d, formula;\n    formula = (pow((x1 - x2), 2) + pow((y1 - y2), 2));\n    d = sqrt(formula);\n    return d;\n}\n\nint main(){\n    double x1, x2, y1, y2;\n\n    printf(\"첫번째 점의 좌표를 입력하시오(x, y): \");\n    scanf(\"%lf %lf\", &x1, &y1);\n    printf(\"두번째 점의 좌표를 입력하시오(x, y): \");\n    scanf(\"%lf %lf\", &x2, &y2);\n\n    printf(\"두점 사이의 거리는 %lf입니다.\", get_distance(x1, y1, x2, y2));\n\n    return 0;\n}\n```",
+    "short_description": "두 점 사이의 거리 계산하는 공식 이용",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": null,
+    "url_slug": "C언어-Express-8장-14",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

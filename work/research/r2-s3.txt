@@ -1,0 +1,1017 @@
+S3 API compatibility · Cloudflare R2 docs
+Skip to content
+Documentation Index
+Fetch the complete documentation index at: https://developers.cloudflare.com/r2/llms.txt
+Use this file to discover all available pages before exploring further.
+Docs
+Directory
+API
+SDKs
+Changelog
+Search
+Ctrl
+K
+Log in
+Dashboard
+R2
+/
+Overview
+Get started
+Overview
+Workers API
+S3
+CLI
+How R2 works
+Data migration
+Overview
+Super Slurper
+Sippy
+Migration Strategies
+Buckets
+Overview
+Create new buckets
+Public buckets
+Configure CORS
+Local uploads
+Beta
+Delete buckets
+Bucket locks
+Event notifications
+Object lifecycles
+Storage classes
+Objects
+Overview
+Upload objects
+Download objects
+Delete objects
+API
+Overview
+Authentication
+Workers API
+Use R2 from Workers
+Use the R2 multipart API from Workers
+Workers API reference
+S3
+S3 API compatibility
+Extensions
+Presigned URLs
+Temporary credentials
+Error codes
+Examples
+Overview
+Multi-cloud setup ↗
+Authenticate against R2 API using auth tokens
+Authenticate against R2 with temporary credentials
+Rclone
+S3 SDKs
+aws CLI
+aws-sdk-go
+aws-sdk-java
+aws-sdk-js
+aws-sdk-js-v3
+aws-sdk-kotlin
+aws-sdk-net
+aws-sdk-php
+aws-sdk-ruby
+aws-sdk-rust
+aws4fetch
+boto3
+Configure custom headers
+s3mini
+Terraform
+Terraform (AWS)
+Use SSE-C
+Use the Cache API
+Tutorials
+Videos ↗
+Demos and architectures
+Platform
+Choose a storage product ↗
+Event subscriptions
+Audit Logs
+Limits
+Metrics and analytics
+Release notes
+Troubleshooting
+Reference
+Consistency model
+Data location
+Data security
+Durability
+Unicode interoperability
+Wrangler commands
+Pricing
+R2 Data Catalog ↗
+Beta
+R2 SQL ↗
+Beta
+Agent resources
+Agent setup ↗
+Cloudflare Skills ↗
+Code Mode MCP Server ↗
+Domain-specific MCP Servers ↗
+MCP
+R2 llms.txt ↗
+R2 llms-full.txt ↗
+Cloudflare Docs llms.txt ↗
+Cloudflare Docs llms-full.txt ↗
+Home
+/
+R2
+/
+…
+API
+/
+S3
+/
+S3 API compatibility
+S3 API compatibility
+Last updated 
+Jul 31, 2026
+|
+Copy as Markdown
+|
+View as Markdown
+|
+Agent setup
+Overview
+How to read this page
+Bucket region
+Checksum Types
+Bucket-level operations
+ Implemented bucket-level operations
+ Unimplemented bucket-level operations
+Object-level operations
+ Implemented object-level operations
+ Unimplemented object-level operations
+R2 implements the S3 API to allow users and their applications to migrate with ease. When comparing to AWS S3, Cloudflare has removed some API operations' features and added others. The S3 API operations are listed below with their current implementation status. Feature implementation is currently in progress. Refer back to this page for updates.
+The API is available via the 
+https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+ endpoint. Find your 
+account ID in the Cloudflare dashboard
+.
+How to read this page
+This page has two sections: bucket-level operations and object-level operations.
+Each section will have two tables: a table of implemented APIs and a table of unimplemented APIs.
+Refer the feature column of each table to review which features of an API have been implemented and which have not.
+✅ Feature Implemented 
+
+🚧 Feature Implemented (Experimental) 
+
+❌ Feature Not Implemented
+Bucket region
+When using the S3 API, the region for an R2 bucket is 
+auto
+. For compatibility with tools that do not allow you to specify a region, an empty value and 
+us-east-1
+ will alias to the 
+auto
+ region.
+This also applies to the 
+LocationConstraint
+ for the 
+CreateBucket
+ API.
+Checksum Types
+Checksums have an algorithm and a 
+type
+ ↗
+. Refer to the table below.
+Checksum Algorithm
+FULL_OBJECT
+COMPOSITE
+CRC-64/NVME (
+CRC64NVME
+)
+✅
+❌
+CRC-32 (
+CRC32
+)
+❌
+✅
+CRC-32C (
+CRC32C
+)
+❌
+✅
+SHA-1 (
+SHA1
+)
+❌
+✅
+SHA-256 (
+SHA256
+)
+❌
+✅
+Bucket-level operations
+The following tables are related to bucket-level operations.
+Implemented bucket-level operations
+Below is a list of implemented bucket-level operations. Refer to the Feature column to review which features have been implemented (✅) and have not been implemented (❌).
+API Name
+Feature
+✅ 
+ListBuckets
+ ↗
+✅ 
+HeadBucket
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+CreateBucket
+ ↗
+❌ ACL: 
+   ❌ x-amz-acl 
+   ❌ x-amz-grant-full-control 
+   ❌ x-amz-grant-read 
+   ❌ x-amz-grant-read-acp 
+   ❌ x-amz-grant-write 
+   ❌ x-amz-grant-write-acp 
+ ❌ Object Locking: 
+   ❌ x-amz-bucket-object-lock-enabled 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+DeleteBucket
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+DeleteBucketCors
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+GetBucketCors
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+GetBucketLifecycleConfiguration
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+GetBucketLocation
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+GetBucketEncryption
+ ↗
+❌ Bucket Owner: 
+ ❌ x-amz-expected-bucket-owner
+✅ 
+PutBucketCors
+ ↗
+❌ Checksums: 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+PutBucketLifecycleConfiguration
+ ↗
+❌ Checksums: 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+Unimplemented bucket-level operations
+Unimplemented bucket-level operations
+API Name
+Feature
+❌ 
+GetBucketAccelerateConfiguration
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketAcl
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketAnalyticsConfiguration
+ ↗
+❌ id 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketIntelligentTieringConfiguration
+ ↗
+❌ id
+❌ 
+GetBucketInventoryConfiguration
+ ↗
+❌ id 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketLifecycle
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketLogging
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketMetricsConfiguration
+ ↗
+❌ id 
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketNotification
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketNotificationConfiguration
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketOwnershipControls
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketPolicy
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketPolicyStatus
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketReplication
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketRequestPayment
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketTagging
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketVersioning
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetBucketWebsite
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetObjectLockConfiguration
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+GetPublicAccessBlock
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+ListBucketAnalyticsConfigurations
+ ↗
+❌ Query Parameters: 
+   ❌ continuation-token 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+ListBucketIntelligentTieringConfigurations
+ ↗
+❌ Query Parameters: 
+   ❌ continuation-token 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+ListBucketInventoryConfigurations
+ ↗
+❌ Query Parameters: 
+   ❌ continuation-token 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+ListBucketMetricsConfigurations
+ ↗
+❌ Query Parameters: 
+   ❌ continuation-token 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketAccelerateConfiguration
+ ↗
+❌ Checksums: 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketAcl
+ ↗
+❌ Permissions: 
+   ❌ x-amz-grant-full-control 
+   ❌ x-amz-grant-read 
+   ❌ x-amz-grant-read-acp 
+   ❌ x-amz-grant-write 
+   ❌ x-amz-grant-write-acp 
+ ❌ Checksums: 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketAnalyticsConfiguration
+ ↗
+❌ id 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketEncryption
+ ↗
+❌ Checksums: 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketIntelligentTieringConfiguration
+ ↗
+❌ id 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketInventoryConfiguration
+ ↗
+❌ id 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketLifecycle
+ ↗
+❌ Checksums: 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketLogging
+ ↗
+❌ Checksums: 
+   ❌ Content-MD5 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketMetricsConfiguration
+ ↗
+❌ id 
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketNotification
+ ↗
+❌ Checksums: 
+   ❌ Content-MD5 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner:   
+ ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketNotificationConfiguration
+ ↗
+❌ Validation: 
+   ❌ x-amz-skip-destination-validation 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketOwnershipControls
+ ↗
+❌ Checksums: 
+   ❌ Content-MD5 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketPolicy
+ ↗
+❌ Validation: 
+   ❌ x-amz-confirm-remove-self-bucket-access 
+ ❌ Checksums: 
+   ❌ Content-MD5 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketReplication
+ ↗
+❌ Object Locking: 
+   ❌ x-amz-bucket-object-lock-token 
+ ❌ Checksums: 
+   ❌ Content-MD5 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketRequestPayment
+ ↗
+❌ Checksums: 
+   ❌ Content-MD5 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketTagging
+ ↗
+❌ Checksums: 
+   ❌ Content-MD5 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketVersioning
+ ↗
+❌ Multi-factor authentication: 
+   ❌ x-amz-mfa 
+ ❌ Checksums: 
+   ❌ Content-MD5 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutBucketWebsite
+ ↗
+❌ Checksums: 
+   ❌ Content-MD5 
+ ❌ Bucket Owner: 
+ ❌ x-amz-expected-bucket-owner
+❌ 
+PutObjectLockConfiguration
+ ↗
+❌ Object Locking: 
+   ❌ x-amz-bucket-object-lock-token 
+ ❌ Checksums: 
+   ❌ Content-MD5 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+❌ 
+PutPublicAccessBlock
+ ↗
+❌ Checksums: 
+   ❌ Content-MD5 
+   ❌ x-amz-sdk-checksum-algorithm 
+   ❌ x-amz-checksum-algorithm 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+Object-level operations
+The following tables are related to object-level operations.
+Implemented object-level operations
+Below is a list of implemented object-level operations. Refer to the Feature column to review which features have been implemented (✅) and have not been implemented (❌).
+Behaviors & Limitations
+UploadPart:
+ Uploading to the same part number replaces the previous part. If a subsequent upload to the same part fails, the original part is lost and must be re-uploaded.
+API Name
+Feature
+✅ 
+HeadObject
+ ↗
+✅ Conditional Operations: 
+   ✅ If-Match 
+   ✅ If-Modified-Since 
+   ✅ If-None-Match 
+   ✅ If-Unmodified-Since 
+ ✅ Range: 
+   ✅ Range (has no effect in HeadObject) 
+   ✅ partNumber 
+ ✅ SSE-C: 
+   ✅ x-amz-server-side-encryption-customer-algorithm 
+   ✅ x-amz-server-side-encryption-customer-key 
+   ✅ x-amz-server-side-encryption-customer-key-MD5 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+ListObjects
+ ↗
+Query Parameters: 
+   ✅ delimiter 
+   ✅ encoding-type 
+   ✅ marker 
+   ✅ max-keys 
+   ✅ prefix 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+ListObjectsV2
+ ↗
+Query Parameters: 
+   ✅ list-type 
+   ✅ continuation-token 
+   ✅ delimiter 
+   ✅ encoding-type 
+   ✅ fetch-owner 
+   ✅ max-keys 
+   ✅ prefix 
+   ✅ start-after 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+GetObject
+ ↗
+✅ Conditional Operations: 
+   ✅ If-Match 
+   ✅ If-Modified-Since 
+   ✅ If-None-Match 
+   ✅ If-Unmodified-Since 
+ ✅ Range: 
+   ✅ Range 
+   ✅ PartNumber 
+ ✅ SSE-C: 
+   ✅ x-amz-server-side-encryption-customer-algorithm 
+   ✅ x-amz-server-side-encryption-customer-key 
+   ✅ x-amz-server-side-encryption-customer-key-MD5 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+PutObject
+ ↗
+✅ Conditional Operations: 
+   ✅ If-Match 
+   ✅ If-Modified-Since 
+   ✅ If-None-Match 
+   ✅ If-Unmodified-Since 
+ ✅ System Metadata: 
+   ✅ Content-Type 
+   ✅ Cache-Control 
+   ✅ Content-Disposition 
+   ✅ Content-Encoding 
+   ✅ Content-Language 
+   ✅ Expires 
+   ✅ Content-MD5 
+ ✅ Storage Class: 
+   ✅ x-amz-storage-class 
+     ✅ STANDARD 
+     ✅ STANDARD_IA 
+ ❌ Object Lifecycle 
+ ❌ Website: 
+   ❌ x-amz-website-redirect-location 
+ ❌ SSE: 
+   ❌ x-amz-server-side-encryption-aws-kms-key-id 
+   ❌ x-amz-server-side-encryption 
+   ❌ x-amz-server-side-encryption-context 
+   ❌ x-amz-server-side-encryption-bucket-key-enabled 
+ ✅ SSE-C: 
+   ✅ x-amz-server-side-encryption-customer-algorithm 
+   ✅ x-amz-server-side-encryption-customer-key 
+   ✅ x-amz-server-side-encryption-customer-key-MD5 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Tagging: 
+   ❌ x-amz-tagging 
+ ❌ Object Locking: 
+   ❌ x-amz-object-lock-mode 
+   ❌ x-amz-object-lock-retain-until-date 
+   ❌ x-amz-object-lock-legal-hold 
+ ❌ ACL: 
+   ❌ x-amz-acl 
+   ❌ x-amz-grant-full-control 
+   ❌ x-amz-grant-read 
+   ❌ x-amz-grant-read-acp 
+   ❌ x-amz-grant-write-acp 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+DeleteObject
+ ↗
+❌ Multi-factor authentication: 
+   ❌ x-amz-mfa 
+ ❌ Object Locking: 
+   ❌ x-amz-bypass-governance-retention 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+DeleteObjects
+ ↗
+❌ Multi-factor authentication: 
+   ❌ x-amz-mfa 
+ ❌ Object Locking: 
+   ❌ x-amz-bypass-governance-retention 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+ListMultipartUploads
+ ↗
+✅ Query Parameters: 
+   ✅ delimiter 
+   ✅ encoding-type 
+   ✅ key-marker 
+   ✅️ max-uploads 
+   ✅ prefix 
+   ✅ upload-id-marker
+✅ 
+CreateMultipartUpload
+ ↗
+✅ System Metadata: 
+   ✅ Content-Type 
+   ✅ Cache-Control 
+   ✅ Content-Disposition 
+   ✅ Content-Encoding 
+   ✅ Content-Language 
+   ✅ Expires 
+   ✅ Content-MD5 
+ ✅ Storage Class: 
+   ✅ x-amz-storage-class 
+     ✅ STANDARD 
+     ✅ STANDARD_IA 
+ ❌ Website: 
+   ❌ x-amz-website-redirect-location 
+ ❌ SSE: 
+   ❌ x-amz-server-side-encryption-aws-kms-key-id 
+   ❌ x-amz-server-side-encryption 
+   ❌ x-amz-server-side-encryption-context 
+   ❌ x-amz-server-side-encryption-bucket-key-enabled 
+ ✅ SSE-C: 
+   ✅ x-amz-server-side-encryption-customer-algorithm 
+   ✅ x-amz-server-side-encryption-customer-key 
+   ✅ x-amz-server-side-encryption-customer-key-MD5 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Tagging: 
+   ❌ x-amz-tagging 
+ ❌ Object Locking: 
+   ❌ x-amz-object-lock-mode 
+   ❌ x-amz-object-lock-retain-until-date 
+   ❌ x-amz-object-lock-legal-hold 
+ ❌ ACL: 
+   ❌ x-amz-acl 
+   ❌ x-amz-grant-full-control 
+   ❌ x-amz-grant-read 
+   ❌ x-amz-grant-read-acp 
+   ❌ x-amz-grant-write-acp 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+CompleteMultipartUpload
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer
+✅ 
+AbortMultipartUpload
+ ↗
+❌ Request Payer: 
+   ❌ x-amz-request-payer
+✅ 
+CopyObject
+ ↗
+✅ Operation Metadata: 
+   ✅ x-amz-metadata-directive 
+ ✅ System Metadata: 
+   ✅ Content-Type 
+   ✅ Cache-Control 
+   ✅ Content-Disposition 
+   ✅ Content-Encoding 
+   ✅ Content-Language 
+   ✅ Expires 
+ ✅ Conditional Operations: 
+   ✅ x-amz-copy-source 
+   ✅ x-amz-copy-source-if-match 
+   ✅ x-amz-copy-source-if-modified-since 
+   ✅ x-amz-copy-source-if-none-match 
+   ✅ x-amz-copy-source-if-unmodified-since 
+ ✅ Storage Class: 
+   ✅ x-amz-storage-class 
+     ✅ STANDARD 
+     ✅ STANDARD_IA 
+ ❌ ACL: 
+   ❌ x-amz-acl 
+   ❌ x-amz-grant-full-control 
+   ❌ x-amz-grant-read 
+   ❌ x-amz-grant-read-acp 
+   ❌ x-amz-grant-write-acp 
+ ❌ Website: 
+   ❌ x-amz-website-redirect-location 
+ ❌ SSE: 
+   ❌ x-amz-server-side-encryption 
+   ❌ x-amz-server-side-encryption-aws-kms-key-id 
+   ❌ x-amz-server-side-encryption-context 
+   ❌ x-amz-server-side-encryption-bucket-key-enabled 
+ ✅ SSE-C: 
+   ✅ x-amz-server-side-encryption-customer-algorithm 
+   ✅ x-amz-server-side-encryption-customer-key 
+   ✅ x-amz-server-side-encryption-customer-key-MD5 
+   ✅ x-amz-copy-source-server-side-encryption-customer-algorithm 
+   ✅ x-amz-copy-source-server-side-encryption-customer-key 
+   ✅ x-amz-copy-source-server-side-encryption-customer-key-MD5 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Tagging: 
+   ❌ x-amz-tagging 
+   ❌ x-amz-tagging-directive 
+ ❌ Object Locking: 
+   ❌ x-amz-object-lock-mode 
+   ❌ x-amz-object-lock-retain-until-date 
+   ❌ x-amz-object-lock-legal-hold 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner 
+   ❌ x-amz-source-expected-bucket-owner 
+ ❌ Checksums: 
+   ❌ x-amz-checksum-algorithm
+✅ 
+UploadPart
+ ↗
+✅ System Metadata: 
+   ✅ Content-MD5 
+ ❌ SSE: 
+   ❌ x-amz-server-side-encryption 
+ ✅ SSE-C: 
+   ✅ x-amz-server-side-encryption-customer-algorithm 
+   ✅ x-amz-server-side-encryption-customer-key 
+   ✅ x-amz-server-side-encryption-customer-key-MD5 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+✅ 
+UploadPartCopy
+ ↗
+✅ Copy Source: 
+   ✅ x-amz-copy-source (required) 
+ ❌ Conditional Operations: 
+   ❌ x-amz-copy-source-if-match 
+   ❌ x-amz-copy-source-if-modified-since 
+   ❌ x-amz-copy-source-if-none-match 
+   ❌ x-amz-copy-source-if-unmodified-since 
+ ✅ Range: 
+   ✅ x-amz-copy-source-range 
+ ✅ SSE-C: 
+   ✅ x-amz-server-side-encryption-customer-algorithm 
+   ✅ x-amz-server-side-encryption-customer-key 
+   ✅ x-amz-server-side-encryption-customer-key-MD5 
+   ✅ x-amz-copy-source-server-side-encryption-customer-algorithm 
+   ✅ x-amz-copy-source-server-side-encryption-customer-key 
+   ✅ x-amz-copy-source-server-side-encryption-customer-key-MD5 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner 
+   ❌ x-amz-source-expected-bucket-owner
+✅ 
+ListParts
+ ↗
+Query Parameters: 
+   ✅ max-parts 
+   ✅ part-number-marker 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+Caution
+Even though 
+ListObjects
+ is a supported operation, it is recommended that you use 
+ListObjectsV2
+ instead when developing applications. For more information, refer to 
+ListObjects
+ ↗
+.
+Unimplemented object-level operations
+Unimplemented object-level operations
+API Name
+Feature
+❌ 
+GetObjectTagging
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer
+❌ 
+PutObjectTagging
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner 
+ ❌ Request Payer: 
+   ❌ x-amz-request-payer 
+ ❌ Checksums: 
+   ❌ x-amz-sdk-checksum-algorithm
+❌ 
+DeleteObjectTagging
+ ↗
+❌ Bucket Owner: 
+   ❌ x-amz-expected-bucket-owner
+Previous
+Workers API reference
+Next
+Extensions
+Was this helpful?
+Yes
+No
+Edit page
+Report issue
+On this page
+Overview
+How to read this page
+Bucket region
+Checksum Types
+Bucket-level operations
+Implemented bucket-level operations
+Unimplemented bucket-level operations
+Object-level operations
+Implemented object-level operations
+Unimplemented object-level operations
+Edit page
+Report issue
+Getting started
+Plans
+Contact sales
+Partners
+Find a partner
+Startups
+Under attack?
+Domain name search
+Company
+About
+Careers
+Investors
+Press
+Press kit
+Global network
+Public interest
+Project Galileo
+Athenian Project
+Cloudflare for Campaigns
+Project Fairshot
+Impact/ESG
+Compliance
+Compliance resources
+Trust Hub
+Data Protection
+Responsible AI
+Transparency report
+Report abuse
+Resources
+App innovation report
+Cloudflare Radar
+Case studies
+Status
+Support
+Events
+Blog
+Developers
+Documentation
+Learning center
+Community
+Solutions
+SSE and SASE platform
+Cloudflare AI Cloud
+AI Security
+Frontend Development Platform
+Multi-Tenant Platform Development
+Web Security Platform
+Start Building
+Log In
+© 2026 Cloudflare, Inc.
+Privacy policy
+|
+Report security issues
+|
+Terms of use
+|
+Trademark
+|
+Your privacy choices
+Docs

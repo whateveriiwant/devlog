@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "d3a34cbc-0af7-4377-b757-d13dc57c7b65",
+    "title": "[React] 조건에 따라 배열 렌더링하기",
+    "released_at": "2023-03-13T05:28:16.104Z",
+    "updated_at": "2026-08-22T01:12:08.600Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/2e5295db-fbf1-46e3-b244-ad12c8d362e4/image.png)\n\n연도에 따라 소비 내역을 보여주는 예제를 제작하고자 합니다. state를 사용할 필요 없이 아주 간단하게 코드 몇 줄로 구현이 가능합니다.\n\n## 고치기 전\n```\nreturn (\n    <div>\n      <Card className=\"expenses\">\n        <ExpenseFilter\n          selected={filteredYear}\n          onChangeFilter={yearChangeHandler}\n        />\n        {props.items.map((expense) => (\n          <ExpenseItem\n            key={expense.id}\n            title={expense.title}\n            amount={expense.amount}\n            date={expense.date}\n          />\n        ))}\n        {/* 객체 렌더링, 배열로 변환 */}\n      </Card>\n    </div>\n  );\n```\n원래의 코드입니다. map 메소드를 통해 받은 객체를 새로운 컴포넌트에 사용해 결과를 반복적으로 출력하는 방식입니다.\n\n\n## 고친 후\n```\nconst filteredExpenses = props.items.filter((expense) => {\n    return expense.date.getFullYear().toString() === filteredYear;\n  }); // 필터 내장 메소드\n\n  return (\n    <div>\n      <Card className=\"expenses\">\n        <ExpenseFilter\n          selected={filteredYear}\n          onChangeFilter={yearChangeHandler}\n        />\n        {filteredExpenses.map((expense) => (\n          <ExpenseItem\n            key={expense.id}\n            title={expense.title}\n            amount={expense.amount}\n            date={expense.date}\n          />\n        ))}\n        {/* 객체 렌더링, 배열로 변환 */}\n      </Card>\n    </div>\n  );\n```\n\nJSX를 리턴하기 전에 위에 상수 하나를 추가해주었습니다. props를 통해 받은 소비 내역 객체 하나를 filter 메소드를 통해 expense 객체에서 연도를 구하고, 필터에서 선택된 연도와 같다면 True를 반환하는 함수를 실행시켜 True로 반환되는 객체들은 filteredExpenses에 새로운 배열로 저장하는 방식입니다.\n",
+    "short_description": "필터 조건에 따라 배열을 렌더링 하는 방법을 짧은 코드로 설명합니다.",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/2e5295db-fbf1-46e3-b244-ad12c8d362e4/image.png",
+    "url_slug": "React-조건에-따라-배열-렌더링하기",
+    "series": {
+      "id": "5ce42d25-c564-4c0e-8513-dff6fdc43d02",
+      "name": "React",
+      "url_slug": "개인공부"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "f732acb2-1143-461e-a9dc-ae3ba521ecb7",
+    "title": "HTTP",
+    "released_at": "2025-10-24T05:04:59.909Z",
+    "updated_at": "2026-08-23T13:35:03.136Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/94fbe4b9-03e4-4a66-9ef0-6a28453262fb/image.png)\n\n> HyperText Transfer Protocol\n>\n> 웹에서 클라이언트와 서버가 서로 데이터를 주고받기 위해 사용하는 **통신 규칙(Protocol)**\n\n# 핵심 특징: 비연결성, 무상태\n\n## 비연결성\n\n- 클라이언트는 서버에 요청을 보내고 응답을 받으면 바로 연결을 끊는다\n- 이는 서버가 수많은 요청을 동시에 감당할 수 있게 함\n- 그러나 매번 요청마다 새로 연결해야 해서 속도 저하 발생 가능\n\n### 보완책: Keep-Alive & HTTP/2\n\n- `Connection: Keep-Alive` 헤더를 사용해 일정 시간 동안 연결을 유지\n- `HTTP/2`에서 하나의 연결로 여러 요청/응답을 동시에 처리하는 Multiplexing 기술 등장\n\n## 무상태\n\n- 서버는 클라이언트의 이전 요청 상태를 기억하지 않음\n- 즉, 각 요청은 완전히 독립적인 것으로 간주\n\n### 보완책: 쿠키와 세션\n\n- **쿠키**, **세션**, **JWT**를 사용해 사용자의 상태를 유지\n- 서버는 로그인 시 쿠키를 발급하고, 클라이언트는 이후 요청마다 쿠키를 함께 보내 자신의 상태/자격을 증명\n\n# HTTP 메시지 구조\n\n> - 클라이언트가 보내는 **Request**\n> - 서버가 보내는 **Response**\n\n## HTTP Request\n\n```text\nGET /users/123?active=true HTTP/1.1  <-- 1. 시작 줄 (Start Line)\nHost: api.example.com                 <-- 2. 헤더 (Headers)\nUser-Agent: Chrome/105.0.0.0\nAccept: application/json\nAuthorization: Bearer my-secret-token\n\n{ \"comment\": \"Hello booduki\" }  <-- 3. 본문 (Body)\n```\n\n### 1. 시작 줄 (Start Line)\n\n- HTTP 메서드: 요청의 의도/목적 (`GET`/`POST` 등)\n- 요청 대상: `/users/123?active=true` 처럼 요청하는 리소스의 경로와 쿼리 문자열을 나타냄\n- HTTP 버전: `HTTP/1.1`, `HTTP/2` 등 사용된 프로토콜의 버전 명시\n\n### 2. 헤더 (Headers)\n\n- (Key, Value) 형태의 메타데이터로, 요청에 대한 부가 정보를 담고 있음\n\n- `Host`: 요청을 보내는 서버의 도메인 이름 (필수)\n- `User-Agent`: 요청을 보낸 클라이언트의 정보\n- `Accept`: 클라이언트가 이해할 수 있는 데이터 타입 (`application/json`, `text/html` 등)\n- `Authorization`: 인증 정보(인증 토큰)을 담아 보내는 헤더\n\n### 3. 본문 (Body)\n\n- 서버에 전달할 실제 데이터를 담는 부분\n- `GET` 요청은 보통 본문이 비어있고, `POST`나 `PUT`은 서버에 생성하거나 수정할 데이터를 본문에 담아 보냄\n\n## HTTP Response\n\n```text\nHTTP/1.1 200 OK                      <-- 1. 상태 줄 (Status Line)\nContent-Type: application/json       <-- 2. 헤더 (Headers)\nContent-Length: 54\nConnection: keep-alive\n\n{ \"userId\": 123, \"name\": \"Seungjun\" }   <-- 3. 본문 (Body)\n```\n\n### 1. 상태 줄 (Status Line)\n\n- HTTP 버전: 요청과 마찬가지로 프로토콜 버전을 나타냄\n- 상태 코드: **요청 처리 결과를 나타내는 세 자리 숫자 (매우 중요)**\n- 상태 텍스트: OK, Not Found처럼 상태 코드를 사람이 이해하기 쉽게 설명하는 짧은 문구\n\n### 2. 헤더 (Headers)\n\n- 응답에 대한 부가 정보\n- 자주 쓰이는 응답 헤더\n  - `Content-Type`: 응답 본문의 데이터 타입\n  - `Content-Length`: 응답 본문의 길이를 바이트 단위로 알려줌\n  - `Set-Cookie`: 서버가 클라이언트에게 쿠키를 저장하라고 명령할 때 사용\n  - `Location`: 페이지를 다른 곳으로 리다이렉트 시킬 때 이동할 URL 명시\n\n### 3. 본문 (Body)\n\n- 클라이언트에게 전달할 실제 데이터가 담기는 부분\n\n# HTTP 메서드\n\n> 리소스에 대해 **수행하려는 작업의 종류**\n\n- `GET`: 리소스 **조회**\n- `POST`: 리소스 **생성**\n- `PUT`: 리소스 **전체 수정**\n- `PATCH`: 리소스 **부분 수정**\n- `DELETE`: 리소스 **삭제**\n\n# HTTP 상태 코드\n\n> 서버가 클라이언트의 요청을 어떻게 처리했는지 알려주는 가장 중요한 지표\n\n## 2xx (성공): 요청이 성공적으로 처리되었음\n\n- `200 OK`: 요청 성공\n- `201 Created`: 리소스 생성 성공(`POST`, `PUT`에 대해)\n- `204 No Content`: 성공했지만 응답 본문에 보낼 데이터는 없음 (주로 `DELETE`)\n\n## 3xx (리다이렉션): 요청을 완료하려면 추가적인 동작 필요\n\n- `301 Moved Permanently`: 요청한 리소스의 URL이 영구적으로 변경됨\n- `302 Found`: 일시적으로 다른 URL로 이동해라\n\n## 4xx (클라이언트 에러): 클라이언트 측에 오류가 있음\n\n- `400 Bad Request`: 요청의 형식이 잘못 됨(e.g. 필요한 파라미터 누락)\n- `401 Unauthorized`: 인증되지 않은 사용자의 요청 (로그인 필요)\n- `403 Forbidden`: 인증은 되었지만 해당 리소스에 접근할 권한 없음\n- `404 Not Found`: 요청한 리소스를 찾을 수 없음\n\n## 5xx (서버 에러): 서버 측에 오류가 있음\n\n- `500 Internal Server Error`: 서버 코드 실행 중 예외가 발생하는 등 서버 내부에 문제 발생\n- `503 Server Unavailable`: 서버가 과부하 등으로 인해 일시적으로 요청을 처리할 수 없음",
+    "short_description": "HTTP와 관련된 모든 개념들에 대해",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/94fbe4b9-03e4-4a66-9ef0-6a28453262fb/image.png",
+    "url_slug": "HTTP",
+    "series": {
+      "id": "621a6c96-50f3-4675-85c5-25cc0514f5ff",
+      "name": "웹 공통",
+      "url_slug": "웹-공통"
+    }
+  }
+}

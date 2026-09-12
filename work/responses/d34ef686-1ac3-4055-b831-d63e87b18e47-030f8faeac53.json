@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "d34ef686-1ac3-4055-b831-d63e87b18e47",
+    "title": "[MLSA] Welcome Aboard! - 본격적인 참여",
+    "released_at": "2023-10-20T08:15:48.253Z",
+    "updated_at": "2026-08-26T01:39:14.277Z",
+    "body": "<img src=\"https://velog.velcdn.com/images/jsj9620/post/d27151af-ec26-4b51-85c4-97da2c5bfb5e/image.png\" width=\"60%\" />\n\n\n> # MLSA 첫 걸음\n> [지난 글 보기](https://velog.io/@jsj9620/MLSA-Welcome-Aboard-%EB%93%B1%EB%A1%9D)\n> 신입 MLSA가 어떻게 이 방대한 커뮤니티에 참여하게 되는지 그 두 번째 과정을 기록해봤습니다.\n> 지난 글이 등록에 대해서 다뤘다면, 이번에는 본격적으로 커뮤니티에 참여하는 과정을 담아봤습니다.\n\n# 메시지를 받았어요!\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/679b99fe-8ecb-41e7-90ac-fb81599f2846/image.png\" width=\"50%\" />\n\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/9686e248-2264-4e28-97e9-e74510d20843/image.png\" width=\"50%\" />\n\n\nTeams에 성공적으로 등록하면 이 자동화된 친구에게 메시지 하나를 받게 됩니다.\n버튼을 클릭해서 환영 비디오(영어 자막 O)를 보고 다 봤다면 사진에는 없지만 Yes 버튼을 눌러 다음 단계로 이동합니다.\n\n\n이후 MLSA 프로그램 핸드북 (가이드), 신입을 위한 체크리스트 등 다양한 안내가 주어지니 한 번씩 자세히 읽고 다음 단계로 이동합니다.\n\n# 마일스톤\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/ea1d7055-9919-4d13-9775-aa8968feb1ec/image.png\" width=\"70%\" />\n\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/ad27d4e9-fef1-4161-beaa-39ea47ddd314/image.png\" width=\"70%\" />\n\n\n저도 MLSA가 된지 1주일도 안되었지만 항상 수동적으로 무언가를 받으려는 것 보다는 능동적인 활동이 주가 되는 프로그램임을 느낍니다.\n\n이를 부스팅하기 위해 MLSA에는 마일스톤이라는 제도가 있습니다. \n사진과 같은 등급으로 나뉘어 게임처럼 도전과제들을 달성하면 등급이 올라가는 방식입니다.\n\n핸드북에서 볼 수 있다시피 Alpha와 Beta 등업에는 기간 제한이 걸려있습니다. 각각 MLSA 선발 후 4개월 내 / 12개월 내입니다.\n\n일단 저는 Alpha로의 등업이 필요하기 때문에 이 과정만 적어봅니다.\n\n# New to Alpha\n모든 신입 MLSA는 처음에는 New 등급으로 시작합니다.\nNew 등급에서는 주어지는 혜택이 Microsoft 365 밖에 없기 때문에 Alpha로의 등업을 빨리 하고 싶었습니다.\nAlpha 등업은 보통 조건 만족 후 2-3주 내에 자동으로 등업된다고 합니다.\n\n> ### 등업 조건\n- Technical Onboarding 과정을 수료합니다.\n- [Microsoft Learn](https://learn.microsoft.com/ko-kr/training/browse/) 에서 1개 학습 경로를 수료합니다.\n\n## Technical Onboarding\n> MLSA에게 가장 기본이 되는 GitHub, Microsoft Azure 체험\n\nTeams 메시지를 따라서 Technical Onboarding Directions 를 확인할 수 있습니다.\nGitHub Repository 링크로 이동해서 과제들을 수행한 후, 메시지로 안내된 Completion Form을 제출하면 끝!\n\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/53fbbae4-e058-4a8a-84ab-f38cf5ce623c/image.png\" width=\"70%\" />\n\n제출 후 저는 하루가 지나서 통과 메일을 받았습니다.\n\n## Microsoft Learn 학습 경로 수료\n위 등업 조건의 [Microsoft Learn](https://learn.microsoft.com/ko-kr/training/browse/) 을 클릭하면 모든 학습 경로와 모듈 리스트가 나옵니다.\n생소한 개념이지만 학습 경로는 곧 로드맵, 모듈은 그 로드맵 안에 있는 하나의 강의라고 보면 됩니다.\n\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/91a63e98-e372-4ebf-b22a-f0598c6750da/image.png\" width=\"70%\" />\n\n저는 AZ-900 (Microsoft Azure Fundamentals) 자격 취득을 위해 위 학습 경로를 수료했습니다. \n학습 경로 내의 모든 모듈을 수료하면 됩니다.\n\n# Alpha MLSA 등업 완료!\n![](https://velog.velcdn.com/images/jsj9620/post/4ce9a146-a621-46c7-91a3-ffc516d99b61/image.png)\n약 일주일이 안걸려서 바로 등업됐습니다!\n\n\n\n",
+    "short_description": "신입 MLSA가 본격적으로 합류하는 과정!",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/d27151af-ec26-4b51-85c4-97da2c5bfb5e/image.png",
+    "url_slug": "MLSA-Welcome-Aboard-본격적인-참여",
+    "series": {
+      "id": "46919296-c6a9-44d4-ace3-1fd698ed41d1",
+      "name": "Microsoft Learn Student Ambassadors",
+      "url_slug": "MLSA"
+    }
+  }
+}

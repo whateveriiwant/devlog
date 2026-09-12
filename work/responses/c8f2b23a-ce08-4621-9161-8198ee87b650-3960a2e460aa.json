@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "c8f2b23a-ce08-4621-9161-8198ee87b650",
+    "title": "C언어 - 선택 정렬",
+    "released_at": "2022-06-01T12:47:49.990Z",
+    "updated_at": "2026-08-19T05:15:57.855Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/31a75418-69d3-4152-9f01-5ff13022dedf/image.jpg)\n\n차례차례 비교해나가는 방식\n\n```\n#include <stdio.h>\n\n#define SIZE 5\n\nint main() {\n    int list[SIZE] = {3, 2, 5, 1, 4};\n    int temp;\n\n    printf(\"정렬 전 순서\\n\");\n    for (int i = 0; i < SIZE; i++)\n        printf(\"%d \", list[i]);\n    printf(\"\\n\");\n\n    for (int i = 0; i < SIZE - 1; i++) { // SIZE - 1 -> 마지막 대상은 비교 필요X\n        for (int j = i + 1; j < SIZE; j++) { // j = i + 1 -> 선정 위치 다음값부터 마지막까지 비교\n            if (list[i] > list[j]) {\n                temp = list[i];\n                list[i] = list[j];\n                list[j] = temp;\n            }\n        }\n    }\n\n    printf(\"정렬 후 순서\\n\");\n    for (int i = 0; i < SIZE; i++)\n        printf(\"%d \", list[i]);\n    printf(\"\\n\");\n\n    return 0;\n}\n```\n\n\n![](https://velog.velcdn.com/images/jsj9620/post/39bd2bd7-0b8a-442c-a977-5bfc6f07b048/image.jpg)\n\n이 알고리즘의 핵심이라 할 수 있는 중첩반복문 내 조건문 예시\ni = 0, j = 1 일 때 가정\n-> 조건에서 list[i] = 3, list[j] = 1",
+    "short_description": "C언어로 보는 선택 정렬 알고리즘",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/31a75418-69d3-4152-9f01-5ff13022dedf/image.jpg",
+    "url_slug": "C언어-선택-정렬",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

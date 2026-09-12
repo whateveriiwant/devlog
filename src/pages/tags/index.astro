@@ -1,0 +1,7 @@
+---
+import { Badge } from '../../components/ui/badge';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContent, tagUrl } from '../../lib/content';
+const { tags } = await getContent();
+---
+<BaseLayout title="태그" description="기술과 키워드로 관련 글을 찾아보세요."><header class="page-heading"><p class="eyebrow">CROSS THE TOPICS</p><h1>태그</h1><p class="page-description">서로 다른 시리즈를 연결하는 {tags.length}개의 키워드.</p></header><div class="tag-index">{tags.map(t => <a href={tagUrl(t.name)}><Badge variant="secondary">#{t.name}</Badge><Badge variant="outline">{t.posts.length}</Badge></a>)}</div><div slot="right"><h2 class="rail-heading">키워드로 연결하기</h2><p class="rail-note">같은 키워드를 다룬 글을 작성 시기에 관계없이 함께 모았습니다.</p></div></BaseLayout>

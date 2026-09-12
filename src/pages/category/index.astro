@@ -1,0 +1,7 @@
+---
+import CollectionRows from '../../components/CollectionRows';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContent } from '../../lib/content';
+const { categories } = await getContent();
+---
+<BaseLayout title="주제별 기록"><header class="page-heading"><p class="eyebrow">EXPLORE BY TOPIC</p><h1>주제별 기록</h1><p class="page-description">지금 궁금한 분야에서 시작해 보세요.</p></header><CollectionRows rows={categories.map(c => ({href:`/category/${c.id}/`,title:c.name,description:c.series.join(' · '),count:c.posts.length}))}/></BaseLayout>

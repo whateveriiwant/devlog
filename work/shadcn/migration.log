@@ -1,0 +1,16 @@
+
+> seungjun-dev-blog@1.0.0 verify:migration /Users/seungjun/Documents/Codex/2026-09-07/files-pasted-by-the-user-velog
+> node scripts/verify-migration.mjs
+
+{
+  "passed": 125,
+  "failed": 0,
+  "series": 23,
+  "sourceHeadingCount": 1046,
+  "destinationHeadingCount": 1046,
+  "sourceImageCount": 238,
+  "destinationImageCount": 238,
+  "codeBlocks": 282,
+  "reviewPosts": 108,
+  "failures": []
+}

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "47183a4b-57f8-4cc9-8455-04f528e6c984",
+    "title": "Node.js Passport 라이브러리",
+    "released_at": "2025-09-03T11:55:55.879Z",
+    "updated_at": "2026-09-07T04:11:18.060Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/0c40431c-333c-4bb8-b776-9b3acaf4105e/image.png)\n# Passport\n\n> Node.js를 위한 인증 미들웨어\n\n로그인과 같은 인증 로직을 아주 Fun Cool Sexy하게 처리할 수 있도록 도와주는 도구이다.\n\n## 전략\n\nPassport의 가장 중요한 특징은 **전략**을 사용한다.\n\n로그인을 하는 방식은 매우 다양하다.\n\nID와 비밀번호를 사용할 수도 있고, 구글, 네이버 같은 소셜 계정으로 로그인할 수도 있다.\n\nPassport는 이러한 각각의 인증 방식을 **전략**이라는 이름의 독립적인 모듈로 분리한다.\n\n- 아이디/비밀번호 로그인 -> `passport-local` 전략 사용\n- JWT 토큰 인증 -> `passport-jwt` 전략 사용\n- 구글 계정 로그인 -> `passport-google-oauth20` 전략 사용\n\n## 장점\n\n- 모듈화와 유연성: 수백가지의 인증 전략이 이미 만들어져 있어, 어떤 방식의 인증이든 쉽게 추가하고 변경할 수 있다.\n- 세션 관리의 편리함: `req.login()`, `req.logout()`, `req.isAuthenticated()`와 같은 헬퍼 함수들을 제공하여 로그인 상태 및 세션 관리를 편리하게 해준다.\n\n## Passport 인증 과정 (Local Strategy 예시)\n\n실제로 어떻게 동작하는지 ID/비밀번호 기반의 `passport-local` 전략을 예로 들어본다.\n\n1. 로그인 요청: 사용자가 아이디와 비밀번호를 입력하고, 서버에 요청을 보낸다.\n\n2. Passport 미들웨어 실행: 서버의 로그인 라우터는 바로 요청을 처리하지 않고, Passport 미들웨어에게 처리를 위임한다.\n\n```js\napp.post('/login', passport.authenticate('local'), (req, res) => {\n  // 인증 성공 시 이 함수가 실행됨\n  res.send('로그인 성공!');\n});\n```\n\n3. 전략 실행 및 사용자 검증\n\n- `passport.authenticate('local')` 이 실행되면, Passport는 내가 미리 설정해 둔 `passport-local` 전략을 찾아 실행한다.\n- 전략은 사용자가 입력한 아이디와 비밀번호를 파라미터로 받아, 내가 직접 작성한 검증 로직을 수행한다.\n- 이 검증 로직은 보통 다음과 같은 일을 한다.\n  - DB에서 해당 아이디를 가진 사용자 찾기\n  - 사용자가 존재하면, 입력된 비밀번호와 DB 상의 암호화된 비밀번호 비교\n\n4. 검증 결과 전달\n   - 인증 성공: 검증 로직은 `done(null, user)` 함수를 호출해 Passport에게 성공했다는 사실과 함께 사용자 정보를 전달\n   - 인증 실패: `done(null, false, { message: '비밀번호가 틀렸습니다.' })`처럼 호출하여 실패했음을 알림\n\n5. 후처리\n   - 성공 시: `passport.authenticate()`는 `next()`를 호출하여 다음 미들웨어(라우터의 콜백 함수)로 제어권을 넘긴다.\n   - 실패 시: Passport는 기본적으로 401 Unauthorized 에러를 응답한다.\n\n## JWT와 함께 사용하기\n\nPassport의 세션 관리 기능을 보면 JWT가 필요 없는 것처럼 느껴질 수 있다.\n\n그러나 둘은 경쟁 관계가 아니라, 각자의 역할을 수행하며 서로를 보완하는 파트너 관계에 가깝다.\n\n### 비유 - 경비원과 신분증\n\n- Passport: 인증 절차 전체를 관리하는 **경비원**\n  - 누가 들어오려고 할 때, 어떤 절차에 따라 신원을 확인할지, 확인 후 어떻게 처리할지를 총괄한다.\n- JWT: 경비원이 확인하는 **신분증**\n  - 사용자의 정보와 이 신분증이 위조되지 않았다는 서명이 담겨있다.\n\nPassport는 이 **신분증**의 종류를 가리지 않는다.\n세션 쿠키라는 구식 신분증을 쓸 수도 있고, JWT라는 최신 디지털 신분증을 쓸 수도 있는 유연한 경비원이다.\n\n### 인증 방식의 차이 - 세션 vs. JWT\n\n#### A. Passport + 세션 (Stateful)\n\n이 방식은 서버가 사용자의 로그인 상태를 **기억**해야 한다.\n\n1. 최초 로그인: 사용자가 아이디/비밀번호를 제출하면 `passport-local`이 이 DB와 대조하여 확인\n2. 세션 생성: 인증에 성공하면, 서버는 세션 저장소에 로그인했다고 기록하고, 브라우저에는 그 기록을 찾아올 수 있는 세션ID가 담긴 쿠키를 전송\n3. 이후 요청: 브라우저는 매 요청마다 이 세션 ID 쿠키를 전송\n4. 상태 확인: 서버는 쿠키를 받고, 자신의 세션 저장소를 뒤져서 검증한 뒤 요청을 처리\n\n- 단점: 사용자가 많아지면 서버가 기억해야 할 세션 정보가 늘어나 부담이 되고, 서버를 여러 대로 늘릴 때 세션 정보를 모든 서버가 공유해야 하는 복잡한 문제가 생긴다.\n\n#### B. Passport + JWT (Stateless)\n\n이 방식은 서버가 사용자의 상태를 **기억할 필요가 없다.**\n\n1. 최초 로그인: 사용자가 아이디/비밀번호를 제출하면 `passport-local`이 이 DB와 대조하여 확인\n2. JWT 발급: 인증에 성공하면, 서버는 세션을 만드는 대신 **사용자 정보가 담긴 JWT를 발급**해서 브라우저에 전송\n3. 이후 요청: 브라우저는 매 요청마다 JWT를 `Authorization` 헤더에 담아 전송\n4. 서명 확인: 서버는 JWT를 받고, 자신이 가진 비밀 키로 서명이 위조되지 않았는지 확인\n   - 서명이 유효하면 저장소를 뒤져볼 필요 없이 즉시 요청을 처리한다.\n   - 이때 `passport-jwt` 전략을 사용\n\n- 장점: 서버가 로그인 상태를 기억할 필요가 없어 부하가 적고, 서버를 몇 대로 늘리든 일관되게 작동한다. 모바일 앱, 다른 서비스와의 연동에도 매우 유리하다.\n\n### 결론\n\n- Passport는 \"어떻게 인증 절차를 처리할까?\"\n- JWT는 \"무엇을 가지고 인증할까?\"\n\n따라서 다음과 같이 역할을 분담하여 함께 사용하면 Passport의 편리한 구조와 JWT의 확장성 및 유연성이라는 장점을 동시에 잡는다.\n\n1. 최초 로그인 처리: `passport-local` 전략으로 검증\n2. 인증 상태 유지: 로그인 성공 시 JWT 발급\n3. API 접근 제어: 이후의 모든 API 요청은 `passport-jwt` 전략으로 검증하여 처리\n",
+    "short_description": "Node.js를 위한 인증 미들웨어인 Passport 라이브러리에 대한 정리와 JWT와의 사용법까지",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/0c40431c-333c-4bb8-b776-9b3acaf4105e/image.png",
+    "url_slug": "Node.js-Passport-라이브러리",
+    "series": {
+      "id": "631448b2-e669-4c0c-a57d-b8c5ad0a4103",
+      "name": "Node.js",
+      "url_slug": "Node.js"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "3da4db5b-31d5-404b-9d91-6d72f26930b1",
+    "title": "Feature 기반 MVC 패턴 디렉토리 구조",
+    "released_at": "2025-09-03T12:05:27.637Z",
+    "updated_at": "2026-09-06T02:01:53.171Z",
+    "body": "<img src=\"https://velog.velcdn.com/images/jsj9620/post/9da4ebfe-6dee-43c9-b990-552c9f7dbc5d/image.png\" width=\"300\" />\n\n\n- Feature(기능) 별로 파일을 묶고, 그 안에서 MVC 패턴을 적용시킨다.\n- 현재 로그인 페이지를 예로 들자면, 로그인이라는 feature 안에서 Model(`login.state.js`), View(`login.view.js`), Controller(`login.controller.js`)가 있다.\n\n```text\n/models\n  - loginState.js\n  - userState.js\n/views\n  - loginView.js\n  - userView.js\n/controllers\n  - loginController.js\n  - userController.js\n ```\n \n \n일반적으로 MVC 패턴을 적용시켰다면, 기술적인 역할을 중심으로 디렉토리를 이렇게 나눴을 것이다.\n\n이 방식에 비해 기능을 중심으로 분리시키면서 MVC를 적용한다면 장점이 많다.\n\n1. 높은 응집도, 낮은 결합도 (High Cohesion, Low Coupling)\n    - 설명: '로그인'과 관련된 코드는 모두 features/login 폴더 안에 모여 있다(높은 응집도). 따라서 로그인 기능을 수정할 때 다른 폴더를 건드릴 필요가 거의 없으며, 이는 다른 기능에 버그를 만들 가능성을 줄여 준다(낮은 결합도).\n   - 효과: 코드가 훨씬 더 견고하고 안정적으로 변한다.\n\n2. 월등한 코드 탐색 및 유지보수 용이성\n   - 설명: 로그인 관련 버그를 수정해야 할 때, 일반 MVC 패턴에서는 models, views, controllers 폴더를 모두 오가며 파일을 찾아야 한다. 하지만 현재 구조에서는 features/login 폴더 하나만 보면 모든 로직 파악이 가능하다.\n\n   - 효과: 개발 속도가 빨라지고 유지보수가 매우 편리해진다.\n\n3. 뛰어난 확장성\n   - 설명: '회원가입' 기능을 새로 추가하고 싶다면, 단순히 features/signup 폴더를 만들고 그 안에 view, state, controller 파일을 추가하면 끝이다. 기존 코드를 거의 수정할 필요가 없다. 기능을 제거할 때도 해당 폴더만 삭제하면 된다.\n\n   - 효과: 프로젝트가 커지고 기능이 많아져도 복잡도가 급격히 증가하지 않고 깔끔한 구조를 유지할 수 있다.",
+    "short_description": "일반 MVC패턴에 비해 기능을 기반으로 MVC 패턴을 적용시켰을 때의 이점",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/9da4ebfe-6dee-43c9-b990-552c9f7dbc5d/image.png",
+    "url_slug": "Feature-기반-MVC-패턴",
+    "series": {
+      "id": "adcfe515-e537-40c8-ac4e-dafed322ac41",
+      "name": "소프트웨어 아키텍처",
+      "url_slug": "소프트웨어-아키텍처"
+    }
+  }
+}

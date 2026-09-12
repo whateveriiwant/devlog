@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "b84e0676-6652-4a3f-aa4c-28df8d8e3c04",
+    "title": "C언어 Express 9장 #06",
+    "released_at": "2022-04-16T07:19:43.474Z",
+    "updated_at": "2026-08-28T01:11:32.020Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/3d3c0a5b-75dd-42c3-bdf5-024c0d099a17/image.png)\n\n문제 8번이랑 마찬가지로 Recursion 이용하는 문제\n\n```\n#include <stdio.h>\n\nint power(int base, int power_raised) {\n    if(power_raised != 1) { // 지수에서 -1 해서 1될 때 까지 곱함\n        return base * power(base, power_raised - 1);\n    }\n    else {\n        return base;\n    }\n\n}\n\nint main() {\n    int base, pow;\n    printf(\"밑수: \");\n    scanf(\"%d\", &base);\n\n    printf(\"지수: \");\n    scanf(\"%d\", &pow);\n\n    printf(\"%d^%d = %d\", base, pow, power(base, pow));\n}\n```",
+    "short_description": "문제 8번이랑 마찬가지로 Recursion 이용하는 문제",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/7a511c1e-3ed1-4d1f-9aff-731a17061f4a/image.png",
+    "url_slug": "C언어-Express-9장-06",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

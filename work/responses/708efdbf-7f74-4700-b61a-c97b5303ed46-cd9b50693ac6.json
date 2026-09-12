@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "708efdbf-7f74-4700-b61a-c97b5303ed46",
+    "title": "Node.js 모듈 시스템",
+    "released_at": "2025-08-11T15:38:11.200Z",
+    "updated_at": "2026-08-10T09:38:22.236Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/618196a0-dd9a-4e4f-90a3-994d03fd6b65/image.svg)\n\n> 하나의 파일에 모든 기능을 작성하는 대신, 관련 있는 함수나 변수, 클래스 등을 별도의 파일로 묶어서 관리\n\n# CommonJS (CJS) - 전통적인 방식\n\n- 모듈 내보내기: `module.exports` 또는 `exports` 객체에 내보내고 싶은 변수나 함수, 객체 할당\n- 모듈 가져오기: `require()` 함수를 사용\n\n```js\nconst hello = () => {\n  console.log(\"Hello\");\n};\n\nmodule.exports = {\n  hello,\n};\n```\n\n```js\nconst helloModule = require(\"./hello.js\");\n\nhelloModule.hello();\n```\n\n# ES Modules (ESM) - 현대적인 표준 방식\n\n- 모듈 내보내기: `export` 키워드 사용\n- 모듈 가져오기: `import` 키워드 사용\n\n> Node.js에서 ESM을 사용하려면, `package.json` 파일에 `\"type\": \"module\"`을 추가하거나 파일 확장자를 `.mjs`로 사용해야 함\n\n```js\nexport const hello = () => {\n  console.log(\"Hello\");\n};\n```\n\n```js\nimport { hello } from \"./helloModule.js\";\n\n// ...\n```",
+    "short_description": "Node.js 모듈 시스템 두 가지 방법",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/618196a0-dd9a-4e4f-90a3-994d03fd6b65/image.svg",
+    "url_slug": "Node.js-모듈-시스템",
+    "series": {
+      "id": "631448b2-e669-4c0c-a57d-b8c5ad0a4103",
+      "name": "Node.js",
+      "url_slug": "Node.js"
+    }
+  }
+}

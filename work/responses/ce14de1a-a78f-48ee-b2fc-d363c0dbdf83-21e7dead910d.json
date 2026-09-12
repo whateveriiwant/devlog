@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "ce14de1a-a78f-48ee-b2fc-d363c0dbdf83",
+    "title": "C - 문자열에서 각 단어 가져오기",
+    "released_at": "2022-06-06T07:55:19.974Z",
+    "updated_at": "2026-08-19T05:16:12.545Z",
+    "body": "# 토큰이란\n- 문법적으로 더 이상 나눌 수 없는 기본적인 언어 요소\n- 예) 문장에서 공백 문자로 분리된 단어들을 토큰이라고 함\n- strtok()에서는 토큰을 분리하는 분리자를 사용자가 지정 가능\n\n# 예시 코드\n\n```\n#include <stdio.h>\n#include <string.h>\n\nint main() {\n    char s[] = \"A brown fox jumps over the lazy dog\"; // 예시 문자열\n    char sep[] = \" \"; // 분리자는 공백\n    char *token; // 단어 임시로 저장하는 토큰 선언\n\n    token = strtok(s, sep);\n\n    while (token != NULL) { // 문자열 s에 토큰이 있는 동안 반복\n        printf(\"token: %s\\n\", token);\n        token = strtok(NULL, sep); // 계속해서 토큰 읽으려면 s대신 NULL\n    }\n}\n```",
+    "short_description": "(C언어) 문자열에서 각 단어를 가져오는 방법 - 토큰 사용",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": null,
+    "url_slug": "C-문자열에서-각-단어-가져오기",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "8d16e8a3-bb14-4b09-940e-717ecccdd77b",
+    "title": "[React] textarea 높이 자동 조절",
+    "released_at": "2023-04-29T07:31:14.964Z",
+    "updated_at": "2026-08-17T13:15:15.816Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/23b44adf-c53c-482b-8573-5545e8470049/image.gif)\n\n학교 동아리 프로젝트 팀에서 개발하고 있는 서비스에 이 기능을 한 번 적용 해보았습니다.\n\n입력한 줄 수 만큼 textarea의 높이가 늘어나게 하는 기능입니다.\n\n```\n  const textarea = useRef();\n  const handleResizeHeight = () => {\n    textarea.current.style.height = \"auto\"; // 높이 초기화\n    textarea.current.style.height = textarea.current.scrollHeight + \"px\";\n  };\n  \n  return (\n  \t<textarea\n      ref={textarea}\n      onInput={handleResizeHeight}\n      rows={1}\n      className=\"...(tailwind css)\">\n    </textarea>\n```\n\nonInput 속성과 useRef을 사용하여 높이를 자동으로 조정하는 간단한 코드입니다.",
+    "short_description": "useRef를 사용하여 아주 간단하게 textarea 높이 자동 조절하기",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/1a041480-e962-4457-83c8-79ec9b2ef5f6/image.gif",
+    "url_slug": "React-textarea-높이-자동-조절",
+    "series": {
+      "id": "5ce42d25-c564-4c0e-8513-dff6fdc43d02",
+      "name": "React",
+      "url_slug": "개인공부"
+    }
+  }
+}

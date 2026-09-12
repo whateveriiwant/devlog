@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "7e7223c0-d3f6-4bc0-94fc-8741528aa5c1",
+    "title": "클래스, 오브젝트, 인스턴스",
+    "released_at": "2025-07-26T03:53:39.895Z",
+    "updated_at": "2026-08-05T22:41:07.470Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/57b043d4-cae5-4f66-9a00-1a5d2165819d/image.jpeg)\n\n\n# 클래스\n\n> 객체를 만들어내기 위한 설계도 또는 템플릿\n\n- 연관되어있는 변수와 메소드의 집합\n- 클래스 자체에는 데이터가 들어있지 않음\n- 한 번 선언되면 여러 번 사용할 수 있는 템플릿 역할\n\n```js\nclass Person {\n  constructor(name, age) {\n    this.name = name; // field\n    this.age = age; // field\n  }\n\n  speak() {\n    // method\n    console.log(`${this.name}: hello!`);\n  }\n}\n```\n\n# 객체\n\n> 소프트웨어 세계에 구현할 대상, 클래스로부터 만들어진 실체\n\n- 클래스에 선언된 모양 그대로 생성된 실체\n- 상태와 동작을 가짐\n- 클래스의 인스턴스라고도 부름\n\n# 인스턴스\n\n> 객체를 실체화한 것, 메모리에 실제로 할당된 구체적인 실체\n\n- 설계도를 바탕으로 소프트웨어 세계에 구현된 구체적인 실체\n- 실체화된 인스턴스는 메모리에 할당\n- 어떤 원본(추상적인 개념)으로부터 생성된 복제본을 의미\n\n## 객체 vs 인스턴스\n\n거의 같은 의미로 쓰이나 강조하는 관점이 다르다고 한다.\n\n- Object: 현실 세계에 가깝고, 실체에 초점\n- Instance: 소프트웨어 세계에 가깝고, 관계에 초점\n\n# JS에서의 구현\n\n```js\n// Class 정의\nclass Person {\n  constructor(name, age) {\n    this.name = name;\n    this.age = age;\n  }\n\n  speak() {\n    console.log(`${this.name}: hello!`);\n  }\n}\n\n// Object/Instance 생성\nconst ellie = new Person(\"ellie\", 20); // ellie는 Person 클래스의 인스턴스\nconst steve = new Person(\"steve\", 25); // steve는 Person 클래스의 인스턴스\n\n// 사용\nconsole.log(ellie.name); // 'ellie'\nellie.speak(); // 'ellie: hello!'\n```\n\n# 차이점 비교\n\n| 구분      | Class            | Object            | Instance               |\n| --------- | ---------------- | ----------------- | ---------------------- |\n| 역할      | 설계도/템플릿    | 구현할 대상       | 실체화된 구체적 객체   |\n| 데이터    | 데이터 없음      | 실제 데이터 포함  | 메모리에 할당된 데이터 |\n| 생성 횟수 | 한 번 선언       | 여러 번 생성 가능 | 여러 번 생성 가능      |\n| 메모리    | 메모리 할당 없음 | 개념적 존재       | 실제 메모리 할당       |\n",
+    "short_description": "객체지향 프로그래밍에서 클래스, 오브젝트, 인스턴스 개념 정리",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/57b043d4-cae5-4f66-9a00-1a5d2165819d/image.jpeg",
+    "url_slug": "클래스-오브젝트-인스턴스",
+    "series": {
+      "id": "ba7963f4-c100-4788-8a38-bdd9833e52ad",
+      "name": "프로그래밍 언어론",
+      "url_slug": "프로그래밍-언어론"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "c60b96b4-2b9b-4170-943f-03cb6dbd65db",
+    "title": "백준 2446번 - Python",
+    "released_at": "2022-03-07T05:15:18.366Z",
+    "updated_at": "2026-08-26T03:20:04.472Z",
+    "body": "![](https://images.velog.io/images/jsj9620/post/8d45a6c4-fb78-4fee-955a-75bcc51eeffa/Screen%20Shot%202022-03-07%20at%2014.13.38.png)\n\n~~저번보다 모양이 더 이상해졌다~~\n\n\n![](https://images.velog.io/images/jsj9620/post/74d785a9-8a60-439e-97e0-a299b82c395a/Screen%20Shot%202022-03-07%20at%2014.14.17.png)\n\n뒤에 있는 공백까지 챙겨야 하는 줄 알았는데 아니었다. 안챙겨도 결과는 같더라.. 바보..",
+    "short_description": "저번보다 모양이 더 이상해!!",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://images.velog.io/images/jsj9620/post/8d45a6c4-fb78-4fee-955a-75bcc51eeffa/Screen Shot 2022-03-07 at 14.13.38.png",
+    "url_slug": "백준-2446번-Python",
+    "series": {
+      "id": "cdfa8dc2-c8f0-478a-af43-b9153eadd24e",
+      "name": "PS",
+      "url_slug": "개인공부-Python"
+    }
+  }
+}

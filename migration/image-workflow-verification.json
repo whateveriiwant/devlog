@@ -1,0 +1,19 @@
+{
+  "verifiedAt": "2026-09-08T03:49:42.713Z",
+  "checks": [
+    {
+      "name": "upload without credentials",
+      "status": "blocked as expected"
+    },
+    {
+      "name": "verify without media domain",
+      "status": "blocked as expected"
+    },
+    {
+      "name": "build configuration with unverified media domain",
+      "status": "blocked as expected"
+    }
+  ],
+  "externalRequestsPerformed": false,
+  "downloadOrUploadVerified": false
+}

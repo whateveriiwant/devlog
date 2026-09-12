@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "3b24ca03-037f-4623-b725-635ce9682493",
+    "title": "객체지향 핵심 개념/특징 정리",
+    "released_at": "2025-07-26T04:02:55.074Z",
+    "updated_at": "2026-08-04T01:39:35.355Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/4e979bb7-55ab-4d44-84ae-fc0b3f1244b9/image.jpeg)\n\n\n# 클래스와 객체\n\n- 클래스: 객체를 만들기 위한 설계도\n- 객체: 그 설계도로 만든 실제 물건\n- 인스턴스: 객체와 다르게 **구현된 구체적인 실체**\n\n[클래스, 객체, 인스턴스에 대해 자세히 다룬 글 보러가기](https://velog.io/@jsj9620/%ED%81%B4%EB%9E%98%EC%8A%A4-%EC%98%A4%EB%B8%8C%EC%A0%9D%ED%8A%B8-%EC%9D%B8%EC%8A%A4%ED%84%B4%EC%8A%A4)\n\n```js\n// 클래스 (설계도)\nclass Person {\n  constructor(name) {\n    this.name = name;\n  }\n\n  // 기능(메소드)\n  greet() {\n    console.log(`안녕하세요, ${this.name}입니다.`);\n  }\n}\n\n// 객체 (실제품)\nconst kim = new Person(\"김민준\");\nkim.greet(); // 출력: 안녕하세요, 김민준입니다.\n\n```\n\n- 생성자는 `constructor()` 메소드\n- `this` 키워드로 인스턴스 속성 접근\n\n# 상속\n\n- 부모 클래스의 특성을 자식 클래스가 물려받는 것\n- 일반적인 것에서 특수한 것으로 점진적으로 구체화하는 **계층적 구조**\n\n```js\nclass Person {\n  constructor(name) {\n    this.name = name;\n  }\n  greet() {\n    console.log(`안녕하세요, ${this.name}입니다.`);\n  }\n}\n\n// Person을 상속받는 Student 클래스\nclass Student extends Person {\n  study() {\n    console.log(\"컴퓨터공학을 공부합니다.\");\n  }\n}\n\nconst lee = new Student(\"이수빈\");\nlee.greet(); // 부모로부터 물려받은 기능\nlee.study(); // 자신만의 기능\n\n```\n\n- `super()`: 부모 클래스의 생성자를 호출\n- 자식 객체가 만들어질 때 부모의 기본 설정을 먼저 받아야 하기 때문에 사용\n\n# 다형성\n\n- 같은 이름의 메소드가 객체에 따라 다르게 동작\n- 런타임에 객체의 실제 타입을 확인하고 해당하는 메소드를 호출 -> 다형성의 핵심 메커니즘\n\n```js\nclass Animal {\n  speak() {\n    console.log(\"동물이 소리를 냅니다.\");\n  }\n}\n\nclass Dog extends Animal {\n  speak() { // 부모의 메소드를 재정의 (오버라이딩)\n    console.log(\"멍멍!\");\n  }\n}\n\nclass Cat extends Animal {\n  speak() { // 부모의 메소드를 재정의 (오버라이딩)\n    console.log(\"야옹\");\n  }\n}\n\nconst myDog = new Dog();\nconst myCat = new Cat();\n\nmyDog.speak(); // 출력: 멍멍!\nmyCat.speak(); // 출력: 야옹\n\n\n```\n\n# 캡슐화\n\n- 객체의 내부 데이터와 구현을 외부에서 직접 접근하지 못하도록 보호\n- 잘못된 값이 들어가는 것을 방지\n\n```js\nclass Counter {\n  #count = 0; // Private 필드: 외부에서 직접 접근 불가\n\n  increment() {\n    this.#count++;\n  }\n\n  getCount() {\n    return this.#count;\n  }\n}\n\nconst counter = new Counter();\n// counter.#count = 100; // 에러 발생! 직접 수정 불가\ncounter.increment();\ncounter.increment();\n\nconsole.log(counter.getCount()); // 출력: 2\n\n```\n\n- `#` 기호로 시작하는 필드가 **private**, 클래스 외부에서 절대 접근 불가\n- 클래스 내부의 메소드로만 접근 가능\n\n# 추상화\n\n- 복잡한 구현 세부사항을 숨기고 핵심 기능만 노출\n- 큰 시스템을 이해하기 쉬운 작은 단위로 나눈다는 장점\n\n```js\nclass CoffeeMachine {\n  // 복잡한 내부 동작 (private 메소드)\n  #grindBeans() { /* 원두 가는 로직 */ }\n  #heatWater() { /* 물 끓이는 로직 */ }\n\n  // 외부에 노출되는 간단한 기능 (public 메소드)\n  makeCoffee() {\n    this.#grindBeans();\n    this.#heatWater();\n    console.log(\"☕️ 커피 완성!\");\n  }\n}\n\nconst machine = new CoffeeMachine();\nmachine.makeCoffee(); // 사용자는 이 버튼 하나만 누르면 됨\n\n```",
+    "short_description": "객체지향의 핵심 개념들을 정리했다",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/4e979bb7-55ab-4d44-84ae-fc0b3f1244b9/image.jpeg",
+    "url_slug": "객체지향-핵심-개념특징-정리",
+    "series": {
+      "id": "ba7963f4-c100-4788-8a38-bdd9833e52ad",
+      "name": "프로그래밍 언어론",
+      "url_slug": "프로그래밍-언어론"
+    }
+  }
+}

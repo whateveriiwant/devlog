@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "7575c5e8-a570-4910-9802-98e242a30d0b",
+    "title": "동기적 그리고 비동기적",
+    "released_at": "2022-04-03T08:47:03.190Z",
+    "updated_at": "2026-08-16T07:26:08.210Z",
+    "body": "# 동기적(Synchronous)\n어떤 작업을 요청했을 때 그 작업이 종료될때 까지 기다린 후 다음 작업을 수행하는 방식\n\n```js\nconsole.log('A');\nvar result = fs.readFileSync('syntax/sample.txt', 'utf8'); // sample.txt 내용은 B\nconsole.log(result);\nconsole.log('C');\n\n// 결과는 A B C\n```\n\n`fs.readFileSync` 에서 동기적으로 작업을 수행한다.\n\n# 비동기적(Asynchronous)\n어떤 작업을 요청했을 때 그 작업이 종료될때 까지 기다리지 않고 다른 작업을 하고 있다가, 요청했던 작업이 종료되면 그에 대한 추가 작업을 수행하는 방식\n\n```js\nconsole.log('A');\nfs.readFile('syntax/sample.txt', 'utf8', function(err, result){\n    console.log(result);\n});\nconsole.log('C');\n\n// 결과는 A C B\n```\n\n`readFileSync` 와 다르게 `readFile` 은 비동기적으로 처리되어 나중에 수행된다.",
+    "short_description": "Node.js에서 동기적과 비동기적의 차이",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/0828fc47-3485-44ef-acdd-34315b634d72/image.svg",
+    "url_slug": "동기적-그리고-비동기적",
+    "series": {
+      "id": "631448b2-e669-4c0c-a57d-b8c5ad0a4103",
+      "name": "Node.js",
+      "url_slug": "Node.js"
+    }
+  }
+}

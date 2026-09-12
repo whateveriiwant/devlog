@@ -1,0 +1,14 @@
+---
+import Expandable from './Expandable';
+import type { MarkdownHeading } from 'astro';
+interface Props { headings: MarkdownHeading[] }
+const { headings } = Astro.props;
+const minimum = Math.min(...headings.map(h => h.depth));
+const primary = headings.filter(h => h.depth <= minimum + 1);
+const secondary = headings.filter(h => h.depth > minimum + 1);
+---
+{headings.length > 0 && <nav aria-label="이 글의 목차">
+  <h2 class="rail-heading mb-5">이 글에서</h2>
+  <ol class="toc-list">{primary.map(h => <li style={`--depth:${h.depth - minimum}`}><a href={`#${encodeURIComponent(h.slug)}`}>{h.text}</a></li>)}</ol>
+  {secondary.length > 0 && <Expandable title={`세부 목차 ${secondary.length}개`} className="mt-4" client:load><ol class="toc-list">{secondary.map(h => <li><a href={`#${encodeURIComponent(h.slug)}`}>{h.text}</a></li>)}</ol></Expandable>}
+</nav>}

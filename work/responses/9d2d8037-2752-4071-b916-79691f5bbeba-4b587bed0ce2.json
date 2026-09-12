@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "9d2d8037-2752-4071-b916-79691f5bbeba",
+    "title": "반복문을 대체하는 JS 고차 함수들",
+    "released_at": "2025-07-26T01:47:53.083Z",
+    "updated_at": "2026-08-23T10:07:38.566Z",
+    "body": "~~노래를 부르면서 고차함수를 공부하여 보자~~\n> # 고차 함수\n>\n> - 아래 조건 중 하나 이상을 만족하는 함수\n>\n> 1. 함수를 인자(argument)로 받음\n> 2. 함수를 결과로 반환함\n\n# 왜 중요한가\n\n- 선언적 코드: `for` 문이 \"어떻게\" 할지를 하나하나 명령한다면, 고차 함수들은 \"무엇을\" 원하는 지만 선언, 이는 가독성과 의도를 좋게 만듦\n- 불변성 유지: `map`과 `filter`는 항상 새로운 배열을 반환하므로 원본 데이터의 불변성을 지킴, 이는 사이드 이펙트를 줄임\n- 함수 조합: 이 함수들은 체이닝(chaining)을 통해 쉽게 조합 가능, 복잡한 데이터 처리 로직을 간결하게 표현할 수 있음\n\n`map`, `filter`, `reduce`는 모두 첫 번째 조건, 즉 함수를 인자로 받는 함수에 해당\n\n# Map\n\n> 배열의 각 요소를 순회하면서, 인자로 받은 함수(`콜백 함수`)가 적용된 새로운 배열을 반환\n> 원본 배열은 절대 변경하지 않는 불변성이 핵심\n\n## 동작 방식\n\n`array.map(callbackFunction)`\n\n- `callbackFunction`: 배열의 모든 요소에 대해 한 번씩 실행될 함수, 이 함수의 반환값이 새로운 배열의 요소가 됨\n\n### `for`문 사용 (명령형 방식)\n\n```js\nconst numbers = [1, 2, 3, 4];\nconst doubledNumbers = []; // 결과를 담을 새 배열을 직접 만들어야 함\n\nfor (let i = 0; i < numbers.length; i++) {\n  doubledNumbers.push(numbers[i] * 2); // 어떻게(how) 처리할지 직접 지시\n}\n\nconsole.log(doubledNumbers); // [2, 4, 6, 8]\nconsole.log(numbers); // [1, 2, 3, 4] (원본 유지)\n```\n\n### `map` 사용 (선언형 방식)\n\n```js\nconst numbers = [1, 2, 3, 4];\n\n// 무엇을(what) 원하는지만 선언\nconst doubledNumbers = numbers.map((number) => number * 2);\n\nconsole.log(doubledNumbers); // [2, 4, 6, 8]\nconsole.log(numbers); // [1, 2, 3, 4] (원본은 절대 불변!)\n```\n\n# filter\n\n> 배열의 각 요소를 순회하면서, 주어진 조건(`콜백 함수`)을 통과하는(`true`) 요소들만 모아서 새로운 배열을 만듦, `map`과 마찬가지로 원본 배열의 불변성을 지킴\n\n## 동작 방식\n\n`array.filter(callbackFunction)`\n\n- `callbackFunction`: 각 요소에 대해 실행, `true`나 `false`를 반환\n- `true`를 반환하는 요소만 새로운 배열에 포함\n\n### `for`문 사용 (명령형 방식)\n\n```js\nconst numbers = [1, 2, 3, 4, 5, 6];\nconst evenNumbers = [];\n\nfor (let i = 0; i < numbers.length; i++) {\n  if (numbers[i] % 2 === 0) {\n    // 조건문을 직접 작성\n    evenNumbers.push(numbers[i]);\n  }\n}\n\nconsole.log(evenNumbers); // [2, 4, 6]\n```\n\n### `filter` 사용 (선언형 방식)\n\n```js\nconst numbers = [1, 2, 3, 4, 5, 6];\n\n// \"숫자를 2로 나눈 나머지가 0인\" 조건만 선언\nconst evenNumbers = numbers.filter((number) => number % 2 === 0);\n\nconsole.log(evenNumbers); // [2, 4, 6]\n```\n\n# reduce\n\n> 배열의 각 요소를 순회하며, 하나의 결과값을 누적해 나가는 함수\n> 이름처럼 배열을 숫자, 문자열, 객체 등 하나의 값으로 줄여나가는(reduce) 데 주로 사용\n\n## 동작 방식\n\n`array.reduce(callbackFunction, initialValue)`\n\n- `callbackFunction`: 두개의 주요 인자를 받음\n  - 누산기 (accumulator, `acc`): 이전 콜백 호출의 반환값이 누적되는 변수\n  - 현재 값 (currentValue, `cur`): 처리 중인 현재 배열 요소\n- `initialValue`: `acc`의 초기값, 제공하지 않으면 배열의 첫 번째 요소가 초기값이 됨\n\n### `for`문 사용 (명령형 방식)\n\n```js\nconst numbers = [1, 2, 3, 4, 5];\nlet sum = 0; // 합계를 저장할 변수를 외부에서 선언하고 변경\n\nfor (let i = 0; i < numbers.length; i++) {\n  sum += numbers[i];\n}\n\nconsole.log(sum); // 15\n```\n\n### `reduce` 사용 (선언형 방식)\n\n```js\nconst numbers = [1, 2, 3, 4, 5];\n\n// \"누적값(acc)에 현재값(cur)을 더한다\"는 규칙만 선언\n// 0은 누적값의 시작점\nconst sum = numbers.reduce((acc, cur) => acc + cur, 0);\n\nconsole.log(sum); // 15\n```",
+    "short_description": "반복문을 대체하는 대표적인 고차함수 map, filter, reduce를 알아보자",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/224aa3fa-2535-4797-8949-afc3358fe755/image.jpg",
+    "url_slug": "반복문을-대체하는-JS-고차-함수들",
+    "series": {
+      "id": "37ef3aea-e9ea-45da-a659-474fe2ff11e3",
+      "name": "JavaScript",
+      "url_slug": "JavaScript"
+    }
+  }
+}

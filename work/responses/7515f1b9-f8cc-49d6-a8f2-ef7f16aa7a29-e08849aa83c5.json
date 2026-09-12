@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "7515f1b9-f8cc-49d6-a8f2-ef7f16aa7a29",
+    "title": "[React] 디버깅의 편의성을 높이는 displayName",
+    "released_at": "2025-11-06T13:39:57.520Z",
+    "updated_at": "2026-09-03T15:08:21.595Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/b32e9fea-6290-493a-8964-8fcc9d2405c4/image.png)\n\n\n# displayName?\n\n리액트의 속성 중에 `displayName` 이란 게 있다.\n\n디버깅의 편의성을 높이기 위해 사용하는 정적 문자열 속성이다.\n\n일반적으로 리액트는 함수나 클래스의 `name` 속성을 자동으로 추론하여 이 이름으로 사용한다.\n\n하지만 컴포넌트의 이름을 추론하기 어렵거나, 프로덕션 빌드에서 코드가 난독화되어 이름이 `a`, `b` 등으로 변경되면 디버깅 시 어떤 컴포넌트인지 파악하기 어렵다.\n\n이럴 때 `displayName`을 명시적으로 설정하면, React DevTools가 컴포넌트의 `name` 속성 대신 `displayName`을 우선적으로 표시하여 디버깅을 쉽게 만든다.\n\n## 언제 주로 사용할까?\n\n`displayName`을 사용했을 때 좋은 경우는 아래와 같다.\n\n1. 익명 함수로 컴포넌트 정의 시 `export default () => <div>...</div>;`와 같이 하면 리액트가 이름 추론 불가\n2. `React.memo`로 래핑된 컴포넌트는 `Memo`로만 표기 됨\n3. `styled-components` 같은 CSS-in-JS 라이브러리들은 내부적으로 `displayName`을 사용하여 DevTools에서 `styled.div`가 `Styled(div)`와 같이 의미 있는 이름으로 보이도록 함\n4. 컴포넌트를 감싸는 함수인 고차 컴포넌트(HOC, Higher-Order Components)는 종종 익명 함수나 일반적인 이름(e.g. Wrapper)을 갖게 되어, DevTools에서 원래 컴포넌트가 무엇인지 알기 어렵게 만듦\n5. `React.forwardRef`로 생성된 컴포넌트는 DevTools에서 `ForwardRef`로만 표시될 수 있음\n\n# Context에 displayName 적용\n\n`context`에 `displayName`을 적용한 예시이다.\n\n```tsx\n/**\n * 재사용 가능한 Context Hook 생성 팩토리\n * Context 검증 로직을 일반화하여 중복을 제거합니다.\n *\n * @param context - 사용할 Context 객체\n * @param contextName - 에러 메시지에 표시할 context 이름\n * @returns context 값이 null이 아닌 경우 context 값, 아니면 에러 throw\n *\n * @example * const AccommodationContext = createContext<AccommodationType[] | null>(null);\n * const useAccommodation = () => useContextHook(AccommodationContext, 'AccommodationContext');\n */\nconst useContextHook = <T>(context: Context<T | null>): T => {\n  const contextValue = useContext(context);\n\n  if (contextValue === null) {\n    throw new Error(\n      `${context.displayName}을 사용하려면 해당 Provider 내에서만 사용 가능합니다.`,\n    );\n  }\n\n  return contextValue;\n};\n```\n\n위 함수는 유효성 검사를 위해 따로 만든 커스텀 훅이다.\n\n`Context` 객체에 `displayName`을 설정하면, 매개변수에 일일이 `contextName` 문자열을 수동로 전달할 필요가 없어지고, `Context` 객체 자체가 자신의 이름을 알도록 캡슐화가 가능하다.\n\n```tsx\nimport type { AccommodationType } from '@/types/accommodationType';\nimport { createContext } from 'react';\n\nconst AccommodationContext = createContext<AccommodationType[] | null>(null);\nconst AccommodationItemContext = createContext<AccommodationType | null>(null);\n\nAccommodationContext.displayName = 'AccommodationContext';\nAccommodationItemContext.displayName = 'AccommodationItemContext';\n\nexport const AccommodationProvider = AccommodationContext.Provider;\nexport const AccommodationItemProvider = AccommodationItemContext.Provider;\n\nexport default AccommodationContext;\nexport { AccommodationItemContext };\n```\n\n이를 위해서 미리 context를 만들고, `displayName`으로 속성을 정의해줄 필요가 있다.",
+    "short_description": "displayName을 사용해서 디버깅의 편의성을 높여보자!",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/b32e9fea-6290-493a-8964-8fcc9d2405c4/image.png",
+    "url_slug": "React-디버깅의-편의성을-높이는-displayName",
+    "series": {
+      "id": "5ce42d25-c564-4c0e-8513-dff6fdc43d02",
+      "name": "React",
+      "url_slug": "개인공부"
+    }
+  }
+}

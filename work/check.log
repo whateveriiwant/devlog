@@ -1,0 +1,13 @@
+
+> seungjun-dev-blog@1.0.0 check /Users/seungjun/Documents/Codex/2026-09-07/files-pasted-by-the-user-velog
+> astro check
+
+12:50:18 [content] Syncing content
+12:50:18 [content] Synced content
+12:50:18 [types] Generated 285ms
+12:50:18 [check] Getting diagnostics for Astro files in /Users/seungjun/Documents/Codex/2026-09-07/files-pasted-by-the-user-velog...
+Result (30 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+

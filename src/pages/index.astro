@@ -1,0 +1,27 @@
+---
+import { buttonVariants } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostList from '../components/PostList.astro';
+import { getContent, postUrl, seriesUrl, dateKey } from '../lib/content';
+const content = await getContent();
+const starting = ['C/C++', 'React', '학교생활'].map(name => content.series.find(s => s.data.name === name)!).filter(Boolean);
+const latestYear = content.years[0].year;
+const oldestYear = content.years.at(-1)!.year;
+---
+<BaseLayout title="개발 기록">
+  <header class="page-heading">
+    <p class="eyebrow">DEVELOPMENT NOTES</p>
+    <h1>개발 기록<span class="text-[var(--primary)]">.</span></h1>
+    <p class="page-description">배우고, 만들고, 다시 꺼내 읽는 글.</p>
+    <div class="stat-line"><Badge variant="secondary">{content.posts.length}개의 글</Badge><Badge variant="secondary">{content.series.length}개의 시리즈</Badge><Badge variant="outline">{oldestYear} — {latestYear}</Badge></div>
+  </header>
+  <div class="section-heading"><h2>최근 글</h2><a href="/archive/" class={buttonVariants({variant:"ghost",size:"sm"})}>전체 기록 <span aria-hidden="true">→</span></a></div>
+  <PostList posts={content.posts.slice(0, 10)} />
+  <a href="/archive/" class={`${buttonVariants({variant:"outline"})} mt-5 flex h-auto w-full justify-between gap-3 py-3 text-xs sm:text-sm`}>이전 글 이어서 보기 <span>{content.posts.length}개의 기록 <span aria-hidden="true">→</span></span></a>
+  <section class="mt-12"><div class="section-heading"><h2>주제별로 읽기</h2><a href="/category/" class={buttonVariants({variant:"ghost",size:"sm"})}>전체 주제 →</a></div><div class="topic-rows">{content.categories.map(c => <a href={`/category/${c.id}/`}><span>{c.name}</span><span class="count">{c.posts.length} →</span></a>)}</div></section>
+  <div slot="right" class="space-y-10">
+    <section><h2 class="rail-heading">연도별 기록</h2><p class="rail-note">언제 쓴 글이든, 바로.</p><div class="year-links">{content.years.map(y => <a href={`/archive/#year-${y.year}`}><span class="font-mono">{y.year}</span><span class="count">{y.posts.length} <span aria-hidden="true">↗</span></span></a>)}</div></section>
+    <section><h2 class="rail-heading">처음부터 읽기</h2><div class="space-y-6 mt-5">{starting.map(s => <div><a href={seriesUrl(s.data.slug)} class="rail-series">{s.data.name} <span class="count">{s.posts.length}</span></a><a href={postUrl(s.posts[0])} class="start-post"><span class="font-mono text-xs text-[var(--muted-foreground)]">{dateKey(s.posts[0].data.publishedAt).slice(0,4)} · 시작 글</span><span>{s.posts[0].data.title}</span></a></div>)}</div></section>
+  </div>
+</BaseLayout>

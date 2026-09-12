@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "1fa7b15e-da70-454f-911d-e4628cc25c42",
+    "title": "Git Objects",
+    "released_at": "2025-08-11T15:30:32.566Z",
+    "updated_at": "2026-07-16T21:57:06.042Z",
+    "body": "\n![](https://velog.velcdn.com/images/jsj9620/post/afd4ea5c-42a7-4fac-b02a-8375fef20144/image.png)\n\n> - Git은 모든 데이터를 객체 데이터베이스에 저장\n> - 핵심 요소: Blob, Tree, Commit, Tag 네 가지 객체\n> - `.git/objects/` 디렉토리 안에 저장되며, 서로 유기적으로 연결되어 버전 관리 시스템을 구성한다.\n\n# Blob\n\n- 역할: 파일의 내용 자체를 저장한다.\n- 파일 이름이나 경로 같은 메타데이터는 포함하지 않고, 오직 데이터만 담는다.\n- 내용이 같으면 동일한 Blob 객체를 공유하여 공간을 절약\n\n파일 이름이 아니라 내용 자체를 기준으로 SHA-1 해시값을 계산해 Blob 객체를 생성한다.\n\n# Tree\n\n- 역할: 디렉토리 구조(폴더)를 저장한다.\n- 특정 디렉토리 안에 어떤 파일(Blob)과 하위 디렉토리(Tree)가 있는지 목록을 관리\n- 파일 권한, 이름, 그리고 해당 Blob/Tree 객체의 해시값을 포함\n\n계층적인 구조 덕분에 프로젝트 전체의 폴더 구조를 표현할 수 있다.\n\n디렉토리 내의 파일이나 폴더 구조가 조금이라도 바뀌면, 내용이 변경된 것이므로 완전히 새로운 해시값을 가진 Tree 객체가 생성된다.\n\n# Commit\n\n- 역할: 특정 시점의 스냅샷, 즉 하나의 버전을 기록\n- 프로젝트 전체 상태를 나타내는 최상위 Tree 객체의 해시값을 가리킴\n- 작성자, 커밋 메시지, 그리고 이전 커밋의 해시값을 포함해 이력을 만듦\n\n## Tag\n\n- 역할: 특정 커밋에 붙이는 이름표\n- `v1.0`처럼 특정 버전을 쉽게 식별하고 참조하기 위해 사용\n\n# 객체들이 함께 동작하는 방식\n\n1. `git add file.txt` 실행 시\n   - `file.txt` 파일 내용으로 Blob 객체를 생성함\n   - Git의 스테이징 영역(Index)에 `file.txt`라는 이름과 방금 생성된 Blob 객체의 해시값이 기록됨\n2. `git commit` 실행 시\n   - 스테이징 영역의 상태를 바탕으로 디렉토리 구조를 나타내는 Tree 객체를 생성함\n   - 이 Tree 객체와 부모 커밋 정보, 메타데이터를 담은 Commit 객체가 생성됨\n   - 마지막으로, 현재 브랜치가 이 새로운 Commit 객체를 가리키도록 포인터가 업데이트됨\n",
+    "short_description": "Git의 Object들에 대해",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/afd4ea5c-42a7-4fac-b02a-8375fef20144/image.png",
+    "url_slug": "Git-Objects",
+    "series": {
+      "id": "b698e6b6-2308-490e-ab9c-a2820a604b90",
+      "name": "Git",
+      "url_slug": "Git"
+    }
+  }
+}

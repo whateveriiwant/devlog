@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "4e67b0cb-acf8-493c-89e1-4256a34b71f0",
+    "title": "[자료구조/C++] 연결 리스트로 이진 트리 만들기",
+    "released_at": "2023-05-04T02:02:38.039Z",
+    "updated_at": "2026-09-07T02:31:02.478Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/f849dba8-8c23-47ef-a490-c83b5e2c31e1/image.png)\n\n> 연결 리스트, 이진 트리에 관한 개념 설명이 없는 글입니다.\n오직 코드를 통한 구현에 초점을 맞춘 글입니다.\n\n\n# 연결 리스트로의 기본 구현\n## 기본 설정\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/3b467b6c-6a53-433e-9e26-8f3a610329a0/image.png\" width=\"50%\" />\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/b653ee73-cfa5-4987-8417-4734a49b344c/image.jpeg\" width=\"50%\"/>\n\n이러한 형태로 연결 리스트로 구현을 해보고자 합니다.\n```\ntypedef int BData;\n\ntypedef struct _bTreeNode {\n    BData item;\n    struct _bTreeNode* left_child;\n    struct _bTreeNode* right_child;\n} BTreeNode;\n```\n\b간단하죠? 왼쪽과 오른쪽 자식 노드는 **자기 참조 구조체**를 이용해 만듭니다.\n\n## 트리로 만들어보기\n구조체를 완성했으니 이번에는 트리로 만들어 보겠습니다.\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/6d45c96e-919c-4386-b5bf-300c17f9f480/image.png\" width=\"30%\" />\n이러한 모양의 이진 트리를 만들어 보고자 합니다.\n\n```\nint main() {\n    BTreeNode* n1 = (BTreeNode *)malloc(sizeof(BTreeNode));\n    BTreeNode* n2 = (BTreeNode *)malloc(sizeof(BTreeNode));\n    BTreeNode* n3 = (BTreeNode *)malloc(sizeof(BTreeNode));\n\n    n1->item = 10;\n    n1->left_child = n2;\n    n1->right_child = NULL;\n\n    n2->item = 10;\n    n2->left_child = n2;\n    n2->right_child = NULL;\n\n    n3->item = 10;\n    n3->left_child = n2;\n    n3->right_child = NULL;\n\n    free(n1), free(n2), free(n3);\n    return 0;\n}\n```\n\b이 또한 매우 직관적인 형태로 코드 작성이 가능합니다. 노드 세 개를 선언해주고 각 노드의 요소, 자식 노드들이 뭔지만 연결 해주면 끝입니다.\n<br>\n#  메소드 만들어보기\n노드의 생성, 삭제 등등.. 이 가능한 메소드를 한 번 만들어 보겠습니다.\n```\n// 새로운 노드를 만듭니다.\nBTreeNode* createNode(BData item);\n// 노드를 삭제합니다.\nvoid DeleteNode(BTreeNode* node);\n\n// 루트 노드를 왼쪽 노드에 연결합니다.\nvoid CreateLeftSubtree(BTreeNode* root, BTreeNode* left);\n// 루트 노드를 오른쪽 노드에 연결합니다.\nvoid CreateRightSubtree(BTreeNode* root, BTreeNode* right);\n```\n\n## CreateNode - 노드 생성\n```\nBTreeNode* CreateNode(BData item) {\n    BTreeNode* node = (BTreeNode *)malloc(sizeof(BTreeNode));\n    node->item = item;\n    node->left_child = NULL;\n    node->right_child = NULL;\n    \n    return node;\n}\n```\n\n## DeleteNode - 노드 삭제\n```\nvoid DeleteNode(BTreeNode *node) {\n    free(node);\n}\n```\n\n## CreateLeftSubtree - 루트와 왼쪽 자식 노드 연결\n```\nvoid CreateLeftSubtree(BTreeNode* root, BTreeNode* left) {\n    if (root->left_child != NULL)\n        exit(1);\n    \n    root->left_child = left;\n}\n```\n여기서 root는 곧 parent로 이해해도 좋습니다. left는 left child node를 말 하는 것입니다.\n\n## CreateRightSubtree - 루트와 오른쪽 자식 노드 연결\n```\nvoid CreateRightSubtree(BTreeNode* root, BTreeNode* right) {\n    if (root->right_child != NULL)\n        exit(1);\n\n    root->right_child = right;\n}\n```\n\n## 실습해보기\n<img src=\"https://velog.velcdn.com/images/jsj9620/post/40732442-529e-49f4-b2b9-8571f7b05053/image.png\" width=\"50%\" />\n\n```\nint main() {\n    BTreeNode* n1 = CreateNode(1);\n    BTreeNode* n2 = CreateNode(2);\n    BTreeNode* n3 = CreateNode(3);\n    BTreeNode* n4 = CreateNode(4);\n    BTreeNode* n5 = CreateNode(5);\n    BTreeNode* n6 = CreateNode(6);\n\n    // level 1\n    CreateLeftSubtree(n1, n2);\n    CreateRightSubtree(n1, n3);\n    \n    // level 2\n    CreateLeftSubtree(n2, n4);\n    CreateLeftSubtree(n2, n5);\n    CreateLeftSubtree(n3, n6);\n    \n    DeleteNode(n1);\n    DeleteNode(n2);\n    DeleteNode(n3);\n    DeleteNode(n4);\n    DeleteNode(n5);\n    DeleteNode(n6);\n    \n    return 0;\n}\n```\n",
+    "short_description": "연결 리스트로 이진 트리 구현",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/04135910-e551-4d0e-bce2-aaa130732925/image.png",
+    "url_slug": "연결-리스트로-이진-트리-만들기",
+    "series": {
+      "id": "a06d9b9c-af8b-4827-a264-0fa788e25564",
+      "name": "자료구조",
+      "url_slug": "자료구조"
+    }
+  }
+}

@@ -1,0 +1,380 @@
+<!doctype html><html lang=en-us><head><script>(function(){try{var e,t,n=localStorage.getItem("theme")}catch{}e=window.matchMedia("(prefers-color-scheme: dark)").matches,t=n||(e?"dark":"light"),document.documentElement.setAttribute("data-pf-theme",t)})()</script><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Using the Pagefind search API | Pagefind</title>
+<meta name=description content="Pagefind can be accessed as an API directly from the JavaScript on your site. This allows you to build custom search interfaces, or integrate with existing systems and components.
+Initializing Pagefind Anywhere on your site, import and initialize Pagefind with:
+"><link rel=icon type=image/png sizes=32x32 href=/meta/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/meta/favicon-16x16.png><link rel=apple-touch-icon href=/meta/apple-touch-icon.png><link rel=stylesheet href=/css/main.ebbc2373dacb09bc29e45a23337fb8e58b74f4266d5868d187705ee84e8a2a4d.css integrity="sha256-67wjc9rLCbwp5FojM3+45Yt09CZtWGjRh3Be6E6KKk0="><meta property="og:url" content="https://pagefind.app/docs/api/"><meta property="og:site_name" content="Pagefind"><meta property="og:title" content="Using the Pagefind search API"><meta property="og:description" content="Pagefind can be accessed as an API directly from the JavaScript on your site. This allows you to build custom search interfaces, or integrate with existing systems and components.
+Initializing Pagefind Anywhere on your site, import and initialize Pagefind with:"><meta property="og:locale" content="en_us"><meta property="og:type" content="article"><meta property="article:section" content="docs"><link href=/pagefind/pagefind-component-ui.css rel=stylesheet><script src=/pagefind/pagefind-component-ui.js type=module></script></head><body><a href=#main-content class=skip-link>Skip to main content</a><div class=site-wrapper><aside class=sidebar><div class=sidebar-header><div class=sidebar-header-row><a href=/ class=logo-link><img src=/pagefind.svg alt=Pagefind class="logo-img logo-light">
+<img src=/pagefind-dark.svg alt class="logo-img logo-dark" aria-hidden=true></a><div class="sidebar-header-icons desktop-only"><a href=https://github.com/pagefind/pagefind class=icon-btn aria-label=GitHub target=_blank rel=noopener><svg width="18" height="18" viewBox="0 0 16 16" fill="currentcolor" aria-hidden="true"><path d="M8 0C3.58.0.0 3.58.0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38.0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95.0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12.0.0.67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15.0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48.0 1.07-.01 1.93-.01 2.2.0.21.15.46.55.38A8.013 8.013.0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+</a><button id=theme-toggle class=icon-btn aria-label="Toggle dark mode"><svg height="20" viewBox="0 0 24 24" width="20" fill="currentcolor" aria-hidden="true"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zm-2 5.79V18h-3.52L12 20.48 9.52 18H6v-3.52L3.52 12 6 9.52V6h3.52L12 3.52 14.48 6H18v3.52L20.48 12 18 14.48zM12 6v12c3.31.0 6-2.69 6-6s-2.69-6-6-6z"/></svg></button></div><div class=mobile-header-icons><button class="icon-btn mobile-only" id=theme-toggle-mobile aria-label="Toggle dark mode">
+<svg height="20" viewBox="0 0 24 24" width="20" fill="currentcolor" aria-hidden="true"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zm-2 5.79V18h-3.52L12 20.48 9.52 18H6v-3.52L3.52 12 6 9.52V6h3.52L12 3.52 14.48 6H18v3.52L20.48 12 18 14.48zM12 6v12c3.31.0 6-2.69 6-6s-2.69-6-6-6z"/></svg>
+</button>
+<button class="menu-toggle icon-btn" aria-label=Menu aria-expanded=false aria-controls=mobile-nav><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button></div></div><div class=sidebar-version>v1.5.2</div></div><div class=sidebar-search><pagefind-modal-trigger></pagefind-modal-trigger><pagefind-modal></pagefind-modal></div><nav class=sidebar-nav aria-label=Documentation><div class=nav-panels-container><div class="nav-panel nav-panel-main"><div class=nav-group><p class=nav-group-title>Overview</p><ul class=nav-list><li><a href=/><span>Home</span></a></li><li><a href=/docs/><span>Quick Start</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>Indexing</p><ul class=nav-list><li><a href=/docs/running-pagefind/><span>Running Pagefind</span></a></li><li><a href=/docs/indexing/><span>Configuring the index</span></a></li><li><a href=/docs/metadata/><span>Setting up metadata</span></a></li><li><a href=/docs/filtering/><span>Setting up filters</span></a></li><li><a href=/docs/sorts/><span>Setting up sorting</span></a></li><li><a href=/docs/weighting/><span>Weighting content</span></a></li><li><a href=/docs/multilingual/><span>Multilingual search</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>Search UI
+<span class=nav-badge>new</span></p><ul class=nav-list><li><a href=/docs/search-ui/><span>Getting Started</span></a></li><li><a href=/docs/components/><span>Component Overview</span></a></li><li><button class=nav-drilldown data-drilldown aria-expanded=false>
+<span>Components</span><svg class="nav-arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 3 9 7 5 11" stroke="currentcolor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></li><li><a href=/docs/css-variables/><span>CSS Variables</span></a></li><li><a href=/docs/custom-components/><span>Custom Components</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>Search API</p><ul class=nav-list><li class=active><a href=/docs/api/ aria-current=page><span>Using the search API</span></a></li><li><a href=/docs/js-api-metadata/><span>Metadata in the JS API</span></a></li><li><a href=/docs/js-api-filtering/><span>Filtering with the JS API</span></a></li><li><a href=/docs/js-api-sorting/><span>Sorting with the JS API</span></a></li><li><a href=/docs/ranking/><span>Customize ranking</span></a></li><li><a href=/docs/sub-results/><span>Multiple results per page</span></a></li><li><a href=/docs/highlighting/><span>Highlighting search terms</span></a></li><li><a href=/docs/multisite/><span>Searching multiple sites</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>References</p><ul class=nav-list><li><a href=/docs/installation/><span>Installing the CLI</span></a></li><li><a href=/docs/config-sources/><span>CLI config sources</span></a></li><li><a href=/docs/config-options/><span>CLI config options</span></a></li><li><a href=/docs/search-config/><span>Search API config</span></a></li><li><a href=/docs/highlight-config/><span>Highlight API config</span></a></li><li><a href=/docs/api-reference/><span>Search API Reference</span></a></li><li><a href=/docs/py-api/><span>Using the Python API</span></a></li><li><a href=/docs/node-api/><span>Using the NodeJS API</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>Resources</p><ul class=nav-list><li><a href=/docs/playground/><span>Pagefind Playground</span></a></li><li><a href=/docs/hosting/><span>Troubleshoot hosting</span></a></li><li><a href=/docs/resources/><span>Community resources</span></a></li></ul></div></div><div class="nav-panel nav-panel-components"><button class=nav-back data-nav-back>
+<svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><path d="M9.5 3 5 7.5 9.5 12" stroke="currentcolor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+All docs</button><div class=nav-components-header><div class=nav-components-title>Components</div><div class=nav-components-subtitle>Web components for search UI</div></div><div class=nav-group><p class=nav-group-title>Prebuilt</p><ul class="nav-list nav-list-mono"><li><a href=/docs/components/modal/>pagefind-modal</a></li><li><a href=/docs/components/modal-trigger/>pagefind-modal-trigger</a></li><li><a href=/docs/components/searchbox/>pagefind-searchbox</a></li></ul></div><div class=nav-group><p class=nav-group-title>Primitives</p><ul class="nav-list nav-list-mono"><li><a href=/docs/components/input/>pagefind-input</a></li><li><a href=/docs/components/results/>pagefind-results</a></li><li><a href=/docs/components/summary/>pagefind-summary</a></li><li><a href=/docs/components/keyboard-hints/>pagefind-keyboard-hints</a></li></ul></div><div class=nav-group><p class=nav-group-title>Filtering</p><ul class="nav-list nav-list-mono"><li><a href=/docs/components/filter-pane/>pagefind-filter-pane</a></li><li><a href=/docs/components/filter-dropdown/>pagefind-filter-dropdown</a></li></ul></div><div class=nav-group><p class=nav-group-title>Configuration</p><ul class="nav-list nav-list-mono"><li><a href=/docs/components/config/>pagefind-config</a></li></ul></div></div></div></nav><dialog class=mobile-nav id=mobile-nav aria-label=Navigation><div class=nav-panels-container><div class="nav-panel nav-panel-main"><div class=nav-group><p class=nav-group-title>Overview</p><ul class=nav-list><li><a href=/><span>Home</span></a></li><li><a href=/docs/><span>Quick Start</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>Indexing</p><ul class=nav-list><li><a href=/docs/running-pagefind/><span>Running Pagefind</span></a></li><li><a href=/docs/indexing/><span>Configuring the index</span></a></li><li><a href=/docs/metadata/><span>Setting up metadata</span></a></li><li><a href=/docs/filtering/><span>Setting up filters</span></a></li><li><a href=/docs/sorts/><span>Setting up sorting</span></a></li><li><a href=/docs/weighting/><span>Weighting content</span></a></li><li><a href=/docs/multilingual/><span>Multilingual search</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>Search UI
+<span class=nav-badge>new</span></p><ul class=nav-list><li><a href=/docs/search-ui/><span>Getting Started</span></a></li><li><a href=/docs/components/><span>Component Overview</span></a></li><li><button class=nav-drilldown data-drilldown aria-expanded=false>
+<span>Components</span><svg class="nav-arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 3 9 7 5 11" stroke="currentcolor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></li><li><a href=/docs/css-variables/><span>CSS Variables</span></a></li><li><a href=/docs/custom-components/><span>Custom Components</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>Search API</p><ul class=nav-list><li class=active><a href=/docs/api/ aria-current=page><span>Using the search API</span></a></li><li><a href=/docs/js-api-metadata/><span>Metadata in the JS API</span></a></li><li><a href=/docs/js-api-filtering/><span>Filtering with the JS API</span></a></li><li><a href=/docs/js-api-sorting/><span>Sorting with the JS API</span></a></li><li><a href=/docs/ranking/><span>Customize ranking</span></a></li><li><a href=/docs/sub-results/><span>Multiple results per page</span></a></li><li><a href=/docs/highlighting/><span>Highlighting search terms</span></a></li><li><a href=/docs/multisite/><span>Searching multiple sites</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>References</p><ul class=nav-list><li><a href=/docs/installation/><span>Installing the CLI</span></a></li><li><a href=/docs/config-sources/><span>CLI config sources</span></a></li><li><a href=/docs/config-options/><span>CLI config options</span></a></li><li><a href=/docs/search-config/><span>Search API config</span></a></li><li><a href=/docs/highlight-config/><span>Highlight API config</span></a></li><li><a href=/docs/api-reference/><span>Search API Reference</span></a></li><li><a href=/docs/py-api/><span>Using the Python API</span></a></li><li><a href=/docs/node-api/><span>Using the NodeJS API</span></a></li></ul></div><div class=nav-group><p class=nav-group-title>Resources</p><ul class=nav-list><li><a href=/docs/playground/><span>Pagefind Playground</span></a></li><li><a href=/docs/hosting/><span>Troubleshoot hosting</span></a></li><li><a href=/docs/resources/><span>Community resources</span></a></li></ul></div></div><div class="nav-panel nav-panel-components"><button class=nav-back data-nav-back>
+<svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><path d="M9.5 3 5 7.5 9.5 12" stroke="currentcolor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+All docs</button><div class=nav-components-header><div class=nav-components-title>Components</div><div class=nav-components-subtitle>Web components for search UI</div></div><div class=nav-group><p class=nav-group-title>Prebuilt</p><ul class="nav-list nav-list-mono"><li><a href=/docs/components/modal/>pagefind-modal</a></li><li><a href=/docs/components/modal-trigger/>pagefind-modal-trigger</a></li><li><a href=/docs/components/searchbox/>pagefind-searchbox</a></li></ul></div><div class=nav-group><p class=nav-group-title>Primitives</p><ul class="nav-list nav-list-mono"><li><a href=/docs/components/input/>pagefind-input</a></li><li><a href=/docs/components/results/>pagefind-results</a></li><li><a href=/docs/components/summary/>pagefind-summary</a></li><li><a href=/docs/components/keyboard-hints/>pagefind-keyboard-hints</a></li></ul></div><div class=nav-group><p class=nav-group-title>Filtering</p><ul class="nav-list nav-list-mono"><li><a href=/docs/components/filter-pane/>pagefind-filter-pane</a></li><li><a href=/docs/components/filter-dropdown/>pagefind-filter-dropdown</a></li></ul></div><div class=nav-group><p class=nav-group-title>Configuration</p><ul class="nav-list nav-list-mono"><li><a href=/docs/components/config/>pagefind-config</a></li></ul></div></div></div></dialog></aside><main id=main-content class=main-content><article class=content><header class=content-header><h1>Using the Pagefind search API</h1></header><div class=content-body><p>Pagefind can be accessed as an API directly from the JavaScript on your site. This allows you to build custom search interfaces, or integrate with existing systems and components.</p><h2 id=initializing-pagefind>Initializing Pagefind</h2><p>Anywhere on your site, import and initialize Pagefind with:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>pagefind</span><span class=p>.</span><span class=nx>init</span><span class=p>();</span>
+</span></span></code></pre></div><p>If your site is on a subpath, or you have otherwise customized your bundle path, this should be included — e.g. in the CloudCannon documentation, we load <code>/documentation/pagefind/pagefind.js</code>.</p><p>The call to <code>pagefind.init()</code> will load the Pagefind dependencies and the metadata about the site. Calling this method is optional, and if it is omitted initialization will happen when the first searching or filtering function is called.</p><p>Calling <code>pagefind.init()</code> when your search interface gains focus will help the core dependencies load by the time a user types in their search query.</p><h2 id=configuring-the-search-api>Configuring the search API</h2><p>Pagefind options can be set before running <code>pagefind.init()</code>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line data-add=true><span class=cl><span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>options</span><span class=p>({</span>
+</span></span><span class=line data-add=true><span class=cl>    <span class=nx>bundlePath</span><span class=o>:</span> <span class=s2>&#34;/custom-pagefind-directory/&#34;</span>
+</span></span><span class=line data-add=true><span class=cl><span class=p>});</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>pagefind</span><span class=p>.</span><span class=nx>init</span><span class=p>();</span>
+</span></span></code></pre></div><p>Calls to <code>pagefind.options</code> may also be made after initialization, however passing in settings such as <code>bundlePath</code> after initialization will have no impact.</p><p>See all available options in <a href=/docs/search-config/>Configuring the Pagefind search in the browser</a>.</p><h2 id=searching>Searching</h2><p>To perform a search, await <code>pagefind.search</code>:<div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line data-add=true><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>search</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>);</span>
+</span></span></code></pre></div></p><p>This will return an object with the following structure:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=p>{</span> 
+</span></span><span class=line><span class=cl>    <span class=nx>results</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nx>id</span><span class=o>:</span> <span class=s2>&#34;en_6fceec9&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>            <span class=nx>data</span><span class=o>:</span> <span class=kr>async</span> <span class=kd>function</span> <span class=nx>data</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>At this point you will have access to the number of search results, and a unique ID for each result. Also see <a href=#debounced-search>Debounced search</a> below for an alternative API.</p><blockquote><p>Note that the prefix <code>en</code> in <code>en_6fceec9</code> matches the <code>lang</code> attribute of your <code>html</code> element. If <code>lang</code> is not set, the prefix defaults to <code>unknown</code>. See <a href=/docs/multilingual/>Multilingual Search</a> for more details.</p></blockquote><h2 id=loading-a-result>Loading a result</h2><p>To reduce bandwidth usage, the data for each result (e.g. URL & title) must be loaded independently.</p><p>To load the data for a result, await the data function:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>search</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>);</span>
+</span></span><span class=line data-add=true><span class=cl><span class=kr>const</span> <span class=nx>oneResult</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>search</span><span class=p>.</span><span class=nx>results</span><span class=p>[</span><span class=mi>0</span><span class=p>].</span><span class=nx>data</span><span class=p>();</span>
+</span></span></code></pre></div><p>Which will return an object with the following structure:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=cm>/* ... other result keys ... */</span>
+</span></span><span class=line><span class=cl>  <span class=s2>&#34;url&#34;</span><span class=o>:</span> <span class=s2>&#34;/url-of-the-page/&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=s2>&#34;excerpt&#34;</span><span class=o>:</span> <span class=s2>&#34;A small snippet of the &lt;mark&gt;static&lt;/mark&gt; content, from the &amp;lt;body&amp;gt; of the page.&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=s2>&#34;plain_excerpt&#34;</span><span class=o>:</span> <span class=s2>&#34;A small snippet of the static content, from the &amp;lt;body&amp;gt; of the page.&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>  <span class=s2>&#34;meta&#34;</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;title&#34;</span><span class=o>:</span> <span class=s2>&#34;The title from the first h1 element on the page&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s2>&#34;image&#34;</span><span class=o>:</span> <span class=s2>&#34;/weka.png&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>},</span>
+</span></span><span class=line><span class=cl>  <span class=s2>&#34;sub_results&#34;</span><span class=o>:</span> <span class=p>[</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=cm>/* ... other sub_result keys ... */</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;title&#34;</span><span class=o>:</span> <span class=s2>&#34;The title from the first h1 element on the page&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;url&#34;</span><span class=o>:</span> <span class=s2>&#34;/url-of-the-page/&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;excerpt&#34;</span><span class=o>:</span> <span class=s2>&#34;A small snippet of the &lt;mark&gt;static&lt;/mark&gt; content, from the &amp;lt;body&amp;gt; of the page&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;plain_excerpt&#34;</span><span class=o>:</span> <span class=s2>&#34;A small snippet of the static content, from the &amp;lt;body&amp;gt; of the page&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=cm>/* ... other sub_result keys ... */</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;title&#34;</span><span class=o>:</span> <span class=s2>&#34;Inner text of some heading&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;url&#34;</span><span class=o>:</span> <span class=s2>&#34;/url-of-the-page/#id-of-the-h2&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;excerpt&#34;</span><span class=o>:</span> <span class=s2>&#34;A snippet of the &lt;mark&gt;static&lt;/mark&gt; content, scoped between this anchor and the next one&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=s2>&#34;plain_excerpt&#34;</span><span class=o>:</span> <span class=s2>&#34;A snippet of the static content, scoped between this anchor and the next one&#34;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><blockquote><p>Note that <code>excerpt</code> and <code>plain_excerpt</code> will have HTML entities encoded before adding any elements, so both are safe to use as innerHTML. The <code>content</code> and <code>meta</code> keys are raw and unprocessed, so will need to be escaped by the user if necessary.</p></blockquote><p>Pagefind returns all matching results from the search call. To load a &ldquo;page&rdquo; of results, you can run something like the following, to slice the first five result objects and load their data:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>search</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>);</span>
+</span></span><span class=line data-add=true><span class=cl><span class=kr>const</span> <span class=nx>fiveResults</span> <span class=o>=</span> <span class=kr>await</span> <span class=nb>Promise</span><span class=p>.</span><span class=nx>all</span><span class=p>(</span><span class=nx>search</span><span class=p>.</span><span class=nx>results</span><span class=p>.</span><span class=nx>slice</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span> <span class=mi>5</span><span class=p>).</span><span class=nx>map</span><span class=p>(</span><span class=nx>r</span> <span class=p>=&gt;</span> <span class=nx>r</span><span class=p>.</span><span class=nx>data</span><span class=p>()));</span>
+</span></span></code></pre></div><h2 id=debounced-search>Debounced search</h2><p>The helper function <code>pagefind.debouncedSearch</code> is available and can be used in place of <code>pagefind.search</code>:<div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line data-add=true><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>debouncedSearch</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>);</span>
+</span></span></code></pre></div></p><p>A custom debounce timeout (default: <code>300</code>) can optionally be specified as the third argument:<div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line data-add=true><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>debouncedSearch</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>,</span> <span class=p>{</span><span class=cm>/* options */</span><span class=p>},</span> <span class=mi>300</span><span class=p>);</span>
+</span></span></code></pre></div></p><p>This function waits for the specified duration, and then either performs the search, or returns null if a subsequent call to <code>pagefind.debouncedSearch</code> has been made. This helps with resource usage when processing large searches, and can help with flickering when rendering results in a UI.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>debouncedSearch</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>);</span>
+</span></span><span class=line data-add=true><span class=cl><span class=k>if</span> <span class=p>(</span><span class=nx>search</span> <span class=o>===</span> <span class=kc>null</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line data-add=true><span class=cl>  <span class=c1>// a more recent search call has been made, nothing to do
+</span></span></span><span class=line data-add=true><span class=cl><span class=c1></span><span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line data-add=true><span class=cl>  <span class=nx>process</span><span class=p>(</span><span class=nx>search</span><span class=p>.</span><span class=nx>results</span><span class=p>);</span>
+</span></span><span class=line data-add=true><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><h2 id=preloading-search-terms>Preloading search terms</h2><p>If you have your own debounced search input, Pagefind won&rsquo;t start loading indexes until you run your search query. To speed up your search query when it runs, you can use the <code>pagefind.preload</code> function as the user is typing. Note that the <a href=#debounced-search>Debounced search</a> helper provided by Pagefind implements this for you under the hood.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line data-add=true><span class=cl><span class=nx>pagefind</span><span class=p>.</span><span class=nx>preload</span><span class=p>(</span><span class=s2>&#34;s&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// later...
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>search</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>);</span>
+</span></span></code></pre></div><p>This function takes the same arguments as the <code>search</code> function and downloads the required indexes, stopping short of running the search query. Since indexes are chunked alphabetically, running <code>pagefind.preload("s")</code> will likely load the index required to search for <code>static</code> by the time the user has finished typing. Multiple calls to <code>preload</code> will not cause redundant network requests.</p><p>In vanilla javascript, this might look like the following:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=p>(</span><span class=nx>term</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span> <span class=cm>/* your main search code */</span> <span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>debouncedSearch</span> <span class=o>=</span> <span class=nx>_</span><span class=p>.</span><span class=nx>debounce</span><span class=p>(</span><span class=nx>search</span><span class=p>,</span> <span class=mi>300</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nx>inputElement</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;input&#39;</span><span class=p>,</span> <span class=p>(</span><span class=nx>e</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span><span class=line data-add=true><span class=cl>    <span class=nx>pagefind</span><span class=p>.</span><span class=nx>preload</span><span class=p>(</span><span class=nx>e</span><span class=p>.</span><span class=nx>target</span><span class=p>.</span><span class=nx>value</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nx>debouncedSearch</span><span class=p>(</span><span class=nx>e</span><span class=p>.</span><span class=nx>target</span><span class=p>.</span><span class=nx>value</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></div><p>The <code>preload</code> function can also be passed the same filtering options as the <code>search</code> function, and will preload any necessary filter indexes.</p><h2 id=filtering>Filtering</h2><p>To load the available filters, you can run:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>filters</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>filters</span><span class=p>();</span>
+</span></span></code></pre></div><p>This will return an object of the following structure, showing the number of search results available under the given <code>filter: value</code> combination.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;misc&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;value_one&#34;</span><span class=p>:</span> <span class=mi>4</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;value_two&#34;</span><span class=p>:</span> <span class=mi>12</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;value_three&#34;</span><span class=p>:</span> <span class=mi>3</span>
+</span></span><span class=line><span class=cl>    <span class=p>},</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&#34;color&#34;</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;Orange&#34;</span><span class=p>:</span> <span class=mi>6</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&#34;Red&#34;</span><span class=p>:</span> <span class=mi>2</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>To filter results alongside searching, pass an options object to the search function. Filter values can be passed as strings or arrays.<div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>search</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line data-add=true><span class=cl>    <span class=nx>filters</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line data-add=true><span class=cl>        <span class=nx>color</span><span class=o>:</span> <span class=s2>&#34;Orange&#34;</span><span class=p>,</span>
+</span></span><span class=line data-add=true><span class=cl>        <span class=nx>misc</span><span class=o>:</span> <span class=p>[</span><span class=s2>&#34;value_one&#34;</span><span class=p>,</span> <span class=s2>&#34;value_three&#34;</span><span class=p>],</span>
+</span></span><span class=line data-add=true><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></div></p><p>See <a href=/docs/js-api-filtering/>Filtering using the Pagefind JavaScript API</a> for more details and functionality.</p><h2 id=sorting-results>Sorting results</h2><p>If pages on your site have been tagged with <a href=/docs/sorts/>sort attributes</a>, a <code>sort</code> object can be provided to Pagefind when searching:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>search</span> <span class=o>=</span> <span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>search</span><span class=p>(</span><span class=s2>&#34;static&#34;</span><span class=p>,</span> <span class=p>{</span>
+</span></span><span class=line data-add=true><span class=cl>    <span class=nx>sort</span><span class=o>:</span> <span class=p>{</span>
+</span></span><span class=line data-add=true><span class=cl>        <span class=nx>date</span><span class=o>:</span> <span class=s2>&#34;asc&#34;</span>
+</span></span><span class=line data-add=true><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>});</span>
+</span></span></code></pre></div><p>See <a href=/docs/js-api-sorting/>Sorting using the Pagefind JavaScript API</a> for more details and functionality.</p><h2 id=re-initializing-the-search-api>Re-initializing the search API</h2><p>In some cases you might need to re-initialize Pagefind. For example, if you dynamically change the language of the page without reloading, Pagefind will need to be re-initialized to reflect this language change.</p><p>The currently loaded Pagefind can be destroyed by running <code>pagefind.destroy()</code>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-js data-lang=js><span class=line><span class=cl><span class=kr>const</span> <span class=nx>pagefind</span> <span class=o>=</span> <span class=kr>await</span> <span class=kr>import</span><span class=p>(</span><span class=s2>&#34;/pagefind/pagefind.js&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>init</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>search</span><span class=p>(</span> <span class=cm>/* ... */</span> <span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=cm>/**
+</span></span></span><span class=line><span class=cl><span class=cm> * Some action that changes the language of the page, for example
+</span></span></span><span class=line><span class=cl><span class=cm> **/</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line data-add=true><span class=cl><span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>destroy</span><span class=p>();</span>
+</span></span><span class=line data-add=true><span class=cl><span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>init</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>await</span> <span class=nx>pagefind</span><span class=p>.</span><span class=nx>search</span><span class=p>(</span> <span class=cm>/* ... */</span> <span class=p>);</span>
+</span></span></code></pre></div><p>Calling <code>pagefind.destroy()</code> will unload the active Pagefind, and also forget anything that was passed through <code>pagefind.options()</code>, resetting to the blank state after the script was first imported.</p><p>After being destroyed, initializing Pagefind will look again at the active language, and use any new options you might pass in.</p></div><span data-pagefind-filter=section style=display:none>Search API</span><hr class=copy-markdown-divider><button class="copy-markdown-btn copy-markdown-btn--mobile" aria-label="Copy page as Markdown" title="Copy as Markdown">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentcolor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M3 10.5H2.5A1.5 1.5.0 011 9V2.5A1.5 1.5.0 012.5 1H9a1.5 1.5.0 011.5 1.5V3"/></svg>
+Copy as Markdown <span class=copy-tick>&#10003;</span></button></article><script type=text/plain id=page-markdown>> **Important: Pagefind 1.5.0 introduces the Component UI, which replaces the
+> Default UI (pagefind-ui.js / PagefindUI). It includes a search modal, better
+> accessibility and customization.** Full component guide:
+> https://pagefind.app/llms-component-ui.txt
+
+# Using the Pagefind search API
+
+
+Pagefind can be accessed as an API directly from the JavaScript on your site. This allows you to build custom search interfaces, or integrate with existing systems and components.
+
+## Initializing Pagefind
+
+Anywhere on your site, import and initialize Pagefind with:
+
+```js
+const pagefind = await import("/pagefind/pagefind.js");
+
+pagefind.init();
+```
+
+If your site is on a subpath, or you have otherwise customized your bundle path, this should be included — e.g. in the CloudCannon documentation, we load `/documentation/pagefind/pagefind.js`.
+
+The call to `pagefind.init()` will load the Pagefind dependencies and the metadata about the site. Calling this method is optional, and if it is omitted initialization will happen when the first searching or filtering function is called.
+
+Calling `pagefind.init()` when your search interface gains focus will help the core dependencies load by the time a user types in their search query.
+
+## Configuring the search API
+
+Pagefind options can be set before running `pagefind.init()`:
+
+```js
+const pagefind = await import("/pagefind/pagefind.js");
+
++await pagefind.options({
++    bundlePath: "/custom-pagefind-directory/"
++});
+
+pagefind.init();
+```
+
+Calls to `pagefind.options` may also be made after initialization, however passing in settings such as `bundlePath` after initialization will have no impact.
+
+See all available options in [Configuring the Pagefind search in the browser](/docs/search-config/).
+
+## Searching
+
+To perform a search, await `pagefind.search`:
+```js
+const pagefind = await import("/pagefind/pagefind.js");
++const search = await pagefind.search("static");
+```
+
+This will return an object with the following structure:
+```js
+{ 
+    results: [
+        {
+            id: "en_6fceec9",
+            data: async function data()
+        }
+    ]
+}
+```
+
+At this point you will have access to the number of search results, and a unique ID for each result. Also see [Debounced search](#debounced-search) below for an alternative API.
+
+> Note that the prefix `en` in `en_6fceec9` matches the `lang` attribute of your `html` element. If `lang` is not set, the prefix defaults to `unknown`. See [Multilingual Search](/docs/multilingual/) for more details.
+
+## Loading a result
+
+To reduce bandwidth usage, the data for each result (e.g. URL & title) must be loaded independently.
+
+To load the data for a result, await the data function:
+
+```js
+const pagefind = await import("/pagefind/pagefind.js");
+const search = await pagefind.search("static");
++const oneResult = await search.results[0].data();
+```
+
+Which will return an object with the following structure:
+
+```js
+{
+  /* ... other result keys ... */
+  "url": "/url-of-the-page/",
+  "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page.",
+  "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page.",
+  "meta": {
+    "title": "The title from the first h1 element on the page",
+    "image": "/weka.png"
+  },
+  "sub_results": [
+    {
+        /* ... other sub_result keys ... */
+        "title": "The title from the first h1 element on the page",
+        "url": "/url-of-the-page/",
+        "excerpt": "A small snippet of the <mark>static</mark> content, from the &lt;body&gt; of the page",
+        "plain_excerpt": "A small snippet of the static content, from the &lt;body&gt; of the page",
+    },
+    {
+        /* ... other sub_result keys ... */
+        "title": "Inner text of some heading",
+        "url": "/url-of-the-page/#id-of-the-h2",
+        "excerpt": "A snippet of the <mark>static</mark> content, scoped between this anchor and the next one",
+        "plain_excerpt": "A snippet of the static content, scoped between this anchor and the next one",
+    }
+  ]
+}
+```
+
+> Note that `excerpt` and `plain_excerpt` will have HTML entities encoded before adding any elements, so both are safe to use as innerHTML. The `content` and `meta` keys are raw and unprocessed, so will need to be escaped by the user if necessary.
+
+Pagefind returns all matching results from the search call. To load a "page" of results, you can run something like the following, to slice the first five result objects and load their data:
+
+```js
+const pagefind = await import("/pagefind/pagefind.js");
+const search = await pagefind.search("static");
++const fiveResults = await Promise.all(search.results.slice(0, 5).map(r => r.data()));
+```
+
+## Debounced search
+
+The helper function `pagefind.debouncedSearch` is available and can be used in place of `pagefind.search`:
+```js
+const pagefind = await import("/pagefind/pagefind.js");
++const search = await pagefind.debouncedSearch("static");
+```
+
+A custom debounce timeout (default: `300`) can optionally be specified as the third argument:
+```js
+const pagefind = await import("/pagefind/pagefind.js");
++const search = await pagefind.debouncedSearch("static", {/* options */}, 300);
+```
+
+This function waits for the specified duration, and then either performs the search, or returns null if a subsequent call to `pagefind.debouncedSearch` has been made. This helps with resource usage when processing large searches, and can help with flickering when rendering results in a UI.
+
+```js
+const search = await pagefind.debouncedSearch("static");
++if (search === null) {
++  // a more recent search call has been made, nothing to do
++} else {
++  process(search.results);
++}
+```
+
+## Preloading search terms
+
+If you have your own debounced search input, Pagefind won't start loading indexes until you run your search query. To speed up your search query when it runs, you can use the `pagefind.preload` function as the user is typing. Note that the [Debounced search](#debounced-search) helper provided by Pagefind implements this for you under the hood.
+
+```js
+const pagefind = await import("/pagefind/pagefind.js");
++pagefind.preload("s");
+
+// later...
+await pagefind.search("static");
+```
+
+This function takes the same arguments as the `search` function and downloads the required indexes, stopping short of running the search query. Since indexes are chunked alphabetically, running `pagefind.preload("s")` will likely load the index required to search for `static` by the time the user has finished typing. Multiple calls to `preload` will not cause redundant network requests.
+
+In vanilla javascript, this might look like the following:
+
+```js
+const search = (term) => { /* your main search code */ };
+const debouncedSearch = _.debounce(search, 300);
+
+inputElement.addEventListener('input', (e) => {
++    pagefind.preload(e.target.value);
+    debouncedSearch(e.target.value);
+})
+```
+
+The `preload` function can also be passed the same filtering options as the `search` function, and will preload any necessary filter indexes.
+
+## Filtering
+
+To load the available filters, you can run:
+
+```js
+const filters = await pagefind.filters();
+```
+
+This will return an object of the following structure, showing the number of search results available under the given `filter: value` combination.
+```json
+{
+    "misc": {
+        "value_one": 4,
+        "value_two": 12,
+        "value_three": 3
+    },
+    "color": {
+        "Orange": 6,
+        "Red": 2
+    }
+}
+```
+
+To filter results alongside searching, pass an options object to the search function. Filter values can be passed as strings or arrays.
+```js
+const search = await pagefind.search("static", {
++    filters: {
++        color: "Orange",
++        misc: ["value_one", "value_three"],
++    }
+});
+```
+
+See [Filtering using the Pagefind JavaScript API](/docs/js-api-filtering/) for more details and functionality.
+
+## Sorting results
+
+If pages on your site have been tagged with [sort attributes](/docs/sorts/), a `sort` object can be provided to Pagefind when searching:
+
+```js
+const search = await pagefind.search("static", {
++    sort: {
++        date: "asc"
++    }
+});
+```
+
+See [Sorting using the Pagefind JavaScript API](/docs/js-api-sorting/) for more details and functionality.
+
+## Re-initializing the search API
+
+In some cases you might need to re-initialize Pagefind. For example, if you dynamically change the language of the page without reloading, Pagefind will need to be re-initialized to reflect this language change.
+
+The currently loaded Pagefind can be destroyed by running `pagefind.destroy()`:
+
+```js
+const pagefind = await import("/pagefind/pagefind.js");
+
+await pagefind.init();
+await pagefind.search( /* ... */ );
+
+/**
+ * Some action that changes the language of the page, for example
+ **/
+
++await pagefind.destroy();
++await pagefind.init();
+
+await pagefind.search( /* ... */ );
+```
+
+Calling `pagefind.destroy()` will unload the active Pagefind, and also forget anything that was passed through `pagefind.options()`, resetting to the blank state after the script was first imported.
+
+After being destroyed, initializing Pagefind will look again at the active language, and use any new options you might pass in.
+</script><aside class=toc-aside data-pagefind-ignore><div class=toc><button class=copy-markdown-btn aria-label="Copy page as Markdown" title="Copy as Markdown">
+<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentcolor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M3 10.5H2.5A1.5 1.5.0 011 9V2.5A1.5 1.5.0 012.5 1H9a1.5 1.5.0 011.5 1.5V3"/></svg>
+Copy as Markdown <span class=copy-tick>&#10003;</span></button><p class=toc-title>On this page</p><a href=# class=toc-top-link>Using the Pagefind search API</a><nav id=TableOfContents><ul><li><a href=#initializing-pagefind>Initializing Pagefind</a></li><li><a href=#configuring-the-search-api>Configuring the search API</a></li><li><a href=#searching>Searching</a></li><li><a href=#loading-a-result>Loading a result</a></li><li><a href=#debounced-search>Debounced search</a></li><li><a href=#preloading-search-terms>Preloading search terms</a></li><li><a href=#filtering>Filtering</a></li><li><a href=#sorting-results>Sorting results</a></li><li><a href=#re-initializing-the-search-api>Re-initializing the search API</a></li></ul></nav><script>(function(){var e,t,n,s,i,a,r,o=document.querySelector(".toc");if(!o)return;if(t=o.querySelector(".toc-top-link"),n=Array.from(o.querySelectorAll('a[href^="#"]')),i=t?[t].concat(n):n,e=[],n.forEach(function(t){var s=t.getAttribute("href").slice(1),n=document.getElementById(s);n&&e.push({el:n,link:t})}),!e.length)return;a=null;function l(e){if(e===a)return;a=e,i.forEach(function(e){e.classList.remove("is-active")}),e.classList.add("is-active")}s=!1;function c(){if(s)return;s=!0,requestAnimationFrame(function(){s=!1;var n,a=window.innerHeight+window.scrollY>=document.body.scrollHeight-50,i=document.querySelector(".content-header h1"),o=null;if(a)o=e[e.length-1].link;else if(!i||i.getBoundingClientRect().bottom<=0)for(n=0;n<e.length;n++)e[n].el.getBoundingClientRect().top<=window.innerHeight*.35&&(o=e[n].link);l(o||t)})}r=window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",i.forEach(function(e){e.addEventListener("click",function(t){t.preventDefault();var o,s=e.getAttribute("href").slice(1),n=s?document.getElementById(s):null;n?(n.hasAttribute("tabindex")||n.setAttribute("tabindex","-1"),o=n.getBoundingClientRect().top+window.scrollY-window.innerHeight*.15,window.scrollTo({top:o,behavior:r}),n.focus({preventScroll:!0}),history.pushState(null,"","#"+s)):(window.scrollTo({top:0,behavior:r}),history.pushState(null,"",window.location.pathname))})}),window.addEventListener("scroll",c,{passive:!0}),c()})()</script></div></aside></main></div><script>function syncThemeToggle(e){var t,n=e==="dark"?"true":"false";document.getElementById("theme-toggle").setAttribute("aria-pressed",n),t=document.getElementById("theme-toggle-mobile"),t&&t.setAttribute("aria-pressed",n)}function toggleTheme(){var t=document.documentElement.getAttribute("data-pf-theme"),e=t==="dark"?"light":"dark";document.documentElement.setAttribute("data-pf-theme",e),localStorage.setItem("theme",e),syncThemeToggle(e)}var mobileToggle,desktopToggle=document.getElementById("theme-toggle");desktopToggle&&desktopToggle.addEventListener("click",toggleTheme),mobileToggle=document.getElementById("theme-toggle-mobile"),mobileToggle&&mobileToggle.addEventListener("click",toggleTheme),syncThemeToggle(document.documentElement.getAttribute("data-pf-theme")),function(){var t=document.querySelector(".menu-toggle"),e=document.getElementById("mobile-nav");t&&e&&(t.addEventListener("click",function(){e.showModal(),t.setAttribute("aria-expanded","true")}),e.addEventListener("close",function(){t.setAttribute("aria-expanded","false"),t.focus()}),e.addEventListener("click",function(t){t.target===e&&e.close()}),e.querySelectorAll("a").forEach(function(t){t.addEventListener("click",function(){e.close()})}))}(),function(){var e="/docs/components/",t=window.location.pathname.indexOf(e)===0&&window.location.pathname!==e;document.querySelectorAll(".sidebar, .mobile-nav").forEach(function(e){var n=e.querySelector("[data-drilldown]"),s=e.querySelector("[data-nav-back]");t&&(e.classList.add("no-transition","show-components"),n&&n.setAttribute("aria-expanded","true"),requestAnimationFrame(function(){requestAnimationFrame(function(){e.classList.remove("no-transition")})})),n&&n.addEventListener("click",function(){e.classList.add("show-components"),n.setAttribute("aria-expanded","true");var t=e.querySelector(".nav-panel-components"),s=t&&t.querySelector("a");s&&s.focus({preventScroll:!0})}),s&&s.addEventListener("click",function(){e.classList.remove("show-components"),n&&(n.setAttribute("aria-expanded","false"),n.focus({preventScroll:!0}))})})}(),function(){var t="pagefind-tabs";function n(){try{return JSON.parse(localStorage.getItem(t))||[]}catch{return[]}}function o(e){try{var s=n().filter(function(t){return t!==e});s.unshift(e),localStorage.setItem(t,JSON.stringify(s))}catch{}}function s(t){var n,i,a,s=t.getAttribute("data-sync");if(!s)return;o(s),n=t.closest(".tabs"),i=n.getBoundingClientRect().top,document.querySelectorAll("[data-tabs-ready]").forEach(function(t){if(t===n)return;var o=t.querySelector('.tabs-tab[data-sync="'+s+'"]');o&&o.getAttribute("aria-selected")!=="true"&&e(o)}),a=n.getBoundingClientRect().top,Math.abs(a-i)>1&&window.scrollBy(0,a-i)}function e(e){var t,s,n=e.closest(".tabs"),o=n.querySelectorAll(".tabs-list .tabs-tab"),i=n.querySelectorAll(":scope > .tabs-panel");o.forEach(function(e){e.setAttribute("aria-selected","false"),e.setAttribute("tabindex","-1")}),i.forEach(function(e){e.setAttribute("hidden",""),e.classList.remove("is-active")}),e.setAttribute("aria-selected","true"),e.setAttribute("tabindex","0"),s=e.getAttribute("aria-controls"),t=document.getElementById(s),t&&(t.removeAttribute("hidden"),t.classList.add("is-active"))}function i(e){function t(){var t=e.scrollLeft,n=e.scrollWidth-e.clientWidth;if(n<=0){e.removeAttribute("data-scroll-start"),e.removeAttribute("data-scroll-end");return}t>2?e.setAttribute("data-scroll-end",""):e.removeAttribute("data-scroll-end"),t<n-2?e.setAttribute("data-scroll-start",""):e.removeAttribute("data-scroll-start")}e.addEventListener("scroll",t,{passive:!0}),t()}document.querySelectorAll("[data-tabs]").forEach(function(t){var a,r,c,d,u,h,l=t.getAttribute("data-tabs-id"),o=t.querySelector(".tabs-list"),m=t.getAttribute("data-tabs-label")||"Content options",f=t.querySelectorAll(":scope > .tabs-panel-raw");f.forEach(function(e,t){var s,i=e.getAttribute("data-tab-label"),a=l+"-tab-"+t,r=l+"-panel-"+t,n=document.createElement("button");n.className="tabs-tab",n.textContent=i,n.id=a,s=e.getAttribute("data-sync"),s&&n.setAttribute("data-sync",s),o.appendChild(n),e.className="tabs-panel",e.id=r,e.removeAttribute("data-tab-label"),e.removeAttribute("data-sync")}),t.setAttribute("data-tabs-ready",""),o.setAttribute("role","tablist"),o.setAttribute("aria-label",m),a=o.querySelectorAll(".tabs-tab"),h=t.querySelectorAll(":scope > .tabs-panel"),a.forEach(function(e,t){var n=l+"-panel-"+t;e.setAttribute("role","tab"),e.setAttribute("aria-controls",n),t===0?(e.setAttribute("aria-selected","true"),e.setAttribute("tabindex","0")):(e.setAttribute("aria-selected","false"),e.setAttribute("tabindex","-1"))}),h.forEach(function(e,t){var n=l+"-tab-"+t;e.setAttribute("role","tabpanel"),e.setAttribute("aria-labelledby",n),e.setAttribute("tabindex","0"),t===0?e.classList.add("is-active"):e.setAttribute("hidden","")});for(u=n(),r=-1,d=0;d<u.length&&r===-1;d++)for(c=0;c<a.length;c++)if(a[c].getAttribute("data-sync")===u[d]){r=c;break}r>0&&e(a[r]),o.addEventListener("click",function(t){var n=t.target.closest(".tabs-tab");n&&(e(n),s(n),n.focus())}),o.addEventListener("keydown",function(t){var n,o,r,c,l,i=t.target.closest(".tabs-tab");if(!i)return;switch(o=Array.prototype.slice.call(a),n=o.indexOf(i),r=!0,t.key){case"ArrowRight":n=(n+1)%o.length;break;case"ArrowLeft":n=(n-1+o.length)%o.length;break;case"Home":n=0;break;case"End":n=o.length-1;break;case"ArrowDown":l=i.getAttribute("aria-controls"),c=document.getElementById(l),c&&c.focus(),t.preventDefault();return;default:r=!1}r&&(t.preventDefault(),e(o[n]),s(o[n]),o[n].focus())}),i(o)})}(),document.addEventListener("click",function(e){var n,t=e.target.closest(".copy-markdown-btn");if(!t)return;if(n=document.getElementById("page-markdown"),!n)return;navigator.clipboard.writeText(n.textContent).then(function(){t.classList.remove("copied"),void t.offsetWidth,t.classList.add("copied"),setTimeout(function(){t.classList.remove("copied")},1500)})})</script></body></html>

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "4f230232-04b2-4f90-bcba-843dbf222a6b",
+    "title": "[Python] 수 2개 입력받기에서 Tuple의 사용 유무 차이",
+    "released_at": "2024-05-08T12:58:47.465Z",
+    "updated_at": "2026-08-26T02:26:01.273Z",
+    "body": "파이썬에서 두 변수에 각각 수를 입력받을 때 일반적으로 많이 쓰이는 방법이다.\n```\na, b = map(int, input().split())\n```\n\n```\na, b = tuple(map(int, input().split()))\n```\n\n```Tuple``` 을 사용하나 안하나 별 차이는 없이 잘 작동한다.\n\n# 차이점\n작동 상의 차이점은 없다. 그러나 의미 상의 차이점이 있다.\n```Map``` 의 경우에도 ```Tuple``` 과 같이 Unpacking을 지원하기 때문에 잘 작동한다.\n\n다만, 보통 ```Map``` 은 사용시 ```List``` 나 ```Tuple``` 과 같이 원하는 형태로 형변환을 진행한 이후에 사용하게 되는 경우가 자주 있기에 \n가독성 측면에서 정확히 2개의 값으로 떨어지는 ```Tuple``` 을 만들어 이를 ```Unpacking``` 한다는 의미를 줄 수 있다.\n\n# 참조\n[코드트리 문제 - 동전이 있는 위치 (토론 탭 - tuple을 꼭 써야하는 이유가 있을까요?)](https://www.codetree.ai/missions/4/problems/Where-coins-are-located?&utm_source=clipboard&utm_medium=text)",
+    "short_description": "두 개의 변수에 각각 수를 입력받을 때 Tuple의 유무의 차이",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": null,
+    "url_slug": "Python-수-2개-입력받기에서-Tuple의-사용-유무-차이",
+    "series": {
+      "id": "cdfa8dc2-c8f0-478a-af43-b9153eadd24e",
+      "name": "PS",
+      "url_slug": "개인공부-Python"
+    }
+  }
+}

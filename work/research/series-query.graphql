@@ -1,0 +1,30 @@
+
+  query Series($username: String, $url_slug: String) {
+    series(username: $username, url_slug: $url_slug) {
+      id
+      name
+      user {
+        id
+        username
+        profile {
+          id
+          display_name
+          short_bio
+          thumbnail
+          profile_links
+        }
+      }
+      series_posts {
+        id
+        index
+        post {
+          id
+          title
+          thumbnail
+          short_description
+          url_slug
+          released_at
+        }
+      }
+    }
+  }

@@ -1,0 +1,163 @@
+[
+  {
+    "id": "5ce42d25-c564-4c0e-8513-dff6fdc43d02",
+    "name": "React",
+    "slug": "개인공부",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EA%B0%9C%EC%9D%B8%EA%B3%B5%EB%B6%80"
+  },
+  {
+    "id": "1cbdd12f-0c40-4ad4-bb01-89612f92c551",
+    "name": "DevOps",
+    "slug": "DevOps",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/DevOps"
+  },
+  {
+    "id": "adcfe515-e537-40c8-ac4e-dafed322ac41",
+    "name": "소프트웨어 아키텍처",
+    "slug": "소프트웨어-아키텍처",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98"
+  },
+  {
+    "id": "928b6b91-8174-41a7-a245-d3a65755410d",
+    "name": "테스팅",
+    "slug": "테스팅",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%85%8C%EC%8A%A4%ED%8C%85"
+  },
+  {
+    "id": "621a6c96-50f3-4675-85c5-25cc0514f5ff",
+    "name": "웹 공통",
+    "slug": "웹-공통",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%9B%B9-%EA%B3%B5%ED%86%B5"
+  },
+  {
+    "id": "631448b2-e669-4c0c-a57d-b8c5ad0a4103",
+    "name": "Node.js",
+    "slug": "Node.js",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/Node.js"
+  },
+  {
+    "id": "1f8077c0-1951-4186-8e38-4fb615ed1226",
+    "name": "데이터베이스",
+    "slug": "데이터베이스",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4"
+  },
+  {
+    "id": "1baf0d0f-7066-4257-b245-8f0fcae7af18",
+    "name": "프로젝트",
+    "slug": "프로젝트",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8"
+  },
+  {
+    "id": "37ef3aea-e9ea-45da-a659-474fe2ff11e3",
+    "name": "JavaScript",
+    "slug": "JavaScript",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/JavaScript"
+  },
+  {
+    "id": "c1d9eff9-7b4f-4762-ba56-b1670522e74b",
+    "name": "네이버 커넥트재단 부스트캠프 웹・모바일 10기 웹 풀스택",
+    "slug": "네이버-부스트캠프-10기-풀스택",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EB%84%A4%EC%9D%B4%EB%B2%84-%EB%B6%80%EC%8A%A4%ED%8A%B8%EC%BA%A0%ED%94%84-10%EA%B8%B0-%ED%92%80%EC%8A%A4%ED%83%9D"
+  },
+  {
+    "id": "d53de5d1-71fd-46d5-b493-e804bef5d183",
+    "name": "운영체제",
+    "slug": "운영체제",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C"
+  },
+  {
+    "id": "b698e6b6-2308-490e-ab9c-a2820a604b90",
+    "name": "Git",
+    "slug": "Git",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/Git"
+  },
+  {
+    "id": "fdac1e63-5de4-493d-aab2-6d8281e6c45f",
+    "name": "네트워크",
+    "slug": "네트워크",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC"
+  },
+  {
+    "id": "ba7963f4-c100-4788-8a38-bdd9833e52ad",
+    "name": "프로그래밍 언어론",
+    "slug": "프로그래밍-언어론",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-%EC%96%B8%EC%96%B4%EB%A1%A0"
+  },
+  {
+    "id": "a06d9b9c-af8b-4827-a264-0fa788e25564",
+    "name": "자료구조",
+    "slug": "자료구조",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0"
+  },
+  {
+    "id": "c9205480-39d8-44e5-9c86-f061d555a377",
+    "name": "Flutter",
+    "slug": "개인공부-APP",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EA%B0%9C%EC%9D%B8%EA%B3%B5%EB%B6%80-APP"
+  },
+  {
+    "id": "c4812740-152d-4537-b8e3-13eded499f2c",
+    "name": "내 장비",
+    "slug": "내-장비",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EB%82%B4-%EC%9E%A5%EB%B9%84"
+  },
+  {
+    "id": "cdfa8dc2-c8f0-478a-af43-b9153eadd24e",
+    "name": "PS",
+    "slug": "개인공부-Python",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EA%B0%9C%EC%9D%B8%EA%B3%B5%EB%B6%80-Python"
+  },
+  {
+    "id": "46919296-c6a9-44d4-ace3-1fd698ed41d1",
+    "name": "Microsoft Learn Student Ambassadors",
+    "slug": "MLSA",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/MLSA"
+  },
+  {
+    "id": "04b470d9-c254-4e53-8a12-c180c15e01ab",
+    "name": "코드잇 앰배서더 1기",
+    "slug": "코드잇-앰배서더-1기",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%BD%94%EB%93%9C%EC%9E%87-%EC%95%B0%EB%B0%B0%EC%84%9C%EB%8D%94-1%EA%B8%B0"
+  },
+  {
+    "id": "14b70fd7-a1ed-4749-8609-a000d08414c4",
+    "name": "DEVOCEAN YOUNG",
+    "slug": "DEVOCEAN-YOUNG",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/DEVOCEAN-YOUNG"
+  },
+  {
+    "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+    "name": "C/C++",
+    "slug": "학교공부-C",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%95%99%EA%B5%90%EA%B3%B5%EB%B6%80-C"
+  },
+  {
+    "id": "558a9a36-14d1-40a5-aaa1-0f0ed880df53",
+    "name": "학교생활",
+    "slug": "학교생활",
+    "description": "",
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%95%99%EA%B5%90%EC%83%9D%ED%99%9C"
+  }
+]

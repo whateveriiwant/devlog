@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "641bf52d-2e41-4f89-9687-73ff2da665c6",
+    "title": "Javascript에서의 리팩터링에 대해",
+    "released_at": "2022-01-23T04:44:02.786Z",
+    "updated_at": "2026-08-23T03:23:00.721Z",
+    "body": "## 리팩터링(Refactoring)\n - 코드에서 중복되거나 불필요한 부분을 수정 또는 제거해 효율성을 높이는 것\n \n\n고등학교 3학년 프로그래밍 시간에 C를 공부하면서 공간복잡도, 시간복잡도 개념에 대해서 배운 적이 있다. Javascript를 공부하면서도 어김없이 코드의 효율성에 대해 공부하게 되었다.\n\n![](https://images.velog.io/images/jsj9620/post/fa58ec29-5409-4874-9e61-d4a4998a0c62/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202022-01-23%2013.16.02.png)\n\n하나의 버튼을 누르면 다크모드, 라이트모드로 각각 전환시키는 기능을 가진 버튼의 코드이다. 버튼의 value를 읽고, 조건문에 따라 알맞은 모드로 전환시킨다.\n\n코드를 보면 중복되는 부분이 꽤 있다. 그래서 아래와 같이 바꿔보았다.\n<br>\n![](https://images.velog.io/images/jsj9620/post/90437e99-634d-4e11-a3bb-9a72a221a761/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202022-01-23%2013.22.28.png)\ndocument.querySelector()에서 특정 id를 선택할 필요 없이 this라는 방법만으로 input 태그 자체를 선택한다. \n또한 target이라는 새로운 변수를 생성하고, 변수의 내용을 body 태그를 선택하는 querySelector로 지정해 마치 수학 문제를 풀 때 특정 변수를 치환하는 듯한 효과를 보인다.\n\n바뀐것은 두가지이다. 하지만 두 코드를 비교해봤을 때 수정 후의 결과가 훨씬 깔끔해보이고 멋있어보인다.\n\n생활코딩 강의를 들으면서 느낀 건 코딩을 할 때는 항상 극단적으로 생각하라는 것이다. \n마치 input 태그가 1억개나 있다고 생각하고, 그걸 어떻게 최적화를 할 것인지 찾아가는 과정이 정말 코딩 공부를 할 때 중요하다는 것을 느꼈다.\n\n\n\n",
+    "short_description": "코드를 간결하게 작성하는게 얼마나 중요한가?",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://images.velog.io/images/jsj9620/post/90437e99-634d-4e11-a3bb-9a72a221a761/스크린샷 2022-01-23 13.22.28.png",
+    "url_slug": "Javascript-Refactoring",
+    "series": {
+      "id": "37ef3aea-e9ea-45da-a659-474fe2ff11e3",
+      "name": "JavaScript",
+      "url_slug": "JavaScript"
+    }
+  }
+}

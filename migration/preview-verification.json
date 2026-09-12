@@ -1,0 +1,51 @@
+{
+  "verifiedAt": "2026-09-08T03:54:22.120Z",
+  "origin": "http://127.0.0.1:4321",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/archive/",
+      "status": 200,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/series/%ED%95%99%EA%B5%90%EA%B3%B5%EB%B6%80-C/",
+      "status": 200,
+      "contentType": "text/html"
+    },
+    {
+      "path": "/pagefind/pagefind.js",
+      "status": 200,
+      "contentType": "text/javascript"
+    },
+    {
+      "path": "/pagefind/pagefind-worker.js",
+      "status": 200,
+      "contentType": "text/javascript"
+    },
+    {
+      "path": "/pagefind/pagefind-entry.json",
+      "status": 200,
+      "contentType": "application/json"
+    },
+    {
+      "path": "/rss.xml",
+      "status": 200,
+      "contentType": "text/xml"
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "contentType": "text/plain"
+    },
+    {
+      "path": "/__missing-page-verification__/",
+      "status": 404
+    }
+  ],
+  "scope": "HTTP routes, search assets, RSS and default SEO; not a browser interaction test."
+}

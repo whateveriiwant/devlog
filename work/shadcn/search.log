@@ -1,0 +1,41 @@
+
+> seungjun-dev-blog@1.0.0 verify:search /Users/seungjun/Documents/Codex/2026-09-07/files-pasted-by-the-user-velog
+> node scripts/verify-search.mjs
+
+{
+  "verifiedAt": "2026-09-12T03:47:22.542Z",
+  "pagefindVersion": "1.5.2",
+  "indexedArticles": 125,
+  "metadataChecks": [
+    "title",
+    "description",
+    "publishedAt",
+    "category",
+    "series",
+    "tags"
+  ],
+  "queries": [
+    {
+      "query": "해피해킹",
+      "results": 1,
+      "expectedFound": true
+    },
+    {
+      "query": "이벤트 루프",
+      "results": 5,
+      "expectedFound": true
+    },
+    {
+      "query": "useEffect",
+      "results": 5,
+      "expectedFound": true
+    },
+    {
+      "query": "Express",
+      "results": 10,
+      "expectedFound": true
+    }
+  ],
+  "noResultsCase": "passed",
+  "scope": "Generated JavaScript/WASM search API in Node; browser interactions and worker execution are not covered."
+}

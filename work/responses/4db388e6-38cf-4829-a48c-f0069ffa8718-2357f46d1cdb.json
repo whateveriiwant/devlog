@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "4db388e6-38cf-4829-a48c-f0069ffa8718",
+    "title": "[Flutter] map방식은 for loop보다 느릴 수 있다",
+    "released_at": "2022-09-27T05:27:33.239Z",
+    "updated_at": "2026-08-15T15:59:28.808Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/5b93d0cb-cc98-4420-aa0e-dced2d45b5aa/image.png)\n\n\n## 문제 상황\n```\nsubjectList\n\t.map((e) => Text(\n\t\te,\n        style: const TextStyle(\n     \t     fontSize: 17,\n             fontWeight: FontWeight.bold),\n        )).toList()\n```\n종합 스터디 앱 프로젝트 개발 초기 스터디의 목록을 출력하는 방식이다. 과목명이 담겨있는 리스트에서 map 방식으로 차례대로 출력하는 방식인데 일부 상황에서 한번에 출력되지 않고 빈 화면으로 나오는 버그가 있었다.\n\n```\nfor (var item in subjectList)\n\tText(item,\n    style: const TextStyle(\n    \tfontWeight: FontWeight.bold,\n        fontSize: 17\n        ),\n    )\n```\n\nfor loop을 사용하니 퍼포먼스가 향상되었고 버그 또한 해결 완료!\n\n\n## 왜 이런 이유가 발생했을까\n**List**를 mapping 할 때는 원래 list의 **모든 값을 복사**하게 된다.\n반면 **for loop**에서는 값을 복사하지 않고 값을 **index**로 접근하게 된다!\n이런 점에서 속도에 차이가 있는 것\n\n<br><br>\n출처: stackoverflow\nhttps://stackoverflow.com/questions/71012581/why-is-map-slower-then-while-for-loop-in-dartflutter",
+    "short_description": "플러터에서 map과 for loop 방식의 차이점",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/5b93d0cb-cc98-4420-aa0e-dced2d45b5aa/image.png",
+    "url_slug": "Flutter-map방식은-for-loop보다-느릴-수-있다",
+    "series": {
+      "id": "c9205480-39d8-44e5-9c86-f061d555a377",
+      "name": "Flutter",
+      "url_slug": "개인공부-APP"
+    }
+  }
+}

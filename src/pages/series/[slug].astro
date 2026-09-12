@@ -1,0 +1,14 @@
+---
+import { Badge } from '../../components/ui/badge';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { getContent, dateLabel } from '../../lib/content';
+export async function getStaticPaths() { const {series} = await getContent(); return series.map(group => ({params:{slug:group.data.slug}, props:{group}})); }
+const { group } = Astro.props;
+const category = group.posts[0].data.category;
+---
+<BaseLayout title={group.data.name} category={category} seriesId={group.id} description={group.data.description || `${group.data.name}에 관한 ${group.posts.length}개의 글을 이어 읽습니다.`}>
+  <header class="page-heading"><a href="/series/" class="eyebrow block">SERIES / 시리즈</a><h1>{group.data.name}</h1>{group.data.description && <p class="page-description">{group.data.description}</p>}<div class="stat-line"><Badge variant="secondary">{group.posts.length}개의 글</Badge><Badge variant="outline">시리즈 순서대로</Badge></div></header>
+  <PostList posts={group.posts} numbered />
+  <div slot="right"><h2 class="rail-heading">이어 읽기</h2><p class="rail-note">각 글의 아래에서 이전 글과 다음 글로 이동할 수 있습니다.</p><p class="rail-note mt-6">첫 순서의 글<br/>{dateLabel(group.posts[0].data.publishedAt)}</p></div>
+</BaseLayout>

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "4e65f68b-7fd7-4943-a2e8-bb158e4c4341",
+    "title": "XML과 JSON",
+    "released_at": "2025-07-26T03:15:11.206Z",
+    "updated_at": "2026-08-14T09:52:33.069Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/73256e61-d4f9-413b-ae81-4e5e86bc9208/image.webp)\n\n# XML\n\n> - 데이터를 저장하고 전송하기 위한 마크업 언어\n> - 화면에 표시하는 목적이 아닌 데이터의 의미와 구조를 정의, 컴퓨터 간에 데이터를 교환하는 데 특화\n\n- 태그 기반 구조: 데이터의 각 요소를 태그로 감싸, 유저가 원하는 태그명 정의 가능\n- 트리 구조: 데이터가 루트 요소를 기준으로 하위 요소들이 중첩되어 계층적으로 표현됨\n- 확장성: 다양한 목적에 맞는 태그와 구조를 자유롭게 설계\n- 사람과 기계 모두 읽기 쉬움: 텍스트 기반이라 사람이 직접 읽고 편집 가능, 기계도 구조적으로 데이터를 처리하기 쉬움\n- 플랫폼/언어 독립적: 플랫폼이나 언어 상관없이 널리 사용 가능\n\n> 예시:\n>\n> ```xml\n> <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n> <book category=\"fantasy\">\n>   <title>Harry Potter</title>\n>   <author>J.K. Rowling</author>\n>   <year>1997</year>\n> </book>\n> ```\n\n- 구성 요소\n  - 요소(Element): `<title>Harry Potter</title>`\n  - 속성(Attribute): `<book category=\"fantasy\">`\n  - 텍스트 데이터(Text Content): 태그 안의 실제 값\n  - 주석(Comment): `<!-- 주석 내용 -->`\n    - 처리 명령(Processing Instruction): `<?xml version=\"1.0\">`\n\n# JSON\n\n> - 데이터를 저장하고 교환하기 위한 텍스트 기반 데이터 포맷\n> - JS의 객체 표기법에서 파생, 언어나 플랫폼 관계없이 널리 사용\n\n- 구조\n  - `key` - `value` 쌍\n  - `{}`로 감싼다\n  - `JSON`의 값으로 `String`, `Number`, `Boolean`, `Array`, `Object`, `null` 등이 올 수 있음\n  - `key` 값은 반드시 `\"\"`로 감싼다\n\n> 예시:\n>\n> ```json\n> {\n>   \"name\": \"정승준\",\n>   \"age\": 23,\n>   \"isStudent\": true,\n>   \"skills\": [\"JavaScript\", \"React\"],\n>   \"address\": { \"city\": \"Suwon\" }\n> }\n> ```\n\n- 특징\n  - 사람과 기계 모두 해석하기 쉬움\n  - 파싱과 생성이 쉬움\n  - 가볍고 간결해 XML 대비 효율적\n  - 함수나 주석, undefined 등은 표현 불가능\n  \n\n# JSON과 XML의 차이점\n\n## 기본적인 구조 차이\n\n### JSON\n  - key-value 쌍 구조\n  - 최소한의 문법으로 데이터 표현\n\n```json\n{\n  \"name\": \"booduki\",\n  \"job\": \"Sending DM\"\n}\n```\n\n### XML\n  - 태그 기반 구조\n  - 태그명으로 데이터의 의미를 명확히 표현\n\n```xml\n<bot>\n  <name>booduki</name>\n  <job>Sending DM</job>\n</bot>\n```\n\n## 같은 데이터에 대해서 다룰 때의 장단점\n\n### JSON\n\n- 장점\n  - 파싱 속도가 XML에 비해서 빠름\n  - 용량이 작다\n  - 구문이 간단해서 읽기/쓰기가 쉽다\n- 단점\n  - 주석이 불가능\n  - 데이터 타입 제한(문자열, 숫자, 배열 등 기본 타입만 지원)\n  - 문법 오류에 취약: 콤마 하나만 틀려도 전체 문서 해석 불가\n\n### XML\n\n- 장점\n  - 스키마 검증: 데이터 무결성 검정 가능\n  - 다양한 데이터 타입\n  - 구조화 우수: 복잡한 계층구조, 메타데이터 표현\n  - 주석 지원\n- 단점\n  - XML 파서가 필요해 파싱 속도 저하\n  - 큰 파일 크기\n  - 복잡한 구문\n\n# 어떤 게 더 좋아?\n![](https://velog.velcdn.com/images/jsj9620/post/cd5b1618-4559-484d-8fe9-7303ce57eb81/image.png)\n>\n> ~~나니가스키~~\n> **JSON**: 웹 API와 모바일 앱에서 빠른 데이터 교환에 적합\n> **XML**: 복잡한 문서 구조와 엄격한 데이터 검증이 필요한 경우에 적합",
+    "short_description": "XML과 JSON에 대해 알아보고 둘을 비교해보자!",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/73256e61-d4f9-413b-ae81-4e5e86bc9208/image.webp",
+    "url_slug": "XML과-JSON",
+    "series": {
+      "id": "ba7963f4-c100-4788-8a38-bdd9833e52ad",
+      "name": "프로그래밍 언어론",
+      "url_slug": "프로그래밍-언어론"
+    }
+  }
+}

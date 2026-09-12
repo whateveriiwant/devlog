@@ -1,0 +1,1045 @@
+[
+  {
+    "id": "5ce42d25-c564-4c0e-8513-dff6fdc43d02",
+    "name": "React",
+    "description": null,
+    "url_slug": "개인공부",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/2d21f42b-a391-4006-bdbe-19ae8ad978e4/image.png",
+    "updated_at": "2025-11-19T15:39:32.562Z",
+    "posts_count": 13,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EA%B0%9C%EC%9D%B8%EA%B3%B5%EB%B6%80",
+    "collectedCount": 13,
+    "posts": [
+      {
+        "id": "bd9d5dd9-da19-4d69-b838-ba43dc779754",
+        "title": "[React] 정말 헷갈리는 부모 자식간 데이터 전달",
+        "slug": "React-정말-헷갈리는-부모-자식간-데이터-전달",
+        "order": 1
+      },
+      {
+        "id": "d3a34cbc-0af7-4377-b757-d13dc57c7b65",
+        "title": "[React] 조건에 따라 배열 렌더링하기",
+        "slug": "React-조건에-따라-배열-렌더링하기",
+        "order": 2
+      },
+      {
+        "id": "1a220256-3bcd-44d1-bf79-63102e3c1c3a",
+        "title": "[React] 자동 로그인 구현하기 (useEffect())",
+        "slug": "React-자동-로그인-구현하기-useEffect",
+        "order": 3
+      },
+      {
+        "id": "8d16e8a3-bb14-4b09-940e-717ecccdd77b",
+        "title": "[React] textarea 높이 자동 조절",
+        "slug": "React-textarea-높이-자동-조절",
+        "order": 4
+      },
+      {
+        "id": "11ce2b3e-c722-49e2-ad66-e4c7acac32db",
+        "title": "[React] Portal로 쉽게 Modal 만들어보기",
+        "slug": "React-Portal로-쉽게-Modal-만들어보기",
+        "order": 5
+      },
+      {
+        "id": "be9642ca-8761-4972-9bbe-bc5e77cb5b72",
+        "title": "[React] MediaPipe Hands 웹에서 띄워보기",
+        "slug": "React-MediaPipe-Hands-웹에서-띄워보기",
+        "order": 6
+      },
+      {
+        "id": "07bda768-ba2d-4e2f-ae22-28ce1d7552ad",
+        "title": "[React] 벨로그처럼 태그 기능 만들기",
+        "slug": "React-벨로그처럼-태그-기능-만들기",
+        "order": 7
+      },
+      {
+        "id": "06c7416c-cac6-4165-ae00-2cf759491790",
+        "title": "[React] 가상 DOM",
+        "slug": "가상-DOM",
+        "order": 8
+      },
+      {
+        "id": "367234c6-2e00-4c44-933f-f59564cd317f",
+        "title": "[React] useEffect로 fetch 할 때 마주할 수 있는 세 가지 함정",
+        "slug": "useEffect로-fetch-할-때-마주할-수-있는-세-가지-함정",
+        "order": 9
+      },
+      {
+        "id": "c71d92ba-ce10-45dd-8a02-540e37738d43",
+        "title": "[React] Context API",
+        "slug": "React-Context-API",
+        "order": 10
+      },
+      {
+        "id": "33c6d547-dfe8-48d9-a478-cbbbc092d5be",
+        "title": "[React] Fragment",
+        "slug": "React-Fragment",
+        "order": 11
+      },
+      {
+        "id": "7515f1b9-f8cc-49d6-a8f2-ef7f16aa7a29",
+        "title": "[React] 디버깅의 편의성을 높이는 displayName",
+        "slug": "React-디버깅의-편의성을-높이는-displayName",
+        "order": 12
+      },
+      {
+        "id": "7cc76a8d-b755-4db9-afd7-2f06f8284f08",
+        "title": "React의 영원한 숙제, Stale Closure 완벽 이해하기",
+        "slug": "React의-영원한-숙제-Stale-Closure-완벽-이해하기",
+        "order": 13
+      }
+    ]
+  },
+  {
+    "id": "1cbdd12f-0c40-4ad4-bb01-89612f92c551",
+    "name": "DevOps",
+    "description": null,
+    "url_slug": "DevOps",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/d8a300d7-8d34-4c0b-b07d-463ce78590d0/image.png",
+    "updated_at": "2025-11-04T14:35:08.610Z",
+    "posts_count": 1,
+    "originalUrl": "https://velog.io/@jsj9620/series/DevOps",
+    "collectedCount": 1,
+    "posts": [
+      {
+        "id": "137284fe-c422-47d2-9cb0-8b496e838925",
+        "title": "Docker가 뭐에요?",
+        "slug": "Docker가-뭐에요",
+        "order": 1
+      }
+    ]
+  },
+  {
+    "id": "adcfe515-e537-40c8-ac4e-dafed322ac41",
+    "name": "소프트웨어 아키텍처",
+    "description": null,
+    "url_slug": "소프트웨어-아키텍처",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/0e337245-dcfa-4966-9d81-b9006a9eba27/image.png",
+    "updated_at": "2025-11-04T14:35:08.607Z",
+    "posts_count": 4,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98",
+    "collectedCount": 4,
+    "posts": [
+      {
+        "id": "38b70e4f-38fe-4df9-a4de-9a26c4f42185",
+        "title": "모노레포",
+        "slug": "모노레포",
+        "order": 1
+      },
+      {
+        "id": "3da4db5b-31d5-404b-9d91-6d72f26930b1",
+        "title": "Feature 기반 MVC 패턴 디렉토리 구조",
+        "slug": "Feature-기반-MVC-패턴",
+        "order": 2
+      },
+      {
+        "id": "7d9839ba-53fa-40d2-bf14-50e7a8e2ac51",
+        "title": "테스트, TDD에 대한 관심과 현실적인 고민",
+        "slug": "테스트-TDD에-대한-관심과-현실적인-고민",
+        "order": 3
+      },
+      {
+        "id": "ce956587-4210-40e0-ae7a-978c623e2803",
+        "title": "프론트엔드 테스트 입문기",
+        "slug": "프론트엔드-테스트-입문기",
+        "order": 4
+      }
+    ]
+  },
+  {
+    "id": "928b6b91-8174-41a7-a245-d3a65755410d",
+    "name": "테스팅",
+    "description": null,
+    "url_slug": "테스팅",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/8382fe43-b76f-4c30-a554-df03b0a76def/image.png",
+    "updated_at": "2025-11-04T14:34:17.836Z",
+    "posts_count": 1,
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%85%8C%EC%8A%A4%ED%8C%85",
+    "collectedCount": 1,
+    "posts": [
+      {
+        "id": "947d11e2-d891-4907-9ec2-99067aa5a9b0",
+        "title": "Storybook 알아보기",
+        "slug": "Storybook-알아보기",
+        "order": 1
+      }
+    ]
+  },
+  {
+    "id": "621a6c96-50f3-4675-85c5-25cc0514f5ff",
+    "name": "웹 공통",
+    "description": null,
+    "url_slug": "웹-공통",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/e22c1c65-d894-4783-ab18-4330a22bc8aa/image.png",
+    "updated_at": "2025-10-31T01:56:09.363Z",
+    "posts_count": 5,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%9B%B9-%EA%B3%B5%ED%86%B5",
+    "collectedCount": 5,
+    "posts": [
+      {
+        "id": "fc8ef196-d560-418d-9806-c83bdc214a44",
+        "title": "JWT (JSON Web Token)",
+        "slug": "JWT-JSON-Web-Token",
+        "order": 1
+      },
+      {
+        "id": "83bcade7-ced2-4aef-b439-690f002913d9",
+        "title": "프론트엔드 빌드 도구와 번들러 작동 원리",
+        "slug": "프론트엔드-빌드-도구와-작동-원리",
+        "order": 2
+      },
+      {
+        "id": "f732acb2-1143-461e-a9dc-ae3ba521ecb7",
+        "title": "HTTP",
+        "slug": "HTTP",
+        "order": 3
+      },
+      {
+        "id": "64503f8a-dca1-4ecb-9463-8c19a57e1ef3",
+        "title": "프록시와 Vite 환경에서 CORS 문제 회피하는 법",
+        "slug": "프록시와-Vite-환경에서-CORS-문제-회피하는-법",
+        "order": 4
+      },
+      {
+        "id": "f84d0f11-d235-4880-b946-c07d7801c442",
+        "title": "OAuth 개념과 사용법 정리",
+        "slug": "OAuth-개념과-사용법-정리",
+        "order": 5
+      }
+    ]
+  },
+  {
+    "id": "631448b2-e669-4c0c-a57d-b8c5ad0a4103",
+    "name": "Node.js",
+    "description": null,
+    "url_slug": "Node.js",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/f48a05f8-2e6d-436a-ba05-6d5179f2bd80/image.png",
+    "updated_at": "2025-10-30T14:54:52.289Z",
+    "posts_count": 13,
+    "originalUrl": "https://velog.io/@jsj9620/series/Node.js",
+    "collectedCount": 13,
+    "posts": [
+      {
+        "id": "c0e494ff-52ec-4398-9e39-a69d45b4a313",
+        "title": "worker_threads 모듈",
+        "slug": "JavaScript-workerthreads-모듈",
+        "order": 1
+      },
+      {
+        "id": "7575c5e8-a570-4910-9802-98e242a30d0b",
+        "title": "동기적 그리고 비동기적",
+        "slug": "동기적-그리고-비동기적",
+        "order": 2
+      },
+      {
+        "id": "b9347622-49c3-4016-8112-383a6ef52326",
+        "title": "Node.js의 프로세스 메모리 관리 방식",
+        "slug": "Node.js의-프로세스-메모리-관리-방식",
+        "order": 3
+      },
+      {
+        "id": "be680b78-cbcd-4130-9ad1-348dc312214d",
+        "title": "Node.js 파일 I/O ",
+        "slug": "Node.js-파일-IO",
+        "order": 4
+      },
+      {
+        "id": "77531960-d712-443b-baa9-9ac59ca8c94b",
+        "title": "Node.js TCP 스트림 문제 해결",
+        "slug": "Node.js-TCP-스트림-문제-해결",
+        "order": 5
+      },
+      {
+        "id": "e65517f0-2910-496e-aabf-de40b2719d39",
+        "title": "Node.js에서 TCP 방식으로 10KB 이상의 대용량 데이터 다루기",
+        "slug": "Node.js에서-TCP-방식으로-10KB-이상의-대용량-데이터-전송",
+        "order": 6
+      },
+      {
+        "id": "bb3e6118-19d8-4e2c-8767-fa119c30cea7",
+        "title": "Node.js 프로그램에서 터미널 명령어 실행하기",
+        "slug": "Node.js-프로그램에서-터미널-명령어-실행하기",
+        "order": 7
+      },
+      {
+        "id": "708efdbf-7f74-4700-b61a-c97b5303ed46",
+        "title": "Node.js 모듈 시스템",
+        "slug": "Node.js-모듈-시스템",
+        "order": 8
+      },
+      {
+        "id": "18eb62e3-7482-4727-b079-36a97136e8a6",
+        "title": "비동기 처리를 위한 Promise/EventEmitter 도입의 고충",
+        "slug": "비동기-처리를-위한-PromiseEventEmitter-도입의-고충",
+        "order": 9
+      },
+      {
+        "id": "6a2add8a-bed7-4fbd-8df8-1757096d476c",
+        "title": "비동기 방식의 어려운 점들",
+        "slug": "비동기-방식의-어려운-점들",
+        "order": 10
+      },
+      {
+        "id": "9945a238-8c0f-4c6d-a31f-05c8e46a171f",
+        "title": "Node.js와 MySQL 연동하기",
+        "slug": "Node.js와-MySQL-연동하기",
+        "order": 11
+      },
+      {
+        "id": "6d61e399-1efc-4934-b923-a6c8b7892203",
+        "title": "CORS가 뭐야?",
+        "slug": "CORS가-뭐야",
+        "order": 12
+      },
+      {
+        "id": "47183a4b-57f8-4cc9-8455-04f528e6c984",
+        "title": "Node.js Passport 라이브러리",
+        "slug": "Node.js-Passport-라이브러리",
+        "order": 13
+      }
+    ]
+  },
+  {
+    "id": "1f8077c0-1951-4186-8e38-4fb615ed1226",
+    "name": "데이터베이스",
+    "description": null,
+    "url_slug": "데이터베이스",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/1049a74a-5b2b-46f7-b30d-6c2aad4b853e/image.png",
+    "updated_at": "2025-10-24T04:45:03.496Z",
+    "posts_count": 5,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EB%8D%B0%EC%9D%B4%ED%84%B0%EB%B2%A0%EC%9D%B4%EC%8A%A4",
+    "collectedCount": 5,
+    "posts": [
+      {
+        "id": "f1334f14-de39-4579-9188-ffaf72eb4aed",
+        "title": "벡터 임베딩",
+        "slug": "벡터-임베딩",
+        "order": 1
+      },
+      {
+        "id": "e374b179-fbba-419d-a363-5b52e8df16c0",
+        "title": "벡터 검색 및 인덱싱",
+        "slug": "벡터-검색-및-인덱싱",
+        "order": 2
+      },
+      {
+        "id": "36a95c71-665c-47c3-8ae9-769d1865b1fa",
+        "title": "벡터 데이터베이스",
+        "slug": "벡터-데이터베이스",
+        "order": 3
+      },
+      {
+        "id": "67406008-c516-40f7-b0c8-c22186d85f58",
+        "title": "유사도와 거리",
+        "slug": "유사도와-거리",
+        "order": 4
+      },
+      {
+        "id": "5059fc35-ebdc-48c5-aa9d-878ce7585aa2",
+        "title": "위치 정보를 DB에 저장하는 방법",
+        "slug": "위치-정보를-DB에-저장하는-방법",
+        "order": 5
+      }
+    ]
+  },
+  {
+    "id": "1baf0d0f-7066-4257-b245-8f0fcae7af18",
+    "name": "프로젝트",
+    "description": null,
+    "url_slug": "프로젝트",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/c499c1ba-09e7-4e73-aa06-a4360e191502/image.png",
+    "updated_at": "2025-10-14T14:06:22.270Z",
+    "posts_count": 1,
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8",
+    "collectedCount": 1,
+    "posts": [
+      {
+        "id": "5acb2408-257c-421a-a18e-40c74eb9f6e2",
+        "title": "Thumbs Up! 👍 - 당신의 최고의 썸네일 메이커",
+        "slug": "Thumbs-Up-당신의-최고의-썸네일-메이커",
+        "order": 1
+      }
+    ]
+  },
+  {
+    "id": "37ef3aea-e9ea-45da-a659-474fe2ff11e3",
+    "name": "JavaScript",
+    "description": null,
+    "url_slug": "JavaScript",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/304223f9-8738-4543-a1d8-16f667c1bea9/image.jpg",
+    "updated_at": "2025-08-27T10:15:02.060Z",
+    "posts_count": 8,
+    "originalUrl": "https://velog.io/@jsj9620/series/JavaScript",
+    "collectedCount": 8,
+    "posts": [
+      {
+        "id": "6ef8b96b-0ba1-4693-a806-d8d0b8dac8e5",
+        "title": "[JavaScript] ArrayBuffer & SharedArrayBuffer",
+        "slug": "JavaScript-ArrayBuffer-SharedArrayBuffer",
+        "order": 1
+      },
+      {
+        "id": "641bf52d-2e41-4f89-9687-73ff2da665c6",
+        "title": "Javascript에서의 리팩터링에 대해",
+        "slug": "Javascript-Refactoring",
+        "order": 2
+      },
+      {
+        "id": "7c6f0f15-b825-424b-8ae1-d94a84c32a9b",
+        "title": "[JavaScript] +가 변수 앞에 붙는 이유는?",
+        "slug": "JavaScript-가-변수-앞에-붙는-이유는",
+        "order": 3
+      },
+      {
+        "id": "ef56d14e-4883-4f44-b2a2-ea2e68f8805c",
+        "title": "Atomics 객체",
+        "slug": "Atomics-객체",
+        "order": 4
+      },
+      {
+        "id": "9d2d8037-2752-4071-b916-79691f5bbeba",
+        "title": "반복문을 대체하는 JS 고차 함수들",
+        "slug": "반복문을-대체하는-JS-고차-함수들",
+        "order": 5
+      },
+      {
+        "id": "0f4c8b50-6034-48ba-94d0-f28db683bd21",
+        "title": "DOM 파서",
+        "slug": "DOM-파서",
+        "order": 6
+      },
+      {
+        "id": "859a4071-21cb-4da5-8b19-da7de50cbf3f",
+        "title": "[JavaScript/Node.js] 이벤트 루프",
+        "slug": "JavaScriptNode.js-이벤트-루프",
+        "order": 7
+      },
+      {
+        "id": "f0e23bb1-2ac8-44f6-b766-94c57be0c45b",
+        "title": "Event 객체 & 고급 이벤트 기법",
+        "slug": "Event-객체-고급-이벤트-기법",
+        "order": 8
+      }
+    ]
+  },
+  {
+    "id": "c1d9eff9-7b4f-4762-ba56-b1670522e74b",
+    "name": "네이버 커넥트재단 부스트캠프 웹・모바일 10기 웹 풀스택",
+    "description": null,
+    "url_slug": "네이버-부스트캠프-10기-풀스택",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/048a51ce-b8cd-4b0c-bf42-d4a5aac559d0/image.png",
+    "updated_at": "2025-08-13T07:41:31.554Z",
+    "posts_count": 3,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EB%84%A4%EC%9D%B4%EB%B2%84-%EB%B6%80%EC%8A%A4%ED%8A%B8%EC%BA%A0%ED%94%84-10%EA%B8%B0-%ED%92%80%EC%8A%A4%ED%83%9D",
+    "collectedCount": 3,
+    "posts": [
+      {
+        "id": "94b9a864-3e65-4910-a2f1-307454615921",
+        "title": "네이버 부스트캠프 10기 베이직을 마치며",
+        "slug": "네이버-부스트캠프-10기-베이직을-마치며",
+        "order": 1
+      },
+      {
+        "id": "655215d3-bf28-4ef1-93d8-76bd856de46a",
+        "title": "네이버 부스트캠프 웹・모바일 10기 챌린지 수료했어요",
+        "slug": "네이버-부스트캠프-웹・모바일-10기-챌린지-수료했어요",
+        "order": 2
+      },
+      {
+        "id": "5af0aa06-6aa3-450e-927f-b20eff435da3",
+        "title": "부스트캠프 웹·모바일 10기 웹 풀스택 멤버십 합격",
+        "slug": "부스트캠프-웹모바일-10기-웹-풀스택-멤버십-합격",
+        "order": 3
+      }
+    ]
+  },
+  {
+    "id": "d53de5d1-71fd-46d5-b493-e804bef5d183",
+    "name": "운영체제",
+    "description": null,
+    "url_slug": "운영체제",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/7076c17a-14b8-4c5c-80b9-235f78cf90cf/image.webp",
+    "updated_at": "2025-08-11T15:42:22.845Z",
+    "posts_count": 13,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C",
+    "collectedCount": 13,
+    "posts": [
+      {
+        "id": "0f71c325-fb39-496e-9d9d-1d06e88f36f9",
+        "title": "JS로 레이스 컨디션 시뮬레이터 만들기",
+        "slug": "JS로-레이스-컨디션-시뮬레이터-만들기",
+        "order": 1
+      },
+      {
+        "id": "b4f81f15-e99e-4d78-bb52-ec89e2450bbb",
+        "title": "프로세스와 스레드",
+        "slug": "프로세스와-스레드",
+        "order": 2
+      },
+      {
+        "id": "a5f8f899-f6fd-4473-b314-6703082dac25",
+        "title": "컨텍스트 스위칭",
+        "slug": "컨텍스트-스위칭",
+        "order": 3
+      },
+      {
+        "id": "a90e2742-f941-4bbd-9473-fad0ac1b24fc",
+        "title": "동시성과 병렬성",
+        "slug": "동시성과-병렬성",
+        "order": 4
+      },
+      {
+        "id": "58adce66-51f0-4643-9e13-81785ef0d4cf",
+        "title": "레이스 컨디션",
+        "slug": "레이스-컨디션",
+        "order": 5
+      },
+      {
+        "id": "67578085-3efa-4064-83fe-2285cdaa7f68",
+        "title": "레이스 컨디션을 해결하기 위한 동기화 기법 정리",
+        "slug": "레이스-컨디션을-해결하기-위한-동기화-기법-정리",
+        "order": 6
+      },
+      {
+        "id": "4e225394-518a-492d-a84b-2a662c8a6d1d",
+        "title": "IPC (Inter-Process Communication / 프로세스 간 통신)",
+        "slug": "IPC-Inter-Process-Communication-프로세스-간-통신",
+        "order": 7
+      },
+      {
+        "id": "6387fecb-7104-4471-9d73-f53cfb730728",
+        "title": "리눅스의 디렉토리 권한",
+        "slug": "리눅스의-디렉토리-권한",
+        "order": 8
+      },
+      {
+        "id": "60b4850b-88f6-4570-9793-701775a5fdfd",
+        "title": "메모리 관리 관점으로 본 스택 & 힙 메모리",
+        "slug": "메모리-관리-관점으로-본-스택-힙-메모리",
+        "order": 9
+      },
+      {
+        "id": "2bc50800-7fc6-4728-ab8a-4038acd6f2aa",
+        "title": "macOS의 메모리 구조와 가상 메모리 관리법",
+        "slug": "macOS의-메모리-구조와-가상-메모리-관리법",
+        "order": 10
+      },
+      {
+        "id": "9d94106c-ddfe-4cf3-88b8-0cfd49a8d554",
+        "title": "절대 경로 vs 상대 경로",
+        "slug": "절대-경로-vs-상대-경로",
+        "order": 11
+      },
+      {
+        "id": "12d4ce34-0ada-429b-9772-58fbe79b7c69",
+        "title": "SimpleFS 가상 파일 시스템",
+        "slug": "SimpleFS-가상-파일-시스템",
+        "order": 12
+      },
+      {
+        "id": "099a1f2a-14cb-454e-b742-3a03654ee739",
+        "title": "멀티 스레딩 vs 비동기",
+        "slug": "멀티-스레딩-vs-비동기",
+        "order": 13
+      }
+    ]
+  },
+  {
+    "id": "b698e6b6-2308-490e-ab9c-a2820a604b90",
+    "name": "Git",
+    "description": null,
+    "url_slug": "Git",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/afd4ea5c-42a7-4fac-b02a-8375fef20144/image.png",
+    "updated_at": "2025-08-11T15:32:44.724Z",
+    "posts_count": 3,
+    "originalUrl": "https://velog.io/@jsj9620/series/Git",
+    "collectedCount": 3,
+    "posts": [
+      {
+        "id": "1fa7b15e-da70-454f-911d-e4628cc25c42",
+        "title": "Git Objects",
+        "slug": "Git-Objects",
+        "order": 1
+      },
+      {
+        "id": "c821b10e-825f-41c9-867e-ce823042c3be",
+        "title": "Git 내부 구조",
+        "slug": "Git-내부-구조",
+        "order": 2
+      },
+      {
+        "id": "47696b0d-2a3e-4dda-94e9-696244eb303b",
+        "title": "Git의 명령어 작동 방식",
+        "slug": "Git의-명령어-작동-방식",
+        "order": 3
+      }
+    ]
+  },
+  {
+    "id": "fdac1e63-5de4-493d-aab2-6d8281e6c45f",
+    "name": "네트워크",
+    "description": null,
+    "url_slug": "네트워크",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/84619523-5b71-4d6c-a5bd-f1207dbb8a67/image.png",
+    "updated_at": "2025-08-11T15:02:56.429Z",
+    "posts_count": 1,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC",
+    "collectedCount": 1,
+    "posts": [
+      {
+        "id": "e0937743-74e8-4129-8ce6-a5ced5eaf310",
+        "title": "TCP로 구현한 동일한 구조를 UDP로 구현할 수 있을까?",
+        "slug": "TCP로-구현한-동일한-구조를-UDP로-구현할-수-있을까",
+        "order": 1
+      }
+    ]
+  },
+  {
+    "id": "ba7963f4-c100-4788-8a38-bdd9833e52ad",
+    "name": "프로그래밍 언어론",
+    "description": null,
+    "url_slug": "프로그래밍-언어론",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/62de6605-6e26-421d-b97e-82e76e34f4b7/image.png",
+    "updated_at": "2025-07-26T04:02:55.102Z",
+    "posts_count": 7,
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-%EC%96%B8%EC%96%B4%EB%A1%A0",
+    "collectedCount": 7,
+    "posts": [
+      {
+        "id": "0222b12f-744f-4779-a6bc-5ee688a96cdb",
+        "title": "함수형 프로그래밍의 특징 정리",
+        "slug": "함수형-프로그래밍의-특징-정리",
+        "order": 1
+      },
+      {
+        "id": "b58b2bae-bc30-4f93-a537-02e99ec290c5",
+        "title": "오직 함수로만 짜는 게 함수형 프로그래밍의 정의일까?",
+        "slug": "오직-함수로만-짜는-게-함수형-프로그래밍의-정의일까",
+        "order": 2
+      },
+      {
+        "id": "4e65f68b-7fd7-4943-a2e8-bb158e4c4341",
+        "title": "XML과 JSON",
+        "slug": "XML과-JSON",
+        "order": 3
+      },
+      {
+        "id": "26a1ee34-952e-4fb1-b1d3-aea3c9c9ff62",
+        "title": "파서 (Parser)",
+        "slug": "파서-Parser",
+        "order": 4
+      },
+      {
+        "id": "23adf87b-526b-4937-b9bd-ea27ae13ceb1",
+        "title": "정규 표현식 (Regex)",
+        "slug": "정규-표현식-Regex",
+        "order": 5
+      },
+      {
+        "id": "7e7223c0-d3f6-4bc0-94fc-8741528aa5c1",
+        "title": "클래스, 오브젝트, 인스턴스",
+        "slug": "클래스-오브젝트-인스턴스",
+        "order": 6
+      },
+      {
+        "id": "3b24ca03-037f-4623-b725-635ce9682493",
+        "title": "객체지향 핵심 개념/특징 정리",
+        "slug": "객체지향-핵심-개념특징-정리",
+        "order": 7
+      }
+    ]
+  },
+  {
+    "id": "a06d9b9c-af8b-4827-a264-0fa788e25564",
+    "name": "자료구조",
+    "description": null,
+    "url_slug": "자료구조",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/eaa0d523-3574-44af-8a3a-604022c6c152/image.png",
+    "updated_at": "2025-07-26T03:01:22.274Z",
+    "posts_count": 8,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0",
+    "collectedCount": 8,
+    "posts": [
+      {
+        "id": "62d124d7-a884-497e-a73d-a84cf7aeb56b",
+        "title": "[자료구조/C++] 반복을 재귀로 바꿔보자",
+        "slug": "자료구조-반복을-재귀로-바꿔보자",
+        "order": 1
+      },
+      {
+        "id": "ecc9f00c-639e-4ce1-bfeb-662cfa9360a5",
+        "title": "[자료구조/C++] Stack",
+        "slug": "자료구조C-Stack",
+        "order": 2
+      },
+      {
+        "id": "59ad0f28-d999-42a6-bbca-86f43a93b82a",
+        "title": "[자료구조/C++] 연결 리스트",
+        "slug": "자료구조C-연결-리스트",
+        "order": 3
+      },
+      {
+        "id": "4e67b0cb-acf8-493c-89e1-4256a34b71f0",
+        "title": "[자료구조/C++] 연결 리스트로 이진 트리 만들기",
+        "slug": "연결-리스트로-이진-트리-만들기",
+        "order": 4
+      },
+      {
+        "id": "dae6f898-de78-46a5-be82-6e00a9ba1e2f",
+        "title": "[자료구조/C++] 이진 트리 탐색 구현",
+        "slug": "자료구조C-이진-트리-탐색-구현",
+        "order": 5
+      },
+      {
+        "id": "72cd1408-ad7a-4606-a2f6-269ee5cb0f2d",
+        "title": "해시 맵 (해시 테이블)",
+        "slug": "해시-맵-해시-테이블",
+        "order": 6
+      },
+      {
+        "id": "a76e0b1b-e6fd-455e-92b4-6f435bd409fe",
+        "title": "JS로 불변성을 가지는 연결 리스트 만들어보기",
+        "slug": "JS로-불변성을-가지는-연결-리스트-만들어보기",
+        "order": 7
+      },
+      {
+        "id": "6b83e97e-c26b-4c68-a182-1e63bf2d2d9c",
+        "title": "JS로 불변성을 가지는 해시 맵 만들어보기",
+        "slug": "JS로-불변성을-가지는-해시-맵-만들어보기",
+        "order": 8
+      }
+    ]
+  },
+  {
+    "id": "c9205480-39d8-44e5-9c86-f061d555a377",
+    "name": "Flutter",
+    "description": null,
+    "url_slug": "개인공부-APP",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/5b93d0cb-cc98-4420-aa0e-dced2d45b5aa/image.png",
+    "updated_at": "2025-07-26T01:33:22.972Z",
+    "posts_count": 1,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EA%B0%9C%EC%9D%B8%EA%B3%B5%EB%B6%80-APP",
+    "collectedCount": 1,
+    "posts": [
+      {
+        "id": "4db388e6-38cf-4829-a48c-f0069ffa8718",
+        "title": "[Flutter] map방식은 for loop보다 느릴 수 있다",
+        "slug": "Flutter-map방식은-for-loop보다-느릴-수-있다",
+        "order": 1
+      }
+    ]
+  },
+  {
+    "id": "c4812740-152d-4537-b8e3-13eded499f2c",
+    "name": "내 장비",
+    "description": null,
+    "url_slug": "내-장비",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/dd3c6f33-0459-48fe-be54-dfd8fa21b776/image.jpeg",
+    "updated_at": "2025-07-09T11:48:13.738Z",
+    "posts_count": 1,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EB%82%B4-%EC%9E%A5%EB%B9%84",
+    "collectedCount": 1,
+    "posts": [
+      {
+        "id": "9d4ade13-5ab6-448d-b173-e1ffd0c0c417",
+        "title": "개발자 기준 해피해킹 리뷰",
+        "slug": "개발자-기준-해피해킹-리뷰",
+        "order": 1
+      }
+    ]
+  },
+  {
+    "id": "cdfa8dc2-c8f0-478a-af43-b9153eadd24e",
+    "name": "PS",
+    "description": null,
+    "url_slug": "개인공부-Python",
+    "thumbnail": "https://images.velog.io/images/jsj9620/post/7907121f-6f07-45a1-b48f-b55768d38a48/Screen Shot 2022-03-07 at 10.48.13.png",
+    "updated_at": "2025-04-29T08:33:13.053Z",
+    "posts_count": 4,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EA%B0%9C%EC%9D%B8%EA%B3%B5%EB%B6%80-Python",
+    "collectedCount": 4,
+    "posts": [
+      {
+        "id": "d6f56db4-2d9e-427f-80db-efaa6629a37a",
+        "title": "백준 2445번 - Python",
+        "slug": "백준-2445번-Python",
+        "order": 1
+      },
+      {
+        "id": "c60b96b4-2b9b-4170-943f-03cb6dbd65db",
+        "title": "백준 2446번 - Python",
+        "slug": "백준-2446번-Python",
+        "order": 2
+      },
+      {
+        "id": "4f230232-04b2-4f90-bcba-843dbf222a6b",
+        "title": "[Python] 수 2개 입력받기에서 Tuple의 사용 유무 차이",
+        "slug": "Python-수-2개-입력받기에서-Tuple의-사용-유무-차이",
+        "order": 3
+      },
+      {
+        "id": "89893ee9-797e-4c06-83ad-467629e26d70",
+        "title": "JavaScript 최대공약수, 최소공배수",
+        "slug": "JavaScript-최대공약수-최소공배수",
+        "order": 4
+      }
+    ]
+  },
+  {
+    "id": "46919296-c6a9-44d4-ace3-1fd698ed41d1",
+    "name": "Microsoft Learn Student Ambassadors",
+    "description": null,
+    "url_slug": "MLSA",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/2bc5582d-d060-4ec1-89fd-f07f809aef36/image.png",
+    "updated_at": "2023-10-20T08:15:48.218Z",
+    "posts_count": 3,
+    "originalUrl": "https://velog.io/@jsj9620/series/MLSA",
+    "collectedCount": 3,
+    "posts": [
+      {
+        "id": "ca3e51c3-70d7-4df5-b949-cecc1498f768",
+        "title": "[MLSA] Microsoft Learn Student Ambassadors 합격",
+        "slug": "MLSA-Microsoft-Learn-Student-Ambassadors-합격-l7m4bgkw",
+        "order": 1
+      },
+      {
+        "id": "5bd8c212-306a-46fd-a258-74db50e0a9e1",
+        "title": "[MLSA] Welcome Aboard! - 등록",
+        "slug": "MLSA-Welcome-Aboard-등록",
+        "order": 2
+      },
+      {
+        "id": "d34ef686-1ac3-4055-b831-d63e87b18e47",
+        "title": "[MLSA] Welcome Aboard! - 본격적인 참여",
+        "slug": "MLSA-Welcome-Aboard-본격적인-참여",
+        "order": 3
+      }
+    ]
+  },
+  {
+    "id": "04b470d9-c254-4e53-8a12-c180c15e01ab",
+    "name": "코드잇 앰배서더 1기",
+    "description": null,
+    "url_slug": "코드잇-앰배서더-1기",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/d6aa83ee-8cf4-4e5f-a4be-57da3846334f/image.png",
+    "updated_at": "2023-09-25T13:29:49.189Z",
+    "posts_count": 7,
+    "originalUrl": "https://velog.io/@jsj9620/series/%EC%BD%94%EB%93%9C%EC%9E%87-%EC%95%B0%EB%B0%B0%EC%84%9C%EB%8D%94-1%EA%B8%B0",
+    "collectedCount": 7,
+    "posts": [
+      {
+        "id": "73ee5083-c890-4ba9-b41a-a44d3f3d1f42",
+        "title": "코드잇과 함께 성장하는 여정",
+        "slug": "코드잇과-함께-성장하는-여정",
+        "order": 1
+      },
+      {
+        "id": "95efb745-8ed2-4094-991a-7bcec8b6ad85",
+        "title": "[코드잇] 대학생 코딩 캠프 13기 모집",
+        "slug": "코드잇-대학생-코딩-캠프-13기-모집",
+        "order": 2
+      },
+      {
+        "id": "955d1c73-f34b-4e3b-b719-305d8aab0dbb",
+        "title": "[코드잇] 코딩 공부를 망설이는 모든 사람들에게",
+        "slug": "코드잇-코딩-공부를-망설이는-모든-사람들에게",
+        "order": 3
+      },
+      {
+        "id": "9f797934-b63f-4aa3-8142-81e6ea6928a9",
+        "title": "[코드잇] 공강 시간을 알차게!!",
+        "slug": "코드잇-공강-시간을-알차게",
+        "order": 4
+      },
+      {
+        "id": "776e6076-1594-4e99-a390-048340b7e0f8",
+        "title": "[코드잇] 코드잇과 함께 공부 습관 기르기",
+        "slug": "코드잇과-함께-공부-습관-기르기",
+        "order": 5
+      },
+      {
+        "id": "ee9a8093-6350-48a5-81c1-997552df982c",
+        "title": "[코드잇] 단기간에 왕초보를 코딩 고수로 만드는 코드잇의 비법은?",
+        "slug": "단기간에-왕초보를-코딩-고수로-만드는-비법",
+        "order": 6
+      },
+      {
+        "id": "dfc320fd-6b90-41b0-b01a-beca032b5e5f",
+        "title": "[코드잇] 코드잇과 함께 100일도 안남은 2023년 불태우기 🔥",
+        "slug": "코드잇-코드잇과-함께-100일도-안남은-2023년-불태우기",
+        "order": 7
+      }
+    ]
+  },
+  {
+    "id": "14b70fd7-a1ed-4749-8609-a000d08414c4",
+    "name": "DEVOCEAN YOUNG",
+    "description": null,
+    "url_slug": "DEVOCEAN-YOUNG",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/f06c73b7-7139-41eb-80b1-cfab1b7e6218/image.jpeg",
+    "updated_at": "2023-09-04T04:39:58.642Z",
+    "posts_count": 4,
+    "originalUrl": "https://velog.io/@jsj9620/series/DEVOCEAN-YOUNG",
+    "collectedCount": 4,
+    "posts": [
+      {
+        "id": "ac87d118-2fae-4711-87c2-7f63d89e1d7b",
+        "title": "[DEVOCEAN YOUNG] 뜨거웠던 발대식 후기",
+        "slug": "DEVOCEAN-YOUNG-뜨거웠던-발대식-후기",
+        "order": 1
+      },
+      {
+        "id": "e262e74f-5503-413b-a5dd-dd2ce484e757",
+        "title": "DEVOCEAN YOUNG 전용 밋업 후기",
+        "slug": "DEVOCEAN-YOUNG-전용-밋업-후기",
+        "order": 2
+      },
+      {
+        "id": "fb05f8bb-a523-4266-84a7-1df792f614df",
+        "title": "[DEVOCEAN YOUNG] SK Telecom 미래기술 체험관 T.um(티움) 체험 후기",
+        "slug": "DEVOCEAN-YOUNG-SK-Telecom-미래기술-체험관-T.um티움-체험-후기",
+        "order": 3
+      },
+      {
+        "id": "fa62aa68-9162-46d5-92ee-8c1bb671a5f5",
+        "title": "DEVOCEAN YOUNG 8월 전용 세미나 후기",
+        "slug": "DEVOCEAN-YOUNG-8월-전용-세미나-후기",
+        "order": 4
+      }
+    ]
+  },
+  {
+    "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+    "name": "C/C++",
+    "description": null,
+    "url_slug": "학교공부-C",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/224d282f-35e7-4b10-86a1-192ed9a2dfee/image.png",
+    "updated_at": "2023-06-29T12:47:39.046Z",
+    "posts_count": 15,
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%95%99%EA%B5%90%EA%B3%B5%EB%B6%80-C",
+    "collectedCount": 15,
+    "posts": [
+      {
+        "id": "b5b04770-4478-4a24-be42-4759f66cde12",
+        "title": "C언어 Express 9장 #08",
+        "slug": "C언어-Express-9장-08",
+        "order": 1
+      },
+      {
+        "id": "b84e0676-6652-4a3f-aa4c-28df8d8e3c04",
+        "title": "C언어 Express 9장 #06",
+        "slug": "C언어-Express-9장-06",
+        "order": 2
+      },
+      {
+        "id": "638885fe-dd5e-46fa-b372-81de9a02fcf4",
+        "title": "C언어 Express 5장 #03",
+        "slug": "C언어-Express-5장-03",
+        "order": 3
+      },
+      {
+        "id": "a25ce309-4635-4917-8f19-13daea66778f",
+        "title": "비트 이동 연산 및 OR연산 사용 예제",
+        "slug": "비트-이동-연산-및-OR연산-사용-예제",
+        "order": 4
+      },
+      {
+        "id": "7f383107-ef4a-4a9d-b24c-784d61272f35",
+        "title": "C언어 Express 7장 #05",
+        "slug": "C언어-Express-7장-05",
+        "order": 5
+      },
+      {
+        "id": "9686a187-bfd9-4305-aea6-179c554ae8a7",
+        "title": "C언어 Express 8장 #14",
+        "slug": "C언어-Express-8장-14",
+        "order": 6
+      },
+      {
+        "id": "748fa571-dc8a-425f-aef5-121bb09d50ed",
+        "title": "C언어 Express 9장 #09",
+        "slug": "C언어-Express-9장-09",
+        "order": 7
+      },
+      {
+        "id": "605badfc-e330-4207-8e9f-fedaa65cd335",
+        "title": "C언어 - 대문자 소문자 간 변환",
+        "slug": "C언어-대문자-소문자-간-변환",
+        "order": 8
+      },
+      {
+        "id": "c8f2b23a-ce08-4621-9161-8198ee87b650",
+        "title": "C언어 - 선택 정렬",
+        "slug": "C언어-선택-정렬",
+        "order": 9
+      },
+      {
+        "id": "1d73127c-b9e4-49df-8fe0-231efb34377f",
+        "title": "C언어 - 탐색",
+        "slug": "C언어-탐색",
+        "order": 10
+      },
+      {
+        "id": "ce14de1a-a78f-48ee-b2fc-d363c0dbdf83",
+        "title": "C - 문자열에서 각 단어 가져오기",
+        "slug": "C-문자열에서-각-단어-가져오기",
+        "order": 11
+      },
+      {
+        "id": "4af88bbb-fd23-4b38-9782-7877b4243de9",
+        "title": "[C++] 두 물체 충돌 구현",
+        "slug": "C-두-물체-충돌-구현",
+        "order": 12
+      },
+      {
+        "id": "1da35491-044b-41d6-aad6-ab9fa8c4be56",
+        "title": "[C++] 총알 피하기 게임 제작 1주차",
+        "slug": "C-총알-피하기-게임-제작-1주차",
+        "order": 13
+      },
+      {
+        "id": "1eeee118-a212-49ad-a35b-58c1514f7c6b",
+        "title": "[C++] 총알 피하기 게임 제작 2주차",
+        "slug": "C-총알-피하기-게임-제작-2주차",
+        "order": 14
+      },
+      {
+        "id": "29dfc376-a553-482a-a2aa-29eb62fea97c",
+        "title": "[C++] 총알 피하기 게임 제작 3주차 (마지막)",
+        "slug": "C-총알-피하기-게임-제작-3주차-마지막",
+        "order": 15
+      }
+    ]
+  },
+  {
+    "id": "558a9a36-14d1-40a5-aaa1-0f0ed880df53",
+    "name": "학교생활",
+    "description": null,
+    "url_slug": "학교생활",
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/b66d81c8-5dab-40fc-a35b-8e4ad6da55ef/image.jpeg",
+    "updated_at": "2022-11-15T05:35:51.354Z",
+    "posts_count": 4,
+    "originalUrl": "https://velog.io/@jsj9620/series/%ED%95%99%EA%B5%90%EC%83%9D%ED%99%9C",
+    "collectedCount": 3,
+    "posts": [
+      {
+        "id": "373a6614-3f0c-4eee-8e8e-b684e34bf533",
+        "title": "학부 1학년이 해커톤에?",
+        "slug": "학부-1학년이-해커톤에",
+        "order": 1
+      },
+      {
+        "id": "36fcb5cd-2010-4f67-80d6-c3b775d18a6b",
+        "title": "첫 게시물",
+        "slug": "첫-게시물",
+        "order": 2
+      },
+      {
+        "id": "c2c99492-462c-4c1d-ab18-dbc544259106",
+        "title": "데보션 굿즈 후기",
+        "slug": "데보션-굿즈-후기",
+        "order": 4
+      }
+    ]
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "startedAt": "2026-09-07T05:58:56.745170+00:00",
+  "completedAt": "2026-09-07T05:59:00.726652+00:00",
+  "username": "jsj9620",
+  "publicPostCount": 125,
+  "collectedPostCount": 125,
+  "seriesCount": 23,
+  "tagCount": 170,
+  "pageSizes": [
+    20,
+    20,
+    20,
+    20,
+    20,
+    20,
+    5,
+    0
+  ],
+  "exhaustedCursor": true,
+  "authenticated": false,
+  "seriesCountDiscrepancies": [
+    {
+      "series": "학교생활",
+      "listedCount": 4,
+      "publicMemberCount": 3
+    }
+  ],
+  "membersMissingFromPublicPosts": [],
+  "sources": [
+    "https://velog.io/@jsj9620/posts",
+    "https://velog.io/@jsj9620/series",
+    "https://v3.velog.io/graphql",
+    "https://v2.velog.io/graphql"
+  ],
+  "queries": {
+    "posts": "query velogPosts($input: GetPostsInput!) {\n      posts(input: $input) { id title short_description thumbnail url_slug\n      released_at updated_at tags is_private } }",
+    "tags": "query userTags($input: UserTagsInput!) {\n      userTags(input: $input) { posts_count tags { name posts_count } } }",
+    "seriesList": "query getUserSeriesList($input: GetUserInput!) {\n      user(input: $input) { series_list { id name description url_slug\n      thumbnail updated_at posts_count } } }",
+    "post": "query readPost($input: ReadPostInput!) {\n      post(input: $input) { id title released_at updated_at body short_description\n      is_markdown is_private is_temp thumbnail url_slug series { id name url_slug } } }",
+    "series": "query Series($username: String, $url_slug: String) {\n      series(username: $username, url_slug: $url_slug) { id name\n      series_posts { id index post { id title url_slug released_at } } } }"
+  }
+}

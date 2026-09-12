@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "a25ce309-4635-4917-8f19-13daea66778f",
+    "title": "비트 이동 연산 및 OR연산 사용 예제",
+    "released_at": "2022-04-17T06:33:53.108Z",
+    "updated_at": "2026-08-19T05:54:17.057Z",
+    "body": "이해하기가 쉽지 않음,,, 진짜 이해하는데 죽을뻔\n아무튼, 문제는 이러하다.\n![](https://velog.velcdn.com/images/jsj9620/post/254bb5da-6ebc-4489-8e5b-e10542d661e0/image.png)\n\n비트 0~31에 각각 문자의 비트를 집어넣는 문제다.\n비트 이동하는거 까지는 이해가 됐었는데 OR연산은 왜 하는지 진짜 머리 많이 굴렸다.\n\n![](https://velog.velcdn.com/images/jsj9620/post/cd401a72-99f2-4dcd-9969-ecb8cb337932/image.jpeg)\n\n아이디어를 끄적여봤다. OR연산의 정의와 연관지으면, OR연산은 1이 하나라도 있으면 무조건 1로 만드는 특징이 있다. 이 점을 생각해, 어떠한 값을 무조건 덮어씌울 수도 있겠다는 생각을 했다.\n\n그래서 문자를 비트 이동하고, num과 OR 연산을 해 num에 문자 비트를 덮어씌우는 방식을 택했다.\n\n```\n#include <stdio.h>\n\nint main() {\n    unsigned int num;\n    char a, b, c, d;\n\n    printf(\"첫번째 문자를 입력하시오: \");\n    scanf(\"%c\", &a);\n    num = a;\n\n    printf(\"두번째 문자를 입력하시오: \");\n    scanf(\" %c\", &b);\n    num = b << 8 | num;\n\n    printf(\"세번째 문자를 입력하시오: \");\n    scanf(\" %c\", &c);\n    num = c << 16 | num;\n\n    printf(\"네번째 문자를 입력하시오: \");\n    scanf(\" %c\", &d);\n    num = d << 24 | num;\n\n    printf(\"결과값: %x\\n\", num);\n    return 0;\n}\n```",
+    "short_description": "C언어 Express 5장 #12",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/254bb5da-6ebc-4489-8e5b-e10542d661e0/image.png",
+    "url_slug": "비트-이동-연산-및-OR연산-사용-예제",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

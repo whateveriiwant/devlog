@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "29dfc376-a553-482a-a2aa-29eb62fea97c",
+    "title": "[C++] 총알 피하기 게임 제작 3주차 (마지막)",
+    "released_at": "2022-12-13T07:32:56.572Z",
+    "updated_at": "2026-08-19T05:54:16.771Z",
+    "body": "어느덧 마지막이다! 마지막인 만큼 게임의 완성도를 높이는 방향으로 개발했다.\n## 코드 리팩토링 및 최적화\n불필요한 코드를 모두 정리하고 변수 이름들을 바꿔줬다. 또한 헤더와 소스파일로 클래스를 분리시켜서 가독성을 높혔다. 파일 구조는 맨 아래의 깃허브 링크를 통해 확인해 볼 수 있다.\n또한 자주 호출되는 함수에 대해서는 inline을 적용해서 성능을 향상시켰다.\n추가적으로 조건문에서 조건이 여러 개일 때는 실행이 간단한 조건부터 먼저 배치시켰다.\n## 벌레 잡기\n게임을 개발하면서 계속 눈에 띄는 버그가 있었다. 첫번째가 게임을 시작하자마자 캐릭터가 총알에 맞고 게임 오버 상태가 된다. 두번째는 총알이 뭉쳐서 생성이 되는 것이다. 이는 게임의 난이도를 대폭 하향시킨다. \n\n먼저 첫번째 버그를 해결해본다면 이건 굉장히 쉽다. \n충돌 여부를 체크하는 조건문의 조건에 한가지 조건을 더 추가해줬다. 시간이 1초 미만이면 충돌해도 무효로 처리하는 것이다. 이를 통해 간단하지만 억울하게 게임 오버 되는 것을 막을 수 있다.\n\n두번째 버그를 해결해본다면, 총알 간의 거리를 비교하는 방식으로 해결해봤다.\n```\nfor (int i = 0; i < 4; i++) { // check collision between bullets\n\tfor (int j = i + 1; j < 5; j++) { \n\t\tif (collTest.spawnCollision(bulletList[i], bulletList[j]) < 40) {\n\t\t\twhile (collTest.spawnCollision(bulletList[i], bulletList[j]) < 40) {\n\t\t\t\tbulletList.erase(bulletList.begin() + i);\n\t\t\t\tBullet newObj(dis_x(gen), dis_y(gen), bulletRadius);\n\t\t\t\tbulletList.push_back(newObj);\n\t\t\t}\n\t\t}\n\t}\n}\n```\n반복문으로 각 총알마다 거리를 비교하고 일정 거리 미만이면 조건을 만족할 때 까지 총알을 삭제/재생성한다. 총알을 삭제하는 방식으로는 Iterator, 즉 반복자를 사용한 방식을 채택했다. 벡터의 요소의 주소를 불러온 후 i번째 요소를 erase 함수로 제거하는 것이다. \n\n이로써 모든 개발 과정은 끝이다!\n\n## 코드\n[Github Repository](https://github.com/jsj9620/Bullet-Dodge)\n\n위 버튼을 누르면 이 게임의 리포지토리로 이동합니다.\n\n",
+    "short_description": "2022-2 컴퓨터프로그래밍및실습 텀 프로젝트 그 마지막",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": null,
+    "url_slug": "C-총알-피하기-게임-제작-3주차-마지막",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "9d94106c-ddfe-4cf3-88b8-0cfd49a8d554",
+    "title": "절대 경로 vs 상대 경로",
+    "released_at": "2025-07-26T04:06:39.165Z",
+    "updated_at": "2026-09-04T20:43:37.679Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/dd7cb72e-22b4-4501-8eab-5e86d43cfa3c/image.jpg)\n\n\n> # 경로 \n- 파일 시스템에서 파일이나 디렉토리의 위치를 저장하는 문자열\n>\n> - 절대경로와 상대경로는 위치의 지정 방법\n\n# 절대경로\n\n- 항상 루트(`/`)에서부터 시작\n- 파일 또는 폴더의 위치를 시스템 전체에서 한 번에 특정\n- 예시\n  - `/home/user/doc.txt`\n- 특징\n  - 경로가 어디서 쓰이든 변하지 않음\n  - 어디서 실행하든 항상 같은 파일 또는 폴더를 참조\n\n# 상대경로\n\n- **현재 작업 중인 디렉토리(현재 위치)**를 기준으로 파일/폴더의 위치를 지정\n- 두 가지 특수기호\n  - `.`: 현재 디렉토리 (e.g. `./boostcamp.txt`)\n  - `..`: 상위(부모) 디렉토리 (e.g. `../readme.txt`)\n- 예시\n  - `docs/report.txt`\n    - 현재 위치의 하위 docs 폴더 속 report.txt\n  - `../data/file.csv`\n    - 상위 폴더의 data 폴더 내부 file.csv\n- 특징\n  - 프로그램의 `현재 위치`에 따라 의미가 달라짐",
+    "short_description": "파일 시스템에서의 절대 경로와 상대 경로의 차이를 정리",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/dd7cb72e-22b4-4501-8eab-5e86d43cfa3c/image.jpg",
+    "url_slug": "절대-경로-vs-상대-경로",
+    "series": {
+      "id": "d53de5d1-71fd-46d5-b493-e804bef5d183",
+      "name": "운영체제",
+      "url_slug": "운영체제"
+    }
+  }
+}

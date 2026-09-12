@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "89893ee9-797e-4c06-83ad-467629e26d70",
+    "title": "JavaScript 최대공약수, 최소공배수",
+    "released_at": "2025-04-29T08:33:13.017Z",
+    "updated_at": "2026-09-06T03:04:46.555Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/912f86c4-5dd0-4eea-9782-12e305e7afae/image.png)\n\n## 최대공약수\n> ### 유클리드 호제법을 이용\n두 수 ```a```, ```b``` (```a``` > ```b```)가 있을 때,\n``` \nGCD(a, b) = GCD(b, a%b)\n```\n```b```가 ```0```이 되면, 그때의 ```a```가 최대공약수\n\n```javascript\nconst gcd = (a, b) => {\n  if (b === 0) return a;\n  return gcd(b, a%b);\n};\n```\n\n## 최대공배수\n> ### 최대공약수의 방법을 이용\n```\nLCD(a, b) = (a * b) / GCD(a, b)\n```\n\n```javascript\nconst lcm = (a, b) => {\n  return (a * b) / gcd(a, b);\n};\n```\n\n",
+    "short_description": "JavaScript에서 최대공약수, 최소공배수 구하기",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/912f86c4-5dd0-4eea-9782-12e305e7afae/image.png",
+    "url_slug": "JavaScript-최대공약수-최소공배수",
+    "series": {
+      "id": "cdfa8dc2-c8f0-478a-af43-b9153eadd24e",
+      "name": "PS",
+      "url_slug": "개인공부-Python"
+    }
+  }
+}

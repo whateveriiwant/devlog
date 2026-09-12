@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "c821b10e-825f-41c9-867e-ce823042c3be",
+    "title": "Git 내부 구조",
+    "released_at": "2025-08-11T15:31:29.229Z",
+    "updated_at": "2026-07-16T21:57:45.893Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/2dc48e0b-1ccd-4b39-9ef8-bf4018bbfca6/image.png)\n\n\n`git init` 명령을 실행하면 프로젝트 폴더에 `.git` 이라는 숨김 폴더가 생긴다.\n이 폴더가 바로 Git이 모든 버전 관리 정보를 보관하는 저장소의 뇌이다.\n\n| 경로            | 역할/설명                                                                        |\n| --------------- | -------------------------------------------------------------------------------- |\n| `.git/objects/` | Git 오브젝트(Blob, Tree, Commit)들이 해시값 기반으로 저장되는 폴더               |\n| `.git/index/`   | 스테이지의 실제 데이터, 어떤 파일이 스테이지에 올라갔는지 추적하는 바이너리 파일 |\n| `.git/logs/`    | 주요 HEAD 이동, 브랜치 변경, 커밋 기록 등의 로그를 저장                          |\n\n## objects\n\n- 파일 내용, 폴더 정보, 커밋 정보를 **해시**로 저장\n- 각각 `<2글자>/<나머지38글자>` 형식의 하위 폴더와 파일로 되어있음\n- 내부 데이터는 `zlib`으로 압축됨\n\n## index\n\n- 현재 스테이지 영역의 상태를 기록\n- `git add`를 하면 파일의 변경 내용과 메타데이터가 이곳에 기록됨\n- 바이너리 형식이라 직접 열어보면 알기 힘듦\n\n## logs\n\n- 예를 들어, `.git/logs/HEAD` 파일에는 HEAD가 어디를 가리켰는지 이력이 남아있음\n\n## HEAD\n\n- 현재 작업 중인 브랜치나 특정 커밋을 가리키는 포인터 역할을 하는 일반 텍스트 파일\n- `ref: refs/heads/<name>`\n- HEAD가 name 브랜치를 가리킨다는 의미",
+    "short_description": "Git의 내부 구조 뜯기",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/2dc48e0b-1ccd-4b39-9ef8-bf4018bbfca6/image.png",
+    "url_slug": "Git-내부-구조",
+    "series": {
+      "id": "b698e6b6-2308-490e-ab9c-a2820a604b90",
+      "name": "Git",
+      "url_slug": "Git"
+    }
+  }
+}

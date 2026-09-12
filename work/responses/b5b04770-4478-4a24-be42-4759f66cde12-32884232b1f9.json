@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "b5b04770-4478-4a24-be42-4759f66cde12",
+    "title": "C언어 Express 9장 #08",
+    "released_at": "2022-04-16T07:11:15.077Z",
+    "updated_at": "2026-09-04T19:12:31.442Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/224d282f-35e7-4b10-86a1-192ed9a2dfee/image.png)\n\n재귀를 사용하여 푸는 문제이다.\n\n```\n#include <stdio.h>\n\nint count_num(int number) {\n    static int count = 1; // 정적변수로 자릿수 세는거\n\n    if (number / 10 != 0) { // 나머지 0 나올 때 까지 나눠줌\n        count++;\n        count_num(number / 10); // 정수값 나눠서 재귀\n    }\n    return count; // 나머지 0 나오면 자릿수 돌려보냄\n}\n\nint main() {\n    int num;\n    printf(\"정수를 입력하시오: \");\n    scanf(\"%d\", &num);\n\n    printf(\"자리수의 개수: %d\", count_num(num)); // 정수 입력받고 자릿수 세는거로 보냄 -> 자릿수 얼만지 받음\n\n    return 0;\n}\n```",
+    "short_description": "재귀를 사용합시다",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/224d282f-35e7-4b10-86a1-192ed9a2dfee/image.png",
+    "url_slug": "C언어-Express-9장-08",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "7f383107-ef4a-4a9d-b24c-784d61272f35",
+    "title": "C언어 Express 7장 #05",
+    "released_at": "2022-04-17T07:17:32.092Z",
+    "updated_at": "2026-08-27T22:09:25.394Z",
+    "body": "단순 중첩 반복문 활용 문제\n\n문제: 중첩 반복문 사용해 다음과 같이 출력하는 프로그램 작성\n```\n정수를 입력하시오: 5\n1\n1 2\n1 2 3\n1 2 3 4 \n1 2 3 4 5 \n```\n\n```\n#include <stdio.h>\n\nint main() {\n    int num;\n\n    printf(\"정수를 입력하시오: \");\n    scanf(\"%d\", &num);\n\n    for (int i = 1; i <= num; i++) { // 입력 받은만큼 줄 만들기\n        for (int j = 1; j <= i; j++) { // i는 5까지만 나옴, j값이 i값에 의존하도록 해 딱 맞게 출력\n            printf(\"%d \", j);\n        }\n        printf(\"\\n\");\n    }\n    return 0;\n}\n```",
+    "short_description": "단순 중첩 반복문 활용 문제 / 유사별찍기",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": null,
+    "url_slug": "C언어-Express-7장-05",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}

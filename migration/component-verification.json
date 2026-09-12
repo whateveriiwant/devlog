@@ -1,0 +1,17 @@
+{
+  "verifiedAt": "2026-09-08T03:50:16.761Z",
+  "component": "Photo.astro imported by an actual Astro MDX page",
+  "checks": [
+    "src",
+    "alt",
+    "width/height",
+    "lazy loading",
+    "async decoding",
+    "srcset",
+    "lightbox attribute",
+    "caption",
+    "camera/lens/exposure metadata"
+  ],
+  "status": "passed",
+  "scope": "Static rendering only; fixture uses /favicon.svg and synthetic metadata, not a real photograph."
+}

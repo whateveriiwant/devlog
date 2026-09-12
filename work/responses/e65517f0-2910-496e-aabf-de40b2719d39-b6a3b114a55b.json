@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "e65517f0-2910-496e-aabf-de40b2719d39",
+    "title": "Node.js에서 TCP 방식으로 10KB 이상의 대용량 데이터 다루기",
+    "released_at": "2025-08-08T06:00:36.498Z",
+    "updated_at": "2026-08-17T04:26:54.660Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/5dacc4e2-14b2-4362-bf82-4cecf100fd8f/image.svg)\n\n[참고하면 좋은 글 - Node.js에서 TCP 스트림 문제 해결하기](https://velog.io/@jsj9620/Node.js-TCP-%EC%8A%A4%ED%8A%B8%EB%A6%BC-%EB%AC%B8%EC%A0%9C-%ED%95%B4%EA%B2%B0)\n\n# 이전의 JSON 데이터 전송 방식\n- 메시지를 주고 받을 때 끝에 `\\n` 을 붙여서 하나의 메시지가 끝났다는 걸 프로토콜로 사용함\n\n간단한 JSON 메시지에는 효과적이지만, 10KB 이상의 큰 데이터를 보낼 때는 문제가 생길 것이다.\n\n1. 만약 보내려는 페이로드 안에 우연히 \\n 문자가 포함되어 있다면 파싱 오류 발생\n2. 서버는 `\\n` 문자가 나올 때까지 계속해서 데이터를 쌓으면서 기다려야 함\n\n# 해결책\n이 문제를 해결하기 위해 길이 접두부(Length-Prefix) 방식을 사용한다.\n\n마치 택배를 보낼 때 내용물(페이로드)을 상자에 넣고 상자 겉면의 송장에 '내용물의 크기와 무게'(헤더)를 적는 것과 같다.\n\n즉, 지금부터 보낼 메시지의 총 길이가 얼마다라는 정보를 담은 고정 크기의 헤더를 먼저 보내는 것이다.\n\n`[고정 길이 헤더: 4바이트 크기 정수] + [가변 길이 페이로드: 실제 JSON 메시지]`\n## 동작 방식\n### 송신 측\n1. 보내려는 JSON 메시지의 전체 바이트 길이 계산\n2. 4바이트 크기의 버퍼에 위에서 계산한 길이를 정수 형태로 작성 (헤더 생성)\n3. 헤더를 먼저 전송하고, 이어서 바로 실제 메시지를 전송\n### 수신 측\n1. 무조건 첫 4바이트(헤더)를 먼저 읽어서 앞으로 받아야 할 페이로드의 길이 확인\n2. 정확히 페이로드의 길이 만큼의 데이터가 도착할 때까지 스트림에서 데이터를 모음\n3. 데이터가 모두 모이면, 그제서야 하나의 완전한 메시지로 간주하고 파싱 시작\n4. 다시 1번으로 돌아가 다음 메시지의 헤더를 기다림\n\n# 예시 코드\n> 소켓 통신을 위해 `net` 모듈을 활용합니다.\n\n## 송신 측\n```js\n/**\n * 대용량 처리 기능 구현\n * @param {net.Socket} socket - 클라이언트 소켓\n * @param {object} jsonObject - JSON 객체\n */\nconst send = (socket, jsonObject) => {\n  // 1. JSON 객체를 문자열로 변환하고, 다시 UTF-8 버퍼로 변환\n  const payload = Buffer.from(JSON.stringify(jsonObject), \"utf8\");\n\n  // 2. 4바이트 크기 헤더 생성\n  const header = Buffer.alloc(4);\n  header.writeUInt32BE(payload.length, 0);\n\n  // 3. 헤더와 페이로드를 합쳐서 한 번에 전송\n  const finalBuffer = Buffer.concat([header, payload]);\n  socket.write(finalBuffer);\n};\n```\n\n## 수신 측\n```js\nlet receiveBuffer = Buffer.alloc(0); // 수신된 데이터 조각을 모아두는 버퍼\nlet expectedPayloadSize = null; // 현재 받아야 할 페이로드의 기대 크기\n```\n먼저 스트림 방식으로 오는 데이터들을 쌓아두는 버퍼를 만들어 준다. `expectedPayloadSize` 에는 받아야하는 데이터의 크기가 나중에 배정된다.\n\n```js\nsocket.on(\"data\", (chunk) => {\n    receiveBuffer = Buffer.concat([receiveBuffer, chunk]);\n    // 줄바꿈 문자 감지하면 전체 메시지 처리\n    while (true) {\n      if (expectedPayloadSize === null) {\n        if (receiveBuffer.length < 4) break;\n        expectedPayloadSize = receiveBuffer.readUInt32BE(0); // 4바이트 헤더에서 페이로드 크기 읽기\n        receiveBuffer = receiveBuffer.slice(4); // 헤더 제거\n      }\n\n      if (receiveBuffer.length < expectedPayloadSize) break; // 아직 전체 메시지가 수신되지 않음\n\n      const payload = receiveBuffer.slice(0, expectedPayloadSize); // 페이로드 추출\n      receiveBuffer = receiveBuffer.slice(expectedPayloadSize); // 사용한 부분 제거\n      expectedPayloadSize = null; // 다음 메시지를 위해 초기화\n      try {\n        const request = JSON.parse(payload.toString(\"utf8\"));\n\n        console.log(`[요청 수신] type: ${request.type}`);\n        // ... 중략\n```\n\n`socket.on` 으로 데이터를 받고 있다가 청크가 오면 일단 `receiveBuffer`에 쌓는다. 그리고 `while` 루프에서 계속 처리할 데이터가 있는지 지켜본다.\n\n그러다가 4바이트 이상 데이터가 있다면 앞 4바이트를 읽어서 거기에 적힌 숫자를 `expectedPayloadSize`에 기록한다.\n\n크기를 확인했으니 헤더는 제거하고, 이제 데이터의 크기를 알기 때문에 받아야하는 페이로드의 크기와 지금까지 받은 페이로드의 크기를 비교하며 계속 반복한다.\n\n예상 크기만큼 페이로드가 다 오면, 그제서야 하나의 완전한 데이터를 처리하기 시작한다.",
+    "short_description": "Node.js에서 TCP 방식으로 10KB 이상 대규모 데이터 처리하기",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/5dacc4e2-14b2-4362-bf82-4cecf100fd8f/image.svg",
+    "url_slug": "Node.js에서-TCP-방식으로-10KB-이상의-대용량-데이터-전송",
+    "series": {
+      "id": "631448b2-e669-4c0c-a57d-b8c5ad0a4103",
+      "name": "Node.js",
+      "url_slug": "Node.js"
+    }
+  }
+}

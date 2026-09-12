@@ -1,0 +1,20 @@
+{
+  "post": {
+    "id": "638885fe-dd5e-46fa-b372-81de9a02fcf4",
+    "title": "C언어 Express 5장 #03",
+    "released_at": "2022-04-17T05:53:04.913Z",
+    "updated_at": "2026-08-19T06:00:01.169Z",
+    "body": "![](https://velog.velcdn.com/images/jsj9620/post/84c1266f-d21c-4296-ac2a-5da7ec986841/image.png)\n\n## 문제\n3개의 정수값 중에서 최대값 출력\n\n## 답안\n\n```\n#include <stdio.h>\n\nint main() {\n    int a, b, c, max;\n    printf(\"3개의 정수를 입력하시오: \");\n    scanf(\"%d %d %d\", &a, &b, &c);\n\n    max = (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);\n\n    printf(\"최대값: %d\", max);\n\n    return 0;\n}\n```\n\n삼항연산을 이렇게 복합적으로 작성할 수도 있다!",
+    "short_description": "복합적인 삼항 연산을 이용한 최대값 찾기 문제",
+    "is_markdown": true,
+    "is_private": false,
+    "is_temp": false,
+    "thumbnail": "https://velog.velcdn.com/images/jsj9620/post/84c1266f-d21c-4296-ac2a-5da7ec986841/image.png",
+    "url_slug": "C언어-Express-5장-03",
+    "series": {
+      "id": "27564660-a6c6-451a-9b7a-937c45e6029f",
+      "name": "C/C++",
+      "url_slug": "학교공부-C"
+    }
+  }
+}
