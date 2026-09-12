@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Menu, Search } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import ThemeSwitch from './ThemeSwitch';
 import { Button } from './ui/button';
 import { Kbd } from './ui/kbd';
@@ -79,7 +79,7 @@ export default function SiteControls({sections}:{sections:NavSection[]}) {
   },[query,limit,open]);
   return <div className="ml-auto flex shrink-0 items-center gap-1.5">
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button variant="outline" className="w-9 px-0 text-muted-foreground sm:w-44 sm:justify-start sm:px-3" aria-label="전체 글 검색" onClick={()=>{searchFocus.current=null;}}><Search/><span className="hidden sm:inline">글 검색</span><Kbd className="ml-auto hidden sm:inline-flex">⌘ K</Kbd></Button></DialogTrigger>
+      <DialogTrigger asChild><Button variant="outline" className="mr-1 h-8 w-9 px-0 text-muted-foreground sm:w-44 sm:justify-start sm:px-3" aria-label="전체 글 검색" onClick={()=>{searchFocus.current=null;}}><Search/><span className="hidden sm:inline">글 검색</span><Kbd className="ml-auto hidden sm:inline-flex">⌘ K</Kbd></Button></DialogTrigger>
       <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-2xl" onCloseAutoFocus={event=>{if(searchFocus.current){event.preventDefault();searchFocus.current.focus();}}}>
         <DialogTitle className="sr-only">전체 글 검색</DialogTitle>
         <DialogDescription className="sr-only">제목과 본문에서 검색합니다. 화살표 키로 결과를 선택하고 Enter로 열 수 있습니다.</DialogDescription>
@@ -97,7 +97,6 @@ export default function SiteControls({sections}:{sections:NavSection[]}) {
       </DialogContent>
     </Dialog>
     <ThemeSwitch dark={dark} onToggle={toggleTheme} />
-    <Button variant="ghost" size="sm" asChild className="hidden lg:inline-flex"><a href="https://github.com/whateveriiwant" aria-label="GitHub 프로필" target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight/></a></Button>
     <Sheet open={menu} onOpenChange={setMenu}>
       <SheetTrigger asChild><Button variant="ghost" size="icon" className="md:hidden" aria-label="탐색 메뉴 열기"><Menu/></Button></SheetTrigger>
       <SheetContent side="left" className="gap-0"><SheetHeader className="border-b p-5"><SheetTitle>seungjun.dev</SheetTitle><SheetDescription>주제와 시리즈로 기록 찾기</SheetDescription></SheetHeader><div className="overflow-y-auto p-3"><NavigationPanel sections={sections}/></div></SheetContent>
