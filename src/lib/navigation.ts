@@ -5,9 +5,8 @@ export async function getNavigation(pathname: string, category?: string, seriesI
   const content = await getContent();
   const current = content.series.find(s => s.id === seriesId);
   const sections: NavSection[] = [{ label: '기록', items: [
-    { label: '최근 글', href: '/', count: content.posts.length, active: pathname === '/' },
+    { label: '전체 글', href: '/blog/', count: content.posts.length, active: pathname === '/blog/' },
     { label: '시리즈', href: '/series/', count: content.series.length, active: pathname === '/series/' },
-    { label: '아카이브', href: '/archive/', active: pathname === '/archive/' },
   ] }];
   if (current) sections.push({ label: current.data.name, href: seriesUrl(current.data.slug), items: current.posts.map((p,i) => ({label:p.data.title, href:postUrl(p), count:String(i+1).padStart(2,'0'), active:p.id===postId})) });
   sections.push({label:'주제별로 찾기', href:'/category/', items:content.categories.map(c=>({label:c.name, href:`/category/${c.id}/`,count:c.posts.length,active:c.id===category}))});

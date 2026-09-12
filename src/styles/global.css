@@ -18,32 +18,32 @@
   --color-sidebar-border: var(--sidebar-border); --color-sidebar-ring: var(--sidebar-ring);
   --radius-sm: calc(var(--radius) * .6); --radius-md: calc(var(--radius) * .8); --radius-lg: var(--radius); --radius-xl: calc(var(--radius) * 1.4);
 }
-/* shadcn/ui Neutral theme: https://ui.shadcn.com/docs/theming */
+/* shadcn/ui Zinc theme: https://ui.shadcn.com/docs/theming */
 :root {
-  --radius: .625rem; --background: oklch(1 0 0); --foreground: oklch(.145 0 0);
-  --card: oklch(1 0 0); --card-foreground: oklch(.145 0 0); --popover: oklch(1 0 0); --popover-foreground: oklch(.145 0 0);
-  --primary: oklch(.205 0 0); --primary-foreground: oklch(.985 0 0);
-  --secondary: oklch(.97 0 0); --secondary-foreground: oklch(.205 0 0);
-  --muted: oklch(.97 0 0); --muted-foreground: oklch(.556 0 0);
-  --accent: oklch(.97 0 0); --accent-foreground: oklch(.205 0 0);
-  --destructive: oklch(.577 .245 27.325); --border: oklch(.922 0 0); --input: oklch(.922 0 0); --ring: oklch(.708 0 0);
-  --sidebar: oklch(.985 0 0); --sidebar-foreground: oklch(.145 0 0);
-  --sidebar-primary: oklch(.205 0 0); --sidebar-primary-foreground: oklch(.985 0 0);
-  --sidebar-accent: oklch(.97 0 0); --sidebar-accent-foreground: oklch(.205 0 0);
-  --sidebar-border: oklch(.922 0 0); --sidebar-ring: oklch(.708 0 0); color-scheme: light;
+  --radius: .625rem; --background: oklch(1 0 0); --foreground: oklch(.141 .005 285.823);
+  --card: oklch(1 0 0); --card-foreground: oklch(.141 .005 285.823); --popover: oklch(1 0 0); --popover-foreground: oklch(.141 .005 285.823);
+  --primary: oklch(.21 .006 285.885); --primary-foreground: oklch(.985 0 0);
+  --secondary: oklch(.967 .001 286.375); --secondary-foreground: oklch(.21 .006 285.885);
+  --muted: oklch(.967 .001 286.375); --muted-foreground: oklch(.552 .016 285.938);
+  --accent: oklch(.967 .001 286.375); --accent-foreground: oklch(.21 .006 285.885);
+  --destructive: oklch(.577 .245 27.325); --border: oklch(.92 .004 286.32); --input: oklch(.92 .004 286.32); --ring: oklch(.705 .015 286.067);
+  --sidebar: oklch(.985 .001 285.858); --sidebar-foreground: oklch(.141 .005 285.823);
+  --sidebar-primary: oklch(.21 .006 285.885); --sidebar-primary-foreground: oklch(.985 0 0);
+  --sidebar-accent: oklch(.967 .001 286.375); --sidebar-accent-foreground: oklch(.21 .006 285.885);
+  --sidebar-border: oklch(.92 .004 286.32); --sidebar-ring: oklch(.705 .015 286.067); color-scheme: light;
 }
 .dark {
-  --background: oklch(.145 0 0); --foreground: oklch(.985 0 0);
-  --card: oklch(.205 0 0); --card-foreground: oklch(.985 0 0); --popover: oklch(.205 0 0); --popover-foreground: oklch(.985 0 0);
-  --primary: oklch(.922 0 0); --primary-foreground: oklch(.205 0 0);
-  --secondary: oklch(.269 0 0); --secondary-foreground: oklch(.985 0 0);
-  --muted: oklch(.269 0 0); --muted-foreground: oklch(.708 0 0);
-  --accent: oklch(.269 0 0); --accent-foreground: oklch(.985 0 0);
-  --destructive: oklch(.704 .191 22.216); --border: oklch(1 0 0 / 10%); --input: oklch(1 0 0 / 15%); --ring: oklch(.556 0 0);
-  --sidebar: oklch(.205 0 0); --sidebar-foreground: oklch(.985 0 0);
-  --sidebar-primary: oklch(.922 0 0); --sidebar-primary-foreground: oklch(.205 0 0);
-  --sidebar-accent: oklch(.269 0 0); --sidebar-accent-foreground: oklch(.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%); --sidebar-ring: oklch(.556 0 0); color-scheme: dark;
+  --background: oklch(.141 .005 285.823); --foreground: oklch(.985 0 0);
+  --card: oklch(.21 .006 285.885); --card-foreground: oklch(.985 0 0); --popover: oklch(.21 .006 285.885); --popover-foreground: oklch(.985 0 0);
+  --primary: oklch(.92 .004 286.32); --primary-foreground: oklch(.21 .006 285.885);
+  --secondary: oklch(.274 .006 286.033); --secondary-foreground: oklch(.985 0 0);
+  --muted: oklch(.274 .006 286.033); --muted-foreground: oklch(.705 .015 286.067);
+  --accent: oklch(.274 .006 286.033); --accent-foreground: oklch(.985 0 0);
+  --destructive: oklch(.704 .191 22.216); --border: oklch(1 0 0 / 10%); --input: oklch(1 0 0 / 15%); --ring: oklch(.552 .016 285.938);
+  --sidebar: oklch(.21 .006 285.885); --sidebar-foreground: oklch(.985 0 0);
+  --sidebar-primary: oklch(.92 .004 286.32); --sidebar-primary-foreground: oklch(.21 .006 285.885);
+  --sidebar-accent: oklch(.274 .006 286.033); --sidebar-accent-foreground: oklch(.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%); --sidebar-ring: oklch(.552 .016 285.938); color-scheme: dark;
 }
 @layer base {
   * { @apply border-border outline-ring/50; }
@@ -75,19 +75,11 @@
   .text-link { @apply inline-flex items-center justify-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-primary hover:bg-accent; }
   .subtle-link { @apply rounded-md text-sm text-muted-foreground hover:text-foreground; }
   .count { @apply shrink-0 text-xs font-normal text-muted-foreground whitespace-nowrap tabular-nums; }
-  .archive-cta { @apply mt-5 flex items-center justify-between gap-3 rounded-md border bg-background px-4 py-3 text-sm font-medium shadow-xs hover:bg-accent; }
-  .archive-cta > span { @apply text-xs text-muted-foreground; }
   .topic-rows > a, .year-links a { @apply flex items-center justify-between gap-3 border-b px-2 py-3 text-sm transition-colors hover:bg-accent; }
   .rail-note { @apply mt-2 text-xs leading-6 text-muted-foreground; }
   .year-links { @apply mt-4; }
   .rail-series { @apply flex items-center gap-2 text-sm font-medium; }
   .start-post { @apply mt-2 flex flex-col gap-1 rounded-md border p-3 text-xs leading-6 text-muted-foreground hover:bg-accent hover:text-foreground; }
-  .archive-years { @apply mb-8 flex flex-wrap gap-2; }
-  .archive-years a { @apply inline-flex h-9 items-center gap-3 rounded-md border bg-background px-3 text-sm font-medium shadow-xs hover:bg-accent; }
-  .archive-year { @apply mt-5 scroll-mt-24; }
-  .archive-month { @apply grid grid-cols-[26px_minmax(0,1fr)] gap-3 pt-4 sm:grid-cols-[35px_minmax(0,1fr)]; }
-  .archive-month > h3 { @apply pt-4 text-sm text-muted-foreground; }
-  .archive-month > h3 span { @apply ml-0.5 text-xs; }
   .series-section { @apply mb-10; }
   .series-index > a { @apply flex items-center justify-between gap-4 border-b px-3 py-5 transition-colors hover:bg-accent; }
   .series-index :is(h2,h3) { @apply text-base font-medium leading-6; }
