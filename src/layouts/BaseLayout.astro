@@ -10,7 +10,7 @@ const sections = await getNavigation(Astro.url.pathname, category, seriesId, pos
 const originConfigured = Boolean(process.env.SITE_URL);
 const canonical = originConfigured && !noindex ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 const indexable = originConfigured && process.env.ALLOW_INDEXING === 'true' && !noindex;
-const siteTitle = title === '개발 기록' ? 'seungjun.dev — 개발 기록' : `${title} · seungjun.dev`;
+const siteTitle = title === '테크 블로그' ? 'seungjun.dev — 테크 블로그' : `${title} · seungjun.dev`;
 ---
 <!doctype html>
 <html lang="ko">
@@ -45,17 +45,17 @@ const siteTitle = title === '개발 기록' ? 'seungjun.dev — 개발 기록' :
   </head>
   <body>
     <a href="#main" class="skip-link">본문으로 건너뛰기</a>
-    <header class="sticky top-0 z-30 h-16 border-b bg-background/95 backdrop-blur" data-pagefind-ignore>
+    <header class="sticky top-0 z-30 h-14 border-b bg-background/95 backdrop-blur" data-pagefind-ignore>
       <div class="mx-auto flex h-full max-w-[1540px] items-center gap-4 px-5 md:gap-8 md:px-8">
         <a href="/" class="brand" aria-label="seungjun.dev 홈"><span class="brand-mark" aria-hidden="true">sj.</span><span>seungjun<span class="text-muted-foreground">.dev</span></span></a>
         <nav aria-label="주요 메뉴" class="hidden items-center gap-1 md:flex">{[{href:'/',label:'글'}, {href:'/series/',label:'시리즈'}, {href:'/archive/',label:'아카이브'}].map(item => <a href={item.href} class={buttonVariants({variant:Astro.url.pathname===item.href?'secondary':'ghost',size:'sm'})} aria-current={Astro.url.pathname===item.href?'page':undefined}>{item.label}</a>)}</nav>
         <SiteControls sections={sections} client:load />
       </div>
     </header>
-    <div class="mx-auto max-w-[1540px] px-[21px] md:grid md:grid-cols-[210px_minmax(0,1fr)] md:gap-[34px] md:px-8 min-[1200px]:grid-cols-[220px_minmax(0,1fr)_216px] min-[1200px]:gap-12 min-[1600px]:grid-cols-[232px_minmax(0,1fr)_220px] min-[1600px]:gap-14">
-      <aside class="sticky top-16 hidden h-[calc(100dvh-64px)] overflow-y-auto border-r border-[var(--border)] pt-[35px] pr-[18px] pb-8 [scrollbar-width:thin] md:block" data-pagefind-ignore><NavigationPanel sections={sections} /></aside>
+    <div class="mx-auto max-w-[1540px] px-5.25 md:grid md:grid-cols-[210px_minmax(0,1fr)] md:gap-[34px] md:px-8 min-[1200px]:grid-cols-[220px_minmax(0,1fr)_216px] min-[1200px]:gap-12 min-[1600px]:grid-cols-[232px_minmax(0,1fr)_220px] min-[1600px]:gap-14">
+      <aside class="sticky top-14 hidden h-[calc(100dvh-56px)] overflow-y-auto border-r border-[var(--border)] pt-[35px] pr-[18px] pb-8 [scrollbar-width:thin] md:block" data-pagefind-ignore><NavigationPanel sections={sections} /></aside>
       <main id="main" tabindex="-1" class="mx-auto w-full min-w-0 max-w-[790px] pt-[34px] outline-none md:pt-[49px]"><slot /><footer class="mt-[70px] flex gap-5 border-t border-[var(--border)] pt-[25px] pb-10 text-xs text-[var(--muted-foreground)]" data-pagefind-ignore><span class="mr-auto">seungjun.dev</span><a href="/archive/">모든 기록</a><a href="/rss.xml">RSS ↗</a></footer></main>
-      <aside class="sticky top-16 hidden max-h-[calc(100dvh-64px)] self-start overflow-y-auto pt-[53px] pb-8 [scrollbar-width:thin] min-[1200px]:block" data-pagefind-ignore><slot name="right" /></aside>
+      <aside class="sticky top-14 hidden max-h-[calc(100dvh-56px)] self-start overflow-y-auto pt-[53px] pb-8 [scrollbar-width:thin] min-[1200px]:block" data-pagefind-ignore><slot name="right" /></aside>
     </div>
     <script>import '../scripts/ui';</script>
   </body>

@@ -20,7 +20,9 @@
     "verify:search": "node scripts/verify-search.mjs",
     "images:download": "node scripts/migrate-images.mjs download",
     "images:upload": "node scripts/migrate-images.mjs upload",
-    "images:verify": "node scripts/migrate-images.mjs verify"
+    "images:verify": "node scripts/migrate-images.mjs verify",
+    "commit": "cz",
+    "prepare": "husky"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.0",
@@ -43,12 +45,17 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@aws-sdk/client-s3": "^3.1127.0",
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
     "@types/node": "^24.13.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "commitizen": "^4.3.2",
+    "cz-customizable": "^7.5.4",
     "github-slugger": "^2.0.0",
     "hast-util-to-string": "^3.0.1",
     "hast-util-to-text": "^4.0.2",
+    "husky": "^9.1.7",
     "mdast-util-to-string": "^4.0.0",
     "pagefind": "1.5.2",
     "rehype-parse": "^9.0.1",
@@ -61,5 +68,6 @@
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
     "yaml": "^2.9.0"
-  }
+  },
+  "config": { "commitizen": { "path": "./node_modules/cz-customizable" } }
 }

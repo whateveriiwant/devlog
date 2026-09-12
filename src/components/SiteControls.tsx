@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Menu, Moon, Search, Sun } from 'lucide-react';
+import { ArrowUpRight, Menu, Search } from 'lucide-react';
+import ThemeSwitch from './ThemeSwitch';
 import { Button } from './ui/button';
 import { Kbd } from './ui/kbd';
 import { Badge } from './ui/badge';
@@ -50,7 +51,14 @@ export default function SiteControls({sections}:{sections:NavSection[]}) {
     document.addEventListener('keydown',key);document.addEventListener('click',click);media.addEventListener('change',systemTheme);
     return()=>{document.removeEventListener('keydown',key);document.removeEventListener('click',click);media.removeEventListener('change',systemTheme);};
   },[]);
-  function applyTheme(value:boolean){document.documentElement.classList.toggle('dark',value);document.documentElement.dataset.theme=value?'dark':'light';setDark(value);}
+  function applyTheme(value:boolean){
+    const root=document.documentElement;
+    root.classList.add('theme-transition');
+    root.classList.toggle('dark',value);
+    root.dataset.theme=value?'dark':'light';
+    setDark(value);
+    window.setTimeout(()=>root.classList.remove('theme-transition'),100);
+  }
   function toggleTheme(){const next=!document.documentElement.classList.contains('dark');applyTheme(next);try{localStorage.setItem('theme',next?'dark':'light');}catch{}}
   useEffect(()=>{
     if(!open)return;
@@ -88,7 +96,7 @@ export default function SiteControls({sections}:{sections:NavSection[]}) {
         <div className="flex items-center justify-between border-t bg-muted/30 px-4 py-3 text-xs text-muted-foreground"><span>↑ ↓ 이동 · Enter 열기</span><span><Kbd>Esc</Kbd> 닫기</span></div>
       </DialogContent>
     </Dialog>
-    <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={`${dark?'라이트':'다크'} 모드로 전환`} title="테마 전환"><Sun className="hidden dark:block"/><Moon className="dark:hidden"/></Button>
+    <ThemeSwitch dark={dark} onToggle={toggleTheme} />
     <Button variant="ghost" size="sm" asChild className="hidden lg:inline-flex"><a href="https://github.com/whateveriiwant" aria-label="GitHub 프로필" target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight/></a></Button>
     <Sheet open={menu} onOpenChange={setMenu}>
       <SheetTrigger asChild><Button variant="ghost" size="icon" className="md:hidden" aria-label="탐색 메뉴 열기"><Menu/></Button></SheetTrigger>

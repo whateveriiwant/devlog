@@ -1,7 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 @custom-variant dark (&:where(.dark, .dark *));
-@theme { --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif; --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+@theme { --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif; --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
 @theme inline {
   --color-background: var(--background); --color-foreground: var(--foreground);
   --color-card: var(--card); --color-card-foreground: var(--card-foreground);
@@ -46,6 +47,11 @@
 }
 @layer base {
   * { @apply border-border outline-ring/50; }
+  .theme-transition, .theme-transition *, .theme-transition *::before, .theme-transition *::after {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow;
+    transition-duration: 100ms;
+    transition-timing-function: ease-out;
+  }
   body { @apply bg-background text-foreground font-sans antialiased; }
   html { scroll-behavior:smooth; scroll-padding-top:6rem; }
   button, summary { cursor:pointer; }
