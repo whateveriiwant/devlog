@@ -101,7 +101,7 @@
 .dark .theme-switch__stars { transform: translateY(0); }
 .dark .theme-switch__stars path { opacity: .95; transform: scale(1); transition-delay: calc(150ms + var(--star-delay)); }
 .dark .theme-switch__balloon { animation: none; opacity: 0; }
-.dark .theme-switch[data-animated] .theme-switch__rocket { animation: theme-rocket-flight 2.3s 650ms var(--switch-ease) both; }
+.dark .theme-switch__rocket { animation: theme-rocket-flight 4.8s 1.2s linear infinite; }
 @media (hover: hover) {
   .theme-switch:hover .theme-switch__orb { transform: translateX(.12em); }
   .dark .theme-switch:hover .theme-switch__orb { transform: translateX(calc(var(--orb-travel) - .12em)); }
