@@ -4,9 +4,9 @@ import NavigationPanel from '../components/NavigationPanel';
 import SiteControls from '../components/SiteControls';
 import { getNavigation } from '../lib/navigation';
 import { buttonVariants } from '../components/ui/button';
-interface Props { title: string; description?: string; category?: string; seriesId?: string; postId?: string; image?: string; publishedAt?: Date; noindex?: boolean }
-const { title, description = '웹 개발, 컴퓨터 기초와 배움의 과정을 기록합니다.', category, seriesId, postId, image, publishedAt, noindex = false } = Astro.props;
-const sections = await getNavigation(Astro.url.pathname, category, seriesId, postId);
+interface Props { title: string; description?: string; seriesId?: string; postId?: string; image?: string; publishedAt?: Date; noindex?: boolean }
+const { title, description = '웹 개발, 컴퓨터 기초와 배움의 과정을 기록합니다.', seriesId, postId, image, publishedAt, noindex = false } = Astro.props;
+const sections = await getNavigation(Astro.url.pathname, seriesId, postId);
 const originConfigured = Boolean(process.env.SITE_URL);
 const canonical = originConfigured && !noindex ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 const indexable = originConfigured && process.env.ALLOW_INDEXING === 'true' && !noindex;

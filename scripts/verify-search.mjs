@@ -31,8 +31,6 @@ for (const post of posts) {
   assert.equal(doc.meta.title, post.title.replace(/\s+/g, ' ').trim(), 'Search title');
   assert.equal(doc.meta.description || '', post.description.replace(/[\u0000-\u001f]/g, '').replace(/\s+/g, ' ').trim(), 'Search description');
   assert.equal(doc.meta.publishedAt, post.publishedAt, 'Search publication date');
-  const category = taxonomy.categories.find(c => c.id === taxonomy.postCategories[post.id]);
-  assert.equal(doc.meta.category, category.name, 'Search category');
   const group = series.find(s => s.posts.some(p => p.id === post.id));
   assert.equal(doc.meta.series || '', group?.name || '', 'Search series');
   const tags = [...new Set(post.tags.map(tag => taxonomy.tagAliases[tag] || tag))];
@@ -52,6 +50,6 @@ for (const [query, expectedSlug] of [
 }
 // Unquoted Pagefind queries allow partial matches; use an absent exact phrase here.
 assert.equal((await pagefind.search('"zzzxqv987654nomatch"')).results.length, 0);
-const result = { verifiedAt: new Date().toISOString(), pagefindVersion: entry.version, indexedArticles: documents.length, metadataChecks: ['title', 'description', 'publishedAt', 'category', 'series', 'tags'], queries, noResultsCase: 'passed', scope: 'Generated JavaScript/WASM search API in Node; browser interactions and worker execution are not covered.' };
+const result = { verifiedAt: new Date().toISOString(), pagefindVersion: entry.version, indexedArticles: documents.length, metadataChecks: ['title', 'description', 'publishedAt', 'series', 'tags'], queries, noResultsCase: 'passed', scope: 'Generated JavaScript/WASM search API in Node; browser interactions and worker execution are not covered.' };
 await fs.writeFile(path.join(root, 'migration/search-verification.json'), JSON.stringify(result, null, 2) + '\n');
 console.log(JSON.stringify(result, null, 2));

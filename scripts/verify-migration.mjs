@@ -15,7 +15,6 @@ const read = file => JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
 const posts = read('migration/velog-posts.json');
 const series = read('migration/velog-series.json');
 const collection = read('migration/collection.json');
-const taxonomy = read('migration/taxonomy.json');
 const structures = read('migration/content-structure.json');
 const parser = unified().use(remarkParse).use(remarkGfm);
 const html = unified().use(rehypeParse,{fragment:true});
@@ -53,7 +52,6 @@ for (const p of posts) {
     for (const key of ['title','description','slug','publishedAt','updatedAt','originalUrl']) assert.equal(frontmatter[key],p[key],key);
     assert.deepEqual(frontmatter.tags,p.tags,'Original tags');
     assert.equal(frontmatter.thumbnail,p.thumbnail || undefined,'Thumbnail');
-    assert.equal(frontmatter.category,taxonomy.postCategories[p.id],'Assigned category');
     assert.deepEqual(frontmatter.series,membership.get(p.id),'Series ID and exact source index');
     assert.equal(frontmatter.draft,false,'Publication state');
     const before = features(p.content); const after = features(body);

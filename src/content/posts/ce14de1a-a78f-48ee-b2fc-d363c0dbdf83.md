@@ -4,7 +4,6 @@ description: (C언어) 문자열에서 각 단어를 가져오는 방법 - 토�
 slug: C-문자열에서-각-단어-가져오기
 publishedAt: 2022-06-06T07:55:19.974Z
 updatedAt: 2026-08-19T05:16:12.545Z
-category: languages-problems
 series:
   id: 27564660-a6c6-451a-9b7a-937c45e6029f
   order: 11

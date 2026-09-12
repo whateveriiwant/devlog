@@ -3,7 +3,6 @@ import taxonomy from '../../migration/taxonomy.json';
 import manifest from '../../migration/image-manifest.json';
 
 export type Post = CollectionEntry<'posts'>;
-export const categoryDefinitions = taxonomy.categories;
 const aliases: Record<string, string> = taxonomy.tagAliases;
 export const normalizeTag = (tag: string) => aliases[tag] || tag;
 export const tagSlug = (tag: string) => normalizeTag(tag).replaceAll('C++', 'cpp').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '');
@@ -23,8 +22,7 @@ export function imageUrl(source?: string) {
 export async function getContent() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf() || a.id.localeCompare(b.id));
   const groups = (await getCollection('series')).map(s => ({ ...s, posts: posts.filter(p => p.data.series?.id === s.id).sort((a, b) => a.data.series!.order - b.data.series!.order) })).filter(s => s.posts.length);
-  const categories = categoryDefinitions.map(c => ({ ...c, posts: posts.filter(p => p.data.category === c.id) }));
   const tags = [...new Set(posts.flatMap(tagsFor))].map(name => ({ name, posts: posts.filter(p => tagsFor(p).includes(name)) })).sort((a,b) => b.posts.length - a.posts.length || a.name.localeCompare(b.name, 'ko'));
   const years = [...new Set(posts.map(p => dateKey(p.data.publishedAt).slice(0, 4)))].sort().reverse().map(year => ({ year, posts: posts.filter(p => dateKey(p.data.publishedAt).startsWith(year)) }));
-  return { posts, series: groups, categories, tags, years };
+  return { posts, series: groups, tags, years };
 }

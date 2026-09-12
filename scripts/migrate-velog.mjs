@@ -8,7 +8,6 @@ const read = p => JSON.parse(fs.readFileSync(path.join(root, p), 'utf8'));
 const hash = value => crypto.createHash('sha256').update(value).digest('hex');
 const posts = read('migration/velog-posts.json');
 const series = read('migration/velog-series.json');
-const taxonomy = read('migration/taxonomy.json');
 const previous = fs.existsSync(path.join(root, 'migration/file-manifest.json')) ? read('migration/file-manifest.json') : [];
 const memberships = new Map();
 for (const s of series) for (const p of s.posts) {
@@ -17,11 +16,9 @@ for (const s of series) for (const p of s.posts) {
 }
 const planned = posts.map(post => {
   if (!post.isMarkdown || hash(post.content) !== post.contentSha256) throw new Error(`Source format/hash needs review: ${post.title}`);
-  const category = taxonomy.postCategories[post.id];
-  if (!taxonomy.categories.some(c => c.id === category)) throw new Error(`Missing category: ${post.title}`);
   const metadata = {
     title: post.title, description: post.description, slug: post.slug,
-    publishedAt: post.publishedAt, updatedAt: post.updatedAt, category,
+    publishedAt: post.publishedAt, updatedAt: post.updatedAt,
     ...(memberships.has(post.id) ? { series: memberships.get(post.id) } : {}),
     tags: post.tags, draft: false, originalUrl: post.originalUrl,
     ...(post.thumbnail ? { thumbnail: post.thumbnail } : {}),

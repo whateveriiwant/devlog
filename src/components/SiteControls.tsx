@@ -3,7 +3,6 @@ import { Menu, Search } from 'lucide-react';
 import ThemeSwitch from './ThemeSwitch';
 import { Button } from './ui/button';
 import { Kbd } from './ui/kbd';
-import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Command, CommandInput, CommandItem, CommandList } from './ui/command';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
@@ -88,7 +87,7 @@ export default function SiteControls({sections}:{sections:NavSection[]}) {
           <p className="px-4 py-3 text-xs text-muted-foreground" role="status" aria-live="polite">{status}</p>
           <CommandList className="max-h-[55dvh] px-2 pb-2">
             {results.map(data=><CommandItem key={data.url} value={data.url} asChild onSelect={()=>location.assign(data.url)} className="flex-col items-start gap-2 p-3">
-              <a href={data.url}><span className="font-medium leading-6">{data.meta.title}</span><span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><Badge variant="secondary">{data.meta.category}</Badge>{data.meta.series}{data.meta.publishedAt&&<time dateTime={data.meta.publishedAt}>{new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul'}).format(new Date(data.meta.publishedAt))}</time>}</span><span className="line-clamp-2 text-xs leading-5 text-muted-foreground">{excerpt(data)}</span>{data.meta.tags&&<span className="line-clamp-1 text-xs text-muted-foreground">{data.meta.tags}</span>}</a>
+              <a href={data.url}><span className="font-medium leading-6">{data.meta.title}</span><span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">{data.meta.series}{data.meta.publishedAt&&<time dateTime={data.meta.publishedAt}>{new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul'}).format(new Date(data.meta.publishedAt))}</time>}</span><span className="line-clamp-2 text-xs leading-5 text-muted-foreground">{excerpt(data)}</span>{data.meta.tags&&<span className="line-clamp-1 text-xs text-muted-foreground">{data.meta.tags}</span>}</a>
             </CommandItem>)}
           </CommandList>
           {total>results.length&&<Button variant="ghost" className="m-2" onClick={()=>setLimit(value=>value+12)}>결과 더 보기</Button>}

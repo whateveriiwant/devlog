@@ -2,10 +2,11 @@
 import CollectionRows from '../../components/CollectionRows';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getContent, seriesUrl } from '../../lib/content';
-const { series, categories } = await getContent();
+const { series } = await getContent();
+const sortedSeries = [...series].sort((a,b) => b.posts.length-a.posts.length);
 ---
 <BaseLayout title="시리즈" description="기술 주제와 학습 과정, 활동별로 이어 읽는 기록입니다.">
   <header class="page-heading"><p class="eyebrow">CONNECTED NOTES</p><h1>시리즈</h1><p class="page-description">하나의 주제를 따라 이어 읽는 {series.length}개의 묶음.</p></header>
-  {categories.map(c => <section class="series-section"><div class="section-heading"><h2>{c.name}</h2><span class="count">{series.filter(s => c.series.includes(s.data.name)).length} SERIES</span></div><CollectionRows heading={3} rows={series.filter(s => c.series.includes(s.data.name)).sort((a,b) => b.posts.length-a.posts.length).map(s => ({href:seriesUrl(s.data.slug),title:s.data.name,description:s.posts[0].data.title,count:s.posts.length}))}/></section>)}
-  <div slot="right"><h2 class="rail-heading mb-5">주제별로 찾기</h2><div class="space-y-3">{categories.map(c => <a href={`/category/${c.id}/`} class="subtle-link block">{c.name}</a>)}</div></div>
+  <CollectionRows heading={3} rows={sortedSeries.map(s => ({href:seriesUrl(s.data.slug),title:s.data.name,description:s.posts[0]?.data.title ?? '',count:s.posts.length}))}/>
+  <div slot="right"><h2 class="rail-heading mb-5">시리즈 안내</h2><p class="rail-note">관련 글을 하나의 흐름으로 묶어 순서대로 읽을 수 있습니다.</p></div>
 </BaseLayout>
