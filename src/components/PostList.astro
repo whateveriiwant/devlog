@@ -1,9 +1,31 @@
 ---
-import { dateLabel, imageUrl, postUrl, tagsFor, getContent, type Post } from '../lib/content';
+import {
+  dateLabel,
+  imageUrl,
+  postUrl,
+  tagsFor,
+  getContent,
+  type Post,
+} from '../lib/content';
 import PostRows from './PostRows';
-interface Props { posts: Post[]; numbered?: boolean; compact?: boolean }
+interface Props {
+  posts: Post[];
+  numbered?: boolean;
+  compact?: boolean;
+}
 const { posts, numbered = false, compact = false } = Astro.props;
 const content = await getContent();
-const rows = posts.map(post=>({href:postUrl(post),title:post.data.title,date:dateLabel(post.data.publishedAt),iso:post.data.publishedAt.toISOString(),series:content.series.find(s=>s.id===post.data.series?.id)?.data.name||'개별 기록',tags:tagsFor(post),thumbnail:imageUrl(post.data.thumbnail)}));
+const rows = posts.map((post) => ({
+  href: postUrl(post),
+  title: post.data.title,
+  date: dateLabel(post.data.publishedAt),
+  iso: post.data.publishedAt.toISOString(),
+  series:
+    content.series.find((s) => s.id === post.data.series?.id)?.data.name ||
+    '개별 기록',
+  tags: tagsFor(post),
+  thumbnail: imageUrl(post.data.thumbnail),
+}));
 ---
-<PostRows rows={rows} numbered={numbered} compact={compact}/>
+
+<PostRows rows={rows} numbered={numbered} compact={compact} />

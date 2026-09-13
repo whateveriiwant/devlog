@@ -4,15 +4,39 @@ import NavigationPanel from '../components/NavigationPanel';
 import SiteControls from '../components/SiteControls';
 import { getNavigation } from '../lib/navigation';
 import { buttonVariants } from '../components/ui/button';
-interface Props { title: string; description?: string; seriesId?: string; postId?: string; image?: string; publishedAt?: Date; noindex?: boolean }
-const { title, description = '웹 개발, 컴퓨터 기초와 배움의 과정을 기록합니다.', seriesId, postId, image, publishedAt, noindex = false } = Astro.props;
+interface Props {
+  title: string;
+  description?: string;
+  seriesId?: string;
+  postId?: string;
+  image?: string;
+  publishedAt?: Date;
+  noindex?: boolean;
+}
+const {
+  title,
+  description = '웹 개발, 컴퓨터 기초와 배움의 과정을 기록합니다.',
+  seriesId,
+  postId,
+  image,
+  publishedAt,
+  noindex = false,
+} = Astro.props;
 const sections = await getNavigation(Astro.url.pathname, seriesId, postId);
 const originConfigured = Boolean(process.env.SITE_URL);
-const canonical = originConfigured && !noindex ? new URL(Astro.url.pathname, Astro.site).href : undefined;
-const indexable = originConfigured && process.env.ALLOW_INDEXING === 'true' && !noindex;
-const siteTitle = title === '테크 블로그' ? 'seungjun.dev — 테크 블로그' : `${title} · seungjun.dev`;
+const canonical =
+  originConfigured && !noindex
+    ? new URL(Astro.url.pathname, Astro.site).href
+    : undefined;
+const indexable =
+  originConfigured && process.env.ALLOW_INDEXING === 'true' && !noindex;
+const siteTitle =
+  title === '테크 블로그'
+    ? 'seungjun.dev — 테크 블로그'
+    : `${title} · seungjun.dev`;
 const isHome = Astro.url.pathname === '/';
 ---
+
 <!doctype html>
 <html lang="ko">
   <head>
@@ -20,44 +44,137 @@ const isHome = Astro.url.pathname === '/';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>{siteTitle}</title>
-    <meta name="description" content={description.replace(/[\u0000-\u001f]/g, '')} />
-    <meta name="robots" content={indexable ? 'index,follow' : 'noindex,nofollow'} />
+    <meta
+      name="description"
+      content={description.replace(/[\u0000-\u001f]/g, '')}
+    />
+    <meta
+      name="robots"
+      content={indexable ? 'index,follow' : 'noindex,nofollow'}
+    />
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:title" content={title} />
-    <meta property="og:description" content={description.replace(/[\u0000-\u001f]/g, '')} />
+    <meta
+      property="og:description"
+      content={description.replace(/[\u0000-\u001f]/g, '')}
+    />
     <meta property="og:site_name" content="seungjun.dev" />
     <meta property="og:type" content={postId ? 'article' : 'website'} />
     <meta property="og:locale" content="ko_KR" />
     {canonical && <meta property="og:url" content={canonical} />}
     {image && <meta property="og:image" content={image} />}
-    {publishedAt && <meta property="article:published_time" content={publishedAt.toISOString()} />}
-    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    {publishedAt && (
+      <meta
+        property="article:published_time"
+        content={publishedAt.toISOString()}
+      />
+    )}
+    <meta
+      name="twitter:card"
+      content={image ? 'summary_large_image' : 'summary'}
+    />
     <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description.replace(/[\u0000-\u001f]/g, '')} />
+    <meta
+      name="twitter:description"
+      content={description.replace(/[\u0000-\u001f]/g, '')}
+    />
     {image && <meta name="twitter:image" content={image} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title="seungjun.dev" href="/rss.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="seungjun.dev"
+      href="/rss.xml"
+    />
     <script is:inline>
-      let theme; try { theme = localStorage.getItem('theme'); } catch {}
-      const dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+      let theme;
+      try {
+        theme = localStorage.getItem('theme');
+      } catch {}
+      const dark =
+        theme === 'dark' ||
+        (theme !== 'light' &&
+          matchMedia('(prefers-color-scheme: dark)').matches);
       document.documentElement.classList.toggle('dark', dark);
       document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     </script>
   </head>
   <body>
-    <a href="#main" class="skip-link">본문으로 건너뛰기</a>
-    <header class="sticky top-0 z-30 h-14 border-b bg-background/95 backdrop-blur" data-pagefind-ignore>
+    <a href="#main" class="skip-link">
+      본문으로 건너뛰기
+    </a>
+    <header
+      class="sticky top-0 z-30 h-14 border-b bg-background/95 backdrop-blur"
+      data-pagefind-ignore
+    >
       <div class="mx-auto flex h-full max-w-[1540px] items-center gap-4 px-5 md:gap-8 md:px-8">
-        <a href="/" class="brand" aria-label="seungjun.dev 홈"><span class="brand-mark" aria-hidden="true">sj.</span><span>seungjun<span class="text-muted-foreground">.dev</span></span></a>
-        <nav aria-label="주요 메뉴" class="hidden items-center gap-1 md:flex">{[{href:'/blog/',label:'글'}, {href:'/series/',label:'시리즈'}].map(item => <a href={item.href} class={buttonVariants({variant:Astro.url.pathname===item.href?'secondary':'ghost',size:'sm'})} aria-current={Astro.url.pathname===item.href?'page':undefined}>{item.label}</a>)}</nav>
+        <a href="/" class="brand" aria-label="seungjun.dev 홈">
+          <span class="brand-mark" aria-hidden="true">
+            sj.
+          </span>
+          <span>
+            seungjun<span class="text-muted-foreground">.dev</span>
+          </span>
+        </a>
+        <nav aria-label="주요 메뉴" class="hidden items-center gap-1 md:flex">
+          {[
+            { href: '/blog/', label: '글' },
+            { href: '/series/', label: '시리즈' },
+          ].map((item) => (
+            <a
+              href={item.href}
+              class={buttonVariants({
+                variant:
+                  Astro.url.pathname === item.href ? 'secondary' : 'ghost',
+                size: 'sm',
+              })}
+              aria-current={
+                Astro.url.pathname === item.href ? 'page' : undefined
+              }
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
         <SiteControls sections={sections} client:load />
       </div>
     </header>
-    <div class={`mx-auto max-w-[1540px] px-5.25 md:px-8 ${isHome ? '' : 'md:grid md:grid-cols-[210px_minmax(0,1fr)] md:gap-[34px] min-[1200px]:grid-cols-[220px_minmax(0,1fr)_216px] min-[1200px]:gap-12 min-[1600px]:grid-cols-[232px_minmax(0,1fr)_220px] min-[1600px]:gap-14'}`}>
-      <aside class={`${isHome ? 'hidden' : 'sticky top-14 hidden h-[calc(100dvh-56px)] overflow-y-auto border-r border-[var(--border)] pt-[35px] pr-[18px] pb-8 [scrollbar-width:thin] md:block'}`} data-pagefind-ignore><NavigationPanel sections={sections} /></aside>
-      <main id="main" tabindex="-1" class:list={['mx-auto w-full min-w-0 pt-[34px] outline-none md:pt-[49px]', { 'max-w-[790px]': !isHome }]}><slot /><footer class="mt-[70px] flex gap-5 border-t border-[var(--border)] pt-[25px] pb-10 text-xs text-[var(--muted-foreground)]" data-pagefind-ignore><span class="mr-auto">seungjun.dev</span><a href="/blog/">모든 글</a><a href="/rss.xml">RSS ↗</a></footer></main>
-      <aside class={`${isHome ? 'hidden' : 'sticky top-14 hidden max-h-[calc(100dvh-56px)] self-start overflow-y-auto pt-[53px] pb-8 [scrollbar-width:thin] min-[1200px]:block'}`} data-pagefind-ignore><slot name="right" /></aside>
+    <div
+      class={`mx-auto max-w-[1540px] px-5.25 md:px-8 ${isHome ? '' : 'md:grid md:grid-cols-[210px_minmax(0,1fr)] md:gap-[34px] min-[1200px]:grid-cols-[220px_minmax(0,1fr)_216px] min-[1200px]:gap-12 min-[1600px]:grid-cols-[232px_minmax(0,1fr)_220px] min-[1600px]:gap-14'}`}
+    >
+      <aside
+        class={`${isHome ? 'hidden' : 'sticky top-14 hidden h-[calc(100dvh-56px)] overflow-y-auto border-r border-[var(--border)] pt-[35px] pr-[18px] pb-8 [scrollbar-width:thin] md:block'}`}
+        data-pagefind-ignore
+      >
+        <NavigationPanel sections={sections} />
+      </aside>
+      <main
+        id="main"
+        tabindex="-1"
+        class:list={[
+          'mx-auto w-full min-w-0 pt-[34px] outline-none md:pt-[49px]',
+          { 'max-w-[790px]': !isHome },
+        ]}
+      >
+        <slot />
+        <footer
+          class="mt-[70px] flex gap-5 border-t border-[var(--border)] pt-[25px] pb-10 text-xs text-[var(--muted-foreground)]"
+          data-pagefind-ignore
+        >
+          <span class="mr-auto">seungjun.dev</span>
+          <a href="/blog/">모든 글</a>
+          <a href="/rss.xml">RSS ↗</a>
+        </footer>
+      </main>
+      <aside
+        class={`${isHome ? 'hidden' : 'sticky top-14 hidden max-h-[calc(100dvh-56px)] self-start overflow-y-auto pt-[53px] pb-8 [scrollbar-width:thin] min-[1200px]:block'}`}
+        data-pagefind-ignore
+      >
+        <slot name="right" />
+      </aside>
     </div>
-    <script>import '../scripts/ui';</script>
+    <script>
+      import '../scripts/ui';
+    </script>
   </body>
 </html>

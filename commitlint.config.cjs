@@ -4,16 +4,27 @@ module.exports = {
     name: 'custom-emoji-parser',
     parserOpts: {
       headerPattern: /^(.+?):\s(.+)$/,
-      headerCorrespondence: ['type', 'subject']
-    }
+      headerCorrespondence: ['type', 'subject'],
+    },
   },
   rules: {
     'type-enum': [
       2,
       'always',
-      ['✨ feat', '🐛 fix', '♻️ refactor', '📝 docs', '⚡ perf', '🔧 chore', '🚀 deploy', '🔥 remove', '💄 style', '🧪 test']
+      [
+        '✨ feat',
+        '🐛 fix',
+        '♻️ refactor',
+        '📝 docs',
+        '⚡ perf',
+        '🔧 chore',
+        '🚀 deploy',
+        '🔥 remove',
+        '💄 style',
+        '🧪 test',
+      ],
     ],
     'subject-empty': [2, 'never'],
-    'subject-max-length': [2, 'always', 100]
-  }
+    'subject-max-length': [2, 'always', 100],
+  },
 };

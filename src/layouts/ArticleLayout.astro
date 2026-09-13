@@ -5,38 +5,167 @@ import { Badge } from '../components/ui/badge';
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '../components/TableOfContents.astro';
-import { getContent, postUrl, seriesUrl, tagUrl, tagsFor, dateLabel, readMinutes, imageUrl, type Post } from '../lib/content';
-interface Props { post: Post; headings: MarkdownHeading[] }
+import {
+  getContent,
+  postUrl,
+  seriesUrl,
+  tagUrl,
+  tagsFor,
+  dateLabel,
+  readMinutes,
+  imageUrl,
+  type Post,
+} from '../lib/content';
+interface Props {
+  post: Post;
+  headings: MarkdownHeading[];
+}
 const { post, headings } = Astro.props;
 const { posts, series } = await getContent();
-const group = series.find(s => s.id === post.data.series?.id);
-const position = group?.posts.findIndex(p => p.id === post.id) ?? -1;
+const group = series.find((s) => s.id === post.data.series?.id);
+const position = group?.posts.findIndex((p) => p.id === post.id) ?? -1;
 const adjacent = group?.posts || [...posts].reverse();
-const idx = group ? position : adjacent.findIndex(p => p.id === post.id);
-const previous = adjacent[idx - 1]; const next = adjacent[idx + 1];
+const idx = group ? position : adjacent.findIndex((p) => p.id === post.id);
+const previous = adjacent[idx - 1];
+const next = adjacent[idx + 1];
 const mine = tagsFor(post);
-const related = posts.filter(p => p.id !== post.id).map(p => ({ post: p, score: tagsFor(p).filter(t => mine.includes(t)).length * 3 + (p.data.series?.id && p.data.series.id === post.data.series?.id ? 2 : 0) })).filter(p => p.score > 0).sort((a,b) => b.score - a.score || a.post.data.publishedAt.valueOf() - b.post.data.publishedAt.valueOf()).slice(0,3);
+const related = posts
+  .filter((p) => p.id !== post.id)
+  .map((p) => ({
+    post: p,
+    score:
+      tagsFor(p).filter((t) => mine.includes(t)).length * 3 +
+      (p.data.series?.id && p.data.series.id === post.data.series?.id ? 2 : 0),
+  }))
+  .filter((p) => p.score > 0)
+  .sort(
+    (a, b) =>
+      b.score - a.score ||
+      a.post.data.publishedAt.valueOf() - b.post.data.publishedAt.valueOf()
+  )
+  .slice(0, 3);
 ---
-<BaseLayout title={post.data.title} description={post.data.description} seriesId={group?.id} postId={post.id} publishedAt={post.data.publishedAt} image={imageUrl(post.data.thumbnail)}>
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  seriesId={group?.id}
+  postId={post.id}
+  publishedAt={post.data.publishedAt}
+  image={imageUrl(post.data.thumbnail)}
+>
   <article data-pagefind-body>
     <header class="article-heading">
-      <div data-pagefind-ignore><ArticleBreadcrumb series={group?{name:group.data.name,href:seriesUrl(group.data.slug)}:undefined}/></div>
-      <h1 data-pagefind-meta="title">{post.data.title}</h1>
-      {post.data.description && <p class="article-description" data-pagefind-meta="description">{post.data.description.replace(/[\u0000-\u001f]/g, '')}</p>}
-      <div class="article-meta"><time datetime={post.data.publishedAt.toISOString()} data-pagefind-meta="publishedAt[datetime]">{dateLabel(post.data.publishedAt)}</time><span aria-hidden="true">·</span><span title="본문 길이로 계산한 대략적인 읽기 시간">약 {readMinutes(post)}분</span>{group && <><span aria-hidden="true">·</span><a href={seriesUrl(group.data.slug)}>{position + 1} / {group.posts.length}</a></>}</div>
-      <div class="article-tags" data-tags={mine.join(' · ')} data-pagefind-meta="tags[data-tags]">{mine.map(tag => <a href={tagUrl(tag)} data-tag={tag} data-pagefind-filter="tag[data-tag]"><Badge variant="secondary">#{tag}</Badge></a>)}</div>
-      {group && <span hidden data-pagefind-meta="series" data-pagefind-filter="series">{group.data.name}</span>}
-    </header>
-    {headings.length > 0 && <div data-pagefind-ignore class="mb-8 min-[1200px]:hidden"><Expandable title="이 글의 목차" client:load><TableOfContents headings={headings}/></Expandable></div>}
-    <div class="prose"><slot /></div>
-    <footer data-pagefind-ignore>
-      {post.data.originalUrl && <p class="original-link"><a href={post.data.originalUrl} target="_blank" rel="noopener noreferrer">Velog 원문 <span aria-hidden="true">↗</span></a></p>}
-      <div class="article-pagination">
-        <div>{previous && <a href={postUrl(previous)}><span>← {group ? '시리즈 이전 글' : '이전 기록'}</span><strong>{previous.data.title}</strong></a>}</div>
-        <div class="text-right">{next && <a href={postUrl(next)}><span>{group ? '시리즈 다음 글' : '다음 기록'} →</span><strong>{next.data.title}</strong></a>}</div>
+      <div data-pagefind-ignore>
+        <ArticleBreadcrumb
+          series={
+            group
+              ? { name: group.data.name, href: seriesUrl(group.data.slug) }
+              : undefined
+          }
+        />
       </div>
-      {related.length > 0 && <section class="related-posts"><h2>함께 읽기</h2>{related.map(({post:p}) => <a href={postUrl(p)}><span>{p.data.title}</span><span class="count">{dateLabel(p.data.publishedAt)} ↗</span></a>)}</section>}
+      <h1 data-pagefind-meta="title">{post.data.title}</h1>
+      {post.data.description && (
+        <p class="article-description" data-pagefind-meta="description">
+          {post.data.description.replace(/[\u0000-\u001f]/g, '')}
+        </p>
+      )}
+      <div class="article-meta">
+        <time
+          datetime={post.data.publishedAt.toISOString()}
+          data-pagefind-meta="publishedAt[datetime]"
+        >
+          {dateLabel(post.data.publishedAt)}
+        </time>
+        <span aria-hidden="true">·</span>
+        <span title="본문 길이로 계산한 대략적인 읽기 시간">
+          약 {readMinutes(post)}분
+        </span>
+        {group && (
+          <>
+            <span aria-hidden="true">·</span>
+            <a href={seriesUrl(group.data.slug)}>
+              {position + 1} / {group.posts.length}
+            </a>
+          </>
+        )}
+      </div>
+      <div
+        class="article-tags"
+        data-tags={mine.join(' · ')}
+        data-pagefind-meta="tags[data-tags]"
+      >
+        {mine.map((tag) => (
+          <a
+            href={tagUrl(tag)}
+            data-tag={tag}
+            data-pagefind-filter="tag[data-tag]"
+          >
+            <Badge variant="secondary">#{tag}</Badge>
+          </a>
+        ))}
+      </div>
+      {group && (
+        <span hidden data-pagefind-meta="series" data-pagefind-filter="series">
+          {group.data.name}
+        </span>
+      )}
+    </header>
+    {headings.length > 0 && (
+      <div data-pagefind-ignore class="mb-8 min-[1200px]:hidden">
+        <Expandable title="이 글의 목차" client:load>
+          <TableOfContents headings={headings} />
+        </Expandable>
+      </div>
+    )}
+    <div class="prose">
+      <slot />
+    </div>
+    <footer data-pagefind-ignore>
+      {post.data.originalUrl && (
+        <p class="original-link">
+          <a
+            href={post.data.originalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Velog 원문 <span aria-hidden="true">↗</span>
+          </a>
+        </p>
+      )}
+      <div class="article-pagination">
+        <div>
+          {previous && (
+            <a href={postUrl(previous)}>
+              <span>← {group ? '시리즈 이전 글' : '이전 기록'}</span>
+              <strong>{previous.data.title}</strong>
+            </a>
+          )}
+        </div>
+        <div class="text-right">
+          {next && (
+            <a href={postUrl(next)}>
+              <span>{group ? '시리즈 다음 글' : '다음 기록'} →</span>
+              <strong>{next.data.title}</strong>
+            </a>
+          )}
+        </div>
+      </div>
+      {related.length > 0 && (
+        <section class="related-posts">
+          <h2>함께 읽기</h2>
+          {related.map(({ post: p }) => (
+            <a href={postUrl(p)}>
+              <span>{p.data.title}</span>
+              <span class="count">{dateLabel(p.data.publishedAt)} ↗</span>
+            </a>
+          ))}
+        </section>
+      )}
     </footer>
   </article>
-  <div slot="right" class="desktop-toc"><TableOfContents headings={headings} /></div>
+  <div slot="right" class="desktop-toc">
+    <TableOfContents headings={headings} />
+  </div>
 </BaseLayout>

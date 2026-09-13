@@ -4,9 +4,15 @@ import ArticleLayout from '../../layouts/ArticleLayout.astro';
 import { getContent } from '../../lib/content';
 export async function getStaticPaths() {
   const { posts } = await getContent();
-  return posts.map(post => ({ params: { slug: post.data.slug }, props: { post } }));
+  return posts.map((post) => ({
+    params: { slug: post.data.slug },
+    props: { post },
+  }));
 }
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 ---
-<ArticleLayout post={post} headings={headings}><Content /></ArticleLayout>
+
+<ArticleLayout post={post} headings={headings}>
+  <Content />
+</ArticleLayout>

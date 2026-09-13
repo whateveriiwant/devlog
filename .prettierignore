@@ -1,0 +1,8 @@
+node_modules
+dist
+work
+outputs
+migration/*.json
+migration/*.md
+pnpm-lock.yaml
+src/content/posts

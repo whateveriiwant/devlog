@@ -34,12 +34,12 @@ pnpm verify:build
 pnpm verify:search
 ```
 
-| 명령 | 검증 내용 |
-|---|---|
-| `check` | Astro/TypeScript 타입·컴포넌트 진단 |
-| `verify:migration` | 125개 원본 본문 SHA-256, 제목·날짜·태그·시리즈 ID/원래 순서, Markdown 구조 |
-| `verify:build` | 실제 HTML의 제목·heading·이미지·코드, 내부 경로/목차 anchor, 아카이브 전체 글, 시리즈 순서 |
-| `verify:search` | 생성된 Pagefind JS/WASM에서 전체 125개 검색 문서와 metadata, 한국어·영어·과거 글 검색 |
+| 명령               | 검증 내용                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| `check`            | Astro/TypeScript 타입·컴포넌트 진단                                                        |
+| `verify:migration` | 125개 원본 본문 SHA-256, 제목·날짜·태그·시리즈 ID/원래 순서, Markdown 구조                 |
+| `verify:build`     | 실제 HTML의 제목·heading·이미지·코드, 내부 경로/목차 anchor, 아카이브 전체 글, 시리즈 순서 |
+| `verify:search`    | 생성된 Pagefind JS/WASM에서 전체 125개 검색 문서와 metadata, 한국어·영어·과거 글 검색      |
 
 검증 결과는 `migration/verification.json`, `build-verification.json`, `search-verification.json`에 저장됩니다. 코드 렌더링 비교는 Shiki와 기본 HTML 렌더러의 **블록 끝 줄바꿈** 차이만 정규화합니다. 들여쓰기·내부 줄바꿈은 그대로 비교하며, 원본 Markdown 전체 바이트 비교는 별도로 통과해야 합니다.
 
@@ -47,26 +47,26 @@ pnpm verify:search
 
 ## 구조와 수정 위치
 
-| 위치 | 역할 |
-|---|---|
-| `src/content/posts/` | 이전한 글 125개의 `.md`; 새 글은 `.md` 또는 `.mdx` |
-| `src/content/series.json` | 기존 23개 시리즈의 ID·이름·slug |
-| `src/content.config.ts` | Content Collections schema와 파일 loader |
-| `src/lib/content.ts` | 날짜·태그 별칭·카테고리·시리즈·URL 처리 |
-| `src/layouts/BaseLayout.astro` | 전체 레이아웃·반응형 3열·React island 배치·SEO |
-| `src/layouts/ArticleLayout.astro` | 글 metadata·시리즈 이전/다음·관련 글·TOC 배치 |
-| `src/components/PostList.astro` | 날짜와 제목 중심의 조밀한 목록; Tailwind utility로 간격 수정 |
-| `src/components/NavigationPanel.tsx` | 5개 카테고리와 글별 시리즈 탐색 |
-| `src/components/TableOfContents.astro` | 실제 heading 기반 목차와 깊은 단계 접기 |
-| `src/components/Photo.astro` | 사진·caption·수동 촬영 정보·responsive image 속성 |
-| `src/components/SiteControls.tsx` | shadcn 검색·모바일 메뉴·테마·이미지 확대 |
-| `src/components/Expandable.tsx` | shadcn 연도·목차 접기 |
-| `src/components/ui/` | 공식 CLI로 추가한 shadcn/ui 컴포넌트 소스 |
-| `src/scripts/ui.ts` | 스크롤에 따른 현재 목차 표시 |
-| `src/styles/global.css` | 색상 변수·테마·Markdown typography·공통 요소 스타일 |
-| `src/pages/` | 홈·아카이브·시리즈·카테고리·태그·글·RSS·robots·404 |
-| `scripts/rehype-content.mjs` | 안전한 HTML 렌더링, heading 단계, 내부 링크와 이미지 URL 매핑 |
-| `migration/taxonomy.json` | 실제 자료에서 결정한 5개 영역과 글별 분류, 태그 표시 별칭 |
+| 위치                                   | 역할                                                          |
+| -------------------------------------- | ------------------------------------------------------------- |
+| `src/content/posts/`                   | 이전한 글 125개의 `.md`; 새 글은 `.md` 또는 `.mdx`            |
+| `src/content/series.json`              | 기존 23개 시리즈의 ID·이름·slug                               |
+| `src/content.config.ts`                | Content Collections schema와 파일 loader                      |
+| `src/lib/content.ts`                   | 날짜·태그 별칭·카테고리·시리즈·URL 처리                       |
+| `src/layouts/BaseLayout.astro`         | 전체 레이아웃·반응형 3열·React island 배치·SEO                |
+| `src/layouts/ArticleLayout.astro`      | 글 metadata·시리즈 이전/다음·관련 글·TOC 배치                 |
+| `src/components/PostList.astro`        | 날짜와 제목 중심의 조밀한 목록; Tailwind utility로 간격 수정  |
+| `src/components/NavigationPanel.tsx`   | 5개 카테고리와 글별 시리즈 탐색                               |
+| `src/components/TableOfContents.astro` | 실제 heading 기반 목차와 깊은 단계 접기                       |
+| `src/components/Photo.astro`           | 사진·caption·수동 촬영 정보·responsive image 속성             |
+| `src/components/SiteControls.tsx`      | shadcn 검색·모바일 메뉴·테마·이미지 확대                      |
+| `src/components/Expandable.tsx`        | shadcn 연도·목차 접기                                         |
+| `src/components/ui/`                   | 공식 CLI로 추가한 shadcn/ui 컴포넌트 소스                     |
+| `src/scripts/ui.ts`                    | 스크롤에 따른 현재 목차 표시                                  |
+| `src/styles/global.css`                | 색상 변수·테마·Markdown typography·공통 요소 스타일           |
+| `src/pages/`                           | 홈·아카이브·시리즈·카테고리·태그·글·RSS·robots·404            |
+| `scripts/rehype-content.mjs`           | 안전한 HTML 렌더링, heading 단계, 내부 링크와 이미지 URL 매핑 |
+| `migration/taxonomy.json`              | 실제 자료에서 결정한 5개 영역과 글별 분류, 태그 표시 별칭     |
 
 전체 배치와 목록의 반응형 크기는 Astro의 Tailwind utility를 수정합니다. 본문에서 자동 생성되는 `p`, `h2`, `pre`, `table` 등의 스타일과 색상은 `global.css`를 수정합니다. 2026-09-12 요청에 따라 UI를 shadcn/ui (new-york, Neutral)로 전환했습니다. React 19.3.0과 Astro React integration 6.0.5를 사용합니다. Sidebar·Item·Badge·Breadcrumb는 서버에서 HTML로 렌더링하고, 검색·모바일 메뉴·이미지 확대·테마·접기만 React island로 동작합니다.
 
@@ -78,11 +78,11 @@ pnpm verify:search
 
 ```yaml
 ---
-title: "새 글 제목"
-description: "글을 한두 문장으로 설명합니다."
-slug: "my-new-post"
-publishedAt: "2026-09-08T09:00:00+09:00"
-category: "web-app"
+title: '새 글 제목'
+description: '글을 한두 문장으로 설명합니다.'
+slug: 'my-new-post'
+publishedAt: '2026-09-08T09:00:00+09:00'
+category: 'web-app'
 tags:
   - JavaScript
 draft: true
