@@ -1,20 +1,37 @@
 ---
-import { Badge } from '../../components/ui/badge';
+import TagExplorer from '../../components/TagExplorer';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getContent, tagUrl } from '../../lib/content';
-const { tags } = await getContent();
+import { getContent, tagUrl, tagsFor } from '../../lib/content';
+const { posts, tags } = await getContent();
+const allTags = tags.map((tag) => ({
+  name: tag.name,
+  count: tag.posts.length,
+  href: tagUrl(tag.name),
+}));
+const graphNodes = allTags.filter((tag) => tag.count >= 2).slice(0, 30);
+const graphNames = new Set(graphNodes.map((tag) => tag.name));
+const pairs = new Map<string, number>();
+posts.forEach((post) => {
+  const names = tagsFor(post).filter((tag) => graphNames.has(tag)).sort();
+  names.forEach((source, sourceIndex) => {
+    names.slice(sourceIndex + 1).forEach((target) => {
+      const key = `${source}\u0000${target}`;
+      pairs.set(key, (pairs.get(key) ?? 0) + 1);
+    });
+  });
+});
+const graphLinks = [...pairs.entries()]
+  .filter(([, count]) => count >= 2)
+  .map(([key, count]) => {
+    const [source, target] = key.split('\u0000');
+    return { source, target, count };
+  });
 ---
 
 <BaseLayout title="태그" description="기술과 키워드로 관련 글을 찾아보세요.">
   <header class="page-heading">
     <h1>태그</h1>
+    <p class="page-description">함께 등장한 키워드의 연결을 살펴보거나 원하는 태그를 검색해보세요.</p>
   </header>
-  <div class="tag-index">
-    {tags.map((t) => (
-      <a href={tagUrl(t.name)}>
-        <Badge variant="secondary">#{t.name}</Badge>
-        <Badge variant="outline">{t.posts.length}</Badge>
-      </a>
-    ))}
-  </div>
+  <TagExplorer graphNodes={graphNodes} graphLinks={graphLinks} allTags={allTags} client:load />
 </BaseLayout>

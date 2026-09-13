@@ -22,14 +22,4 @@ const { tags } = await getContent();
     <p class="page-description">{tag.posts.length}개의 글</p>
   </header>
   <PostList posts={tag.posts} />
-  <div slot="right">
-    <h2 class="rail-heading mb-5">자주 다룬 키워드</h2>
-    <div class="space-y-4">
-      {tags.slice(0, 8).map((t) => (
-        <a href={tagUrl(t.name)} class="subtle-link block">
-          #{t.name} <span class="count">{t.posts.length}</span>
-        </a>
-      ))}
-    </div>
-  </div>
 </BaseLayout>
