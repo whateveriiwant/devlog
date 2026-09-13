@@ -147,7 +147,7 @@ const isHome = Astro.url.pathname === '/';
         class={`${isHome ? 'hidden' : 'sticky top-14 hidden h-[calc(100dvh-56px)] overflow-y-auto border-r border-[var(--border)] pt-[35px] pr-[18px] pb-8 [scrollbar-width:thin] md:block'}`}
         data-pagefind-ignore
       >
-        <NavigationPanel sections={sections} />
+        <NavigationPanel sections={sections} client:load />
       </aside>
       <main
         id="main"

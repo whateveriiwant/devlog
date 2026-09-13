@@ -123,17 +123,6 @@ const related = posts
       <slot />
     </div>
     <footer data-pagefind-ignore>
-      {post.data.originalUrl && (
-        <p class="original-link">
-          <a
-            href={post.data.originalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Velog 원문 <span aria-hidden="true">↗</span>
-          </a>
-        </p>
-      )}
       <div class="article-pagination">
         <div>
           {previous && (

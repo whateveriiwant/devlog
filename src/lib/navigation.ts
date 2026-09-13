@@ -3,6 +3,8 @@ import { getContent, postUrl, seriesUrl } from './content';
 export interface NavSection {
   label: string;
   href?: string;
+  initialCount?: number;
+  moreLabel?: string;
   items: {
     label: string;
     href: string;
@@ -49,20 +51,21 @@ export async function getNavigation(
     });
   if (!current)
     sections.push({
-      label: '주요 시리즈',
+      label: '시리즈',
       href: '/series/',
-      items: ['React', 'Node.js', '운영체제', 'C/C++'].flatMap((name) => {
-        const s = content.series.find((s) => s.data.name === name);
-        return s
-          ? [
-              {
-                label: name,
-                href: seriesUrl(s.data.slug),
-                count: s.posts.length,
-              },
-            ]
-          : [];
-      }),
+      initialCount: 4,
+      moreLabel: '시리즈 더 보기',
+      items: [...content.series]
+        .sort(
+          (a, b) =>
+            Math.max(...b.posts.map((post) => post.data.publishedAt.valueOf())) -
+            Math.max(...a.posts.map((post) => post.data.publishedAt.valueOf()))
+        )
+        .map((series) => ({
+          label: series.data.name,
+          href: seriesUrl(series.data.slug),
+          count: series.posts.length,
+        })),
     });
   sections.push({
     label: '더 찾아보기',

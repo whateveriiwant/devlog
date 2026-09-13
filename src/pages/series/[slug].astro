@@ -2,7 +2,7 @@
 import { Badge } from '../../components/ui/badge';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostList from '../../components/PostList.astro';
-import { getContent, dateLabel } from '../../lib/content';
+import { getContent } from '../../lib/content';
 export async function getStaticPaths() {
   const { series } = await getContent();
   return series.map((group) => ({
@@ -23,7 +23,7 @@ const { group } = Astro.props;
 >
   <header class="page-heading">
     <a href="/series/" class="eyebrow block">
-      SERIES / 시리즈
+      시리즈
     </a>
     <h1>{group.data.name}</h1>
     {group.data.description && (
@@ -31,18 +31,40 @@ const { group } = Astro.props;
     )}
     <div class="stat-line">
       <Badge variant="secondary">{group.posts.length}개의 글</Badge>
-      <Badge variant="outline">시리즈 순서대로</Badge>
     </div>
   </header>
-  <PostList posts={group.posts} numbered />
-  <div slot="right">
-    <h2 class="rail-heading">이어 읽기</h2>
-    <p class="rail-note">
-      각 글의 아래에서 이전 글과 다음 글로 이동할 수 있습니다.
-    </p>
-    <p class="rail-note mt-6">
-      첫 순서의 글<br />
-      {dateLabel(group.posts[0].data.publishedAt)}
-    </p>
+  <div class="mb-5 flex justify-end">
+    <div class="inline-flex h-9 items-center rounded-lg bg-muted p-1" aria-label="글 정렬 방식" data-series-sort>
+      <button type="button" class="h-7 rounded-md bg-background px-3 text-xs font-medium text-foreground shadow-xs transition-[background-color,color,box-shadow]" data-sort="order" aria-pressed="true">시리즈 순서</button>
+      <button type="button" class="h-7 rounded-md px-3 text-xs font-medium text-muted-foreground transition-[background-color,color,box-shadow] hover:text-foreground" data-sort="latest" aria-pressed="false">최신순</button>
+    </div>
   </div>
+  <div data-series-posts><PostList posts={group.posts} numbered /></div>
 </BaseLayout>
+<script>
+  const sortRoot = document.querySelector<HTMLElement>('[data-series-sort]');
+  const postList = document.querySelector<HTMLOListElement>('[data-series-posts] [data-post-list]');
+  if (sortRoot && postList) {
+    const buttons = Array.from(sortRoot.querySelectorAll<HTMLButtonElement>('[data-sort]'));
+    const posts = Array.from(postList.children) as HTMLLIElement[];
+    const setSort = (mode: string) => {
+      const sorted = mode === 'latest'
+        ? [...posts].sort((a, b) => Number(new Date(b.dataset.publishedAt || '')) - Number(new Date(a.dataset.publishedAt || '')))
+        : posts;
+      sorted.forEach((post, index) => {
+        postList.append(post);
+        const indexLabel = post.querySelector<HTMLElement>('.post-row-index');
+        if (indexLabel) indexLabel.textContent = String(index + 1).padStart(2, '0');
+      });
+      buttons.forEach((button) => {
+        const active = button.dataset.sort === mode;
+        button.setAttribute('aria-pressed', String(active));
+        button.classList.toggle('bg-background', active);
+        button.classList.toggle('text-foreground', active);
+        button.classList.toggle('text-muted-foreground', !active);
+        button.classList.toggle('shadow-xs', active);
+      });
+    };
+    buttons.forEach((button) => button.addEventListener('click', () => setSort(button.dataset.sort || 'order')));
+  }
+</script>

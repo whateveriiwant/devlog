@@ -26,9 +26,9 @@ export default function PostRows({
   compact?: boolean;
 }) {
   return (
-    <ol className="m-0 list-none divide-y p-0">
+    <ol className="m-0 list-none divide-y p-0" data-post-list>
       {rows.map((row, index) => (
-        <li key={row.href}>
+        <li key={row.href} data-published-at={row.iso}>
           <Item
             asChild
             className={`rounded-none border-0 px-2 transition-colors hover:bg-accent/60 ${compact ? 'py-3' : 'py-4'}`}
@@ -48,7 +48,7 @@ export default function PostRows({
                 )}
               </div>
               <ItemContent className="min-w-0 gap-1.5">
-                <div className="pt-0.5 text-xs text-muted-foreground tabular-nums">
+                <div className="post-row-index pt-0.5 text-xs text-muted-foreground tabular-nums">
                   {numbered ? (
                     String(index + 1).padStart(2, '0')
                   ) : (

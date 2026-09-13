@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import type { NavSection } from '@/lib/navigation';
 import {
   Sidebar,
@@ -17,11 +19,21 @@ export default function NavigationPanel({
 }: {
   sections: NavSection[];
 }) {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
   return (
     <SidebarProvider className="min-h-0 w-full bg-transparent">
       <Sidebar collapsible="none" className="w-full bg-transparent">
         <SidebarContent className="gap-4 py-2">
-          {sections.map((section) => (
+          {sections.map((section) => {
+            const initialCount = section.initialCount ?? section.items.length;
+            const canExpand = section.items.length > initialCount;
+            const isExpanded = expanded[section.label] ?? false;
+            const visibleItems = isExpanded
+              ? section.items
+              : section.items.slice(0, initialCount);
+
+            return (
             <SidebarGroup key={section.label} className="px-0">
               <SidebarGroupLabel className="mb-1 text-xs">
                 {section.href ? (
@@ -32,7 +44,7 @@ export default function NavigationPanel({
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {section.items.map((item) => (
+                  {visibleItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
                       <SidebarMenuButton
                         asChild
@@ -53,10 +65,31 @@ export default function NavigationPanel({
                       )}
                     </SidebarMenuItem>
                   ))}
+                  {canExpand && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        type="button"
+                        className="mt-1 text-muted-foreground"
+                        onClick={() =>
+                          setExpanded((current) => ({
+                            ...current,
+                            [section.label]: !isExpanded,
+                          }))
+                        }
+                        aria-expanded={isExpanded}
+                      >
+                        <ChevronDown
+                          className={`size-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                        />
+                        <span>{isExpanded ? '시리즈 접기' : section.moreLabel}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
-          ))}
+            );
+          })}
         </SidebarContent>
       </Sidebar>
     </SidebarProvider>

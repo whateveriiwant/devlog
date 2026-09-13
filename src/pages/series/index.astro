@@ -4,7 +4,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getContent, seriesUrl } from '../../lib/content';
 const { series } = await getContent();
 const sortedSeries = [...series].sort(
-  (a, b) => b.posts.length - a.posts.length
+  (a, b) =>
+    Math.max(...b.posts.map((post) => post.data.publishedAt.valueOf())) -
+    Math.max(...a.posts.map((post) => post.data.publishedAt.valueOf()))
 );
 ---
 
@@ -14,9 +16,6 @@ const sortedSeries = [...series].sort(
 >
   <header class="page-heading">
     <h1>시리즈</h1>
-    <p class="page-description">
-      하나의 주제를 따라 읽어보세요
-    </p>
   </header>
   <CollectionRows
     heading={3}

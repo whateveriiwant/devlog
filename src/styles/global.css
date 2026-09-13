@@ -150,7 +150,7 @@
     @apply flex size-8 items-center justify-center rounded-lg bg-primary font-mono text-sm font-bold text-primary-foreground;
   }
   .page-heading {
-    @apply pb-8;
+    @apply pb-4;
   }
   .eyebrow {
     @apply mb-3 text-xs font-medium tracking-widest text-muted-foreground;
