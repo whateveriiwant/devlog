@@ -72,7 +72,8 @@ export async function getNavigation(
         href: '/tags/',
         active: pathname.startsWith('/tags/'),
       },
-      { label: 'RSS 구독', href: '/rss.xml' },
+    { label: '프로필', href: '/profile/', active: pathname === '/profile/' },
+    { label: 'RSS 구독', href: '/rss.xml' },
     ],
   });
   return sections;

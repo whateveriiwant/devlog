@@ -1,0 +1,153 @@
+---
+import { Mail } from 'lucide-react';
+import { buttonVariants } from '../components/ui/button';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const profile = {
+  name: '정승준',
+  introduction:
+    '프론트엔드 엔지니어입니다. 기술 커뮤니티 활성화에 관심이 많으며, 사용성 좋은 UI/UX 설계를 좋아합니다. 최근에는 각종 시스템의 내부 원리 파악에도 관심이 많아요.',
+  email: 'seungjun.jeong10@gmail.com',
+  github: 'https://github.com/whateveriiwant',
+  linkedin: 'https://www.linkedin.com/in/seungjun-dev/',
+};
+
+const careers = [
+  {
+    period: '2026.09 — Present',
+    organization: 'HUFS One',
+    position: 'Frontend Engineer',
+    description:
+        '한국외대 컴퓨터공학부 공로장학생으로 학교의 모든 과에서 사용 가능한 기자재/세미나룸 대여 시스템을 개발 중입니다.',
+  },
+  {
+    period: '2026.08 — Present',
+    organization: 'Google Developer Groups on Campus HUFS',
+    position: 'Core Member',
+    description:
+        '한국외국어대학교의 GDGoC에서 코어 멤버로 활동 중이며, 다양한 기술 세미나를 기획하고 진행 할 예정입니다. 또한, 프로그램팀 코어 멤버로서 정규 세션과 이벤트를 기획하고 운영하며 기술에 열정을 가진 학생들을 지원합니다.',
+  },
+  {
+    period: '2025.06 — 2026.02',
+    organization: '네이버 커넥트재단 부스트캠프 웹·모바일 10기 웹 풀스택',
+    position: '멤버십 캠퍼',
+    description:
+      '부스트캠프 웹·모바일 10기 웹 풀스택 과정에 참여하여, 프론트엔드와 백엔드 전반에 걸친 기술을 학습하고 프로젝트를 진행했습니다.',
+  },
+  {
+    period: '2023.12 — 2025.06',
+    organization: 'KATUSA',
+    position: 'Military Police (31B)',
+    description:
+        '엔터프라이즈급 생체 보안 시스템을 운영하고 데이터 무결성 관리, 보안 준수, 한·미 합동 환경의 업무 조율을 담당했습니다.',
+  },
+  {
+    period: '2023.10 — 2025.02',
+    organization: 'Microsoft Student Ambassadors',
+    position: 'Beta Student Ambassador',
+    description:
+      '동료 학생을 돕고 강한 기술 커뮤니티를 만들며 미래를 위한 기술을 개발하는 프로그램으로, Microsoft의 기술과 리소스를 활용하여 학생들에게 기술을 전파하고, 다양한 이벤트를 주최했습니다.',
+  },
+  {
+    period: '2023.08 — 2023.10',
+    organization: '코드잇 앰배서더 1기',
+    position: '학생 앰배서더',
+    description:
+        '온라인 IT 교육 플랫폼 코드잇에서 앰배서더로서 활동하며, 학생들에게 코드잇의 교육 콘텐츠를 소개하고, 학습 경험을 향상시키기 위한 다양한 활동을 진행했습니다.',
+  },
+  {
+    period: '2023.03 — 2023.11',
+    organization: 'SK DEVOCEAN YOUNG 2기',
+    position: 'Tech Influencer',
+    description:
+      'SK그룹의 DevRel 플랫폼인 DEVOCEAN에서 대학생 테크 인플루언서로 활동하며 기술 커뮤니티 활성화와 기술 역량 발전을 위한 활동을 진행했습니다.',
+  },
+  {
+    period: '2022.03 — 2023.06',
+    organization: '한국외대 IT자치기구 훕스토리',
+    position: 'Frontend Engineer',
+    description:
+        '대학에 입학하자마자 가입한 동아리에요. Flutter와 React로 각종 프로젝트를 진행하며 실무 개발 기초를 쌓았습니다.',
+  },
+];
+---
+
+<BaseLayout
+  title="프로필"
+  description="정승준의 소개, 경력과 연락처를 확인할 수 있는 프로필입니다."
+>
+  <article>
+    <header class="grid gap-8 border-b pb-10 sm:grid-cols-[18rem_minmax(0,1fr)] sm:items-center">
+      <div class="aspect-3/4 w-full overflow-hidden rounded-xl border bg-muted">
+        <img
+          src="/profile.jpg"
+          alt="프로필 사진"
+          class="size-full object-cover object-[50%_38%]"
+          loading="eager"
+        />
+      </div>
+
+      <div>
+        <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">
+          {profile.name}
+        </h1>
+        <p class="mt-5 text-sm leading-7 text-muted-foreground sm:text-base">
+          {profile.introduction}
+        </p>
+
+        <div class="mt-7 flex flex-wrap gap-2" aria-label="외부 링크와 연락처">
+          <a
+            href={`mailto:${profile.email}`}
+            class={buttonVariants({ variant: 'outline', size: 'icon' })}
+            aria-label="이메일 보내기"
+            title="이메일 보내기"
+          >
+            <Mail className="size-4" />
+          </a>
+          <a
+            href={profile.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class={buttonVariants({ variant: 'outline', size: 'icon' })}
+            aria-label="GitHub 프로필"
+            title="GitHub"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-current">
+              <path d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.23c-3.23.7-3.91-1.37-3.91-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.78 1.2 1.78 1.2 1.04 1.77 2.72 1.26 3.38.96.1-.75.4-1.26.73-1.55-2.58-.29-5.29-1.29-5.29-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.16 1.18a10.9 10.9 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.83 1.19 3.08 0 4.4-2.72 5.38-5.3 5.67.42.36.79 1.06.79 2.14v3.17c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .7Z" />
+            </svg>
+          </a>
+          <a
+            href={profile.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            class={buttonVariants({ variant: 'outline', size: 'icon' })}
+            aria-label="LinkedIn 프로필"
+            title="LinkedIn"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="size-4 fill-current">
+              <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V8.98h3.42v1.57h.05a3.75 3.75 0 0 1 3.37-1.85c3.61 0 4.27 2.37 4.27 5.46v6.29ZM5.32 7.41a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13Zm1.78 13.04H3.54V8.98H7.1v11.47Z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="pt-10" aria-labelledby="career-heading">
+      <div class="grid gap-7 sm:grid-cols-[12rem_minmax(0,1fr)]">
+        <h2 id="career-heading" class="text-2xl font-semibold">경력</h2>
+        <ol class="divide-y border-y">
+          {careers.map((career) => (
+            <li class="py-4">
+              <p class="text-xs text-muted-foreground tabular-nums">{career.period}</p>
+              <div class="mt-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h3 class="font-semibold">{career.organization}</h3>
+                <span class="text-sm text-muted-foreground">{career.position}</span>
+              </div>
+              <p class="mt-3 text-sm leading-6 text-muted-foreground">{career.description}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  </article>
+</BaseLayout>

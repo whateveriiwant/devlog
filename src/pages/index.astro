@@ -3,7 +3,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   CalendarDays,
-  Clock3,
   Library,
 } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
@@ -15,7 +14,6 @@ import {
   getContent,
   imageUrl,
   postUrl,
-  readMinutes,
   seriesUrl,
   tagUrl,
 } from '../lib/content';
@@ -76,9 +74,6 @@ const popularTags = content.tags.slice(0, 18);
             <span class="inline-flex items-center gap-2">
               <CalendarDays className="size-4" />
               {dateLabel(featured.data.publishedAt)}
-            </span>
-            <span class="inline-flex items-center gap-2">
-              <Clock3 className="size-4" />약 {readMinutes(featured)}분
             </span>
           </div>
 
