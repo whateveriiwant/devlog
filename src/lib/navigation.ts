@@ -42,6 +42,8 @@ export async function getNavigation(
     sections.push({
       label: current.data.name,
       href: seriesUrl(current.data.slug),
+      initialCount: 5,
+      moreLabel: '시리즈 글 더 보기',
       items: current.posts.map((p, i) => ({
         label: p.data.title,
         href: postUrl(p),

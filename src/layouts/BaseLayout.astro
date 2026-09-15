@@ -141,7 +141,7 @@ const isHome = Astro.url.pathname === '/';
       </div>
     </header>
     <div
-      class={`mx-auto max-w-[1540px] px-5.25 md:px-8 ${isHome ? '' : 'md:grid md:grid-cols-[210px_minmax(0,1fr)] md:gap-[34px] min-[1200px]:grid-cols-[220px_minmax(0,1fr)_216px] min-[1200px]:gap-12 min-[1600px]:grid-cols-[232px_minmax(0,1fr)_220px] min-[1600px]:gap-14'}`}
+      class={`mx-auto max-w-[1540px] px-5.25 md:px-8 ${isHome ? '' : 'md:grid md:grid-cols-[210px_minmax(0,1fr)] md:gap-[34px] xl:grid-cols-[220px_minmax(0,1fr)_216px] xl:gap-12 2xl:grid-cols-[232px_minmax(0,1fr)_220px] 2xl:gap-14'}`}
     >
       <aside
         class={`${isHome ? 'hidden' : 'sticky top-14 hidden h-[calc(100dvh-56px)] overflow-y-auto border-r border-[var(--border)] pt-[35px] pr-[18px] pb-8 [scrollbar-width:thin] md:block'}`}
@@ -168,7 +168,7 @@ const isHome = Astro.url.pathname === '/';
         </footer>
       </main>
       <aside
-        class={`${isHome ? 'hidden' : 'sticky top-14 hidden max-h-[calc(100dvh-56px)] self-start overflow-y-auto pt-[53px] pb-8 [scrollbar-width:thin] min-[1200px]:block'}`}
+        class={`${isHome ? 'hidden' : 'sticky top-14 hidden max-h-[calc(100dvh-56px)] self-start overflow-y-auto pt-[53px] pb-8 [scrollbar-width:thin] xl:block'}`}
         data-pagefind-ignore
       >
         <slot name="right" />

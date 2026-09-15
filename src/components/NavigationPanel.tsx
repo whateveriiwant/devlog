@@ -29,9 +29,20 @@ export default function NavigationPanel({
             const initialCount = section.initialCount ?? section.items.length;
             const canExpand = section.items.length > initialCount;
             const isExpanded = expanded[section.label] ?? false;
+            const activeIndex = section.items.findIndex((item) => item.active);
+            const collapsedStart =
+              activeIndex < initialCount
+                ? 0
+                : Math.min(
+                    activeIndex - Math.floor(initialCount / 2),
+                    section.items.length - initialCount
+                  );
             const visibleItems = isExpanded
               ? section.items
-              : section.items.slice(0, initialCount);
+              : section.items.slice(
+                  collapsedStart,
+                  collapsedStart + initialCount
+                );
 
             return (
             <SidebarGroup key={section.label} className="px-0">

@@ -1,6 +1,7 @@
 ---
 import Expandable from '../components/Expandable';
 import ArticleBreadcrumb from '../components/ArticleBreadcrumb';
+import SeriesPostPagination from '../components/SeriesPostPagination';
 import { Badge } from '../components/ui/badge';
 import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
@@ -12,7 +13,6 @@ import {
   tagUrl,
   tagsFor,
   dateLabel,
-  readMinutes,
   imageUrl,
   type Post,
 } from '../lib/content';
@@ -29,21 +29,6 @@ const idx = group ? position : adjacent.findIndex((p) => p.id === post.id);
 const previous = adjacent[idx - 1];
 const next = adjacent[idx + 1];
 const mine = tagsFor(post);
-const related = posts
-  .filter((p) => p.id !== post.id)
-  .map((p) => ({
-    post: p,
-    score:
-      tagsFor(p).filter((t) => mine.includes(t)).length * 3 +
-      (p.data.series?.id && p.data.series.id === post.data.series?.id ? 2 : 0),
-  }))
-  .filter((p) => p.score > 0)
-  .sort(
-    (a, b) =>
-      b.score - a.score ||
-      a.post.data.publishedAt.valueOf() - b.post.data.publishedAt.valueOf()
-  )
-  .slice(0, 3);
 ---
 
 <BaseLayout
@@ -78,18 +63,6 @@ const related = posts
         >
           {dateLabel(post.data.publishedAt)}
         </time>
-        <span aria-hidden="true">·</span>
-        <span title="본문 길이로 계산한 대략적인 읽기 시간">
-          약 {readMinutes(post)}분
-        </span>
-        {group && (
-          <>
-            <span aria-hidden="true">·</span>
-            <a href={seriesUrl(group.data.slug)}>
-              {position + 1} / {group.posts.length}
-            </a>
-          </>
-        )}
       </div>
       <div
         class="article-tags"
@@ -113,7 +86,7 @@ const related = posts
       )}
     </header>
     {headings.length > 0 && (
-      <div data-pagefind-ignore class="mb-8 min-[1200px]:hidden">
+      <div data-pagefind-ignore class="mb-8 xl:hidden">
         <Expandable title="이 글의 목차" client:load>
           <TableOfContents headings={headings} />
         </Expandable>
@@ -141,16 +114,19 @@ const related = posts
           )}
         </div>
       </div>
-      {related.length > 0 && (
-        <section class="related-posts">
-          <h2>함께 읽기</h2>
-          {related.map(({ post: p }) => (
-            <a href={postUrl(p)}>
-              <span>{p.data.title}</span>
-              <span class="count">{dateLabel(p.data.publishedAt)} ↗</span>
-            </a>
-          ))}
-        </section>
+      {group && (
+        <SeriesPostPagination
+          name={group.data.name}
+          posts={group.posts.map((item, index) => ({
+            href: postUrl(item),
+            title: item.data.title,
+            date: dateLabel(item.data.publishedAt),
+            position: index + 1,
+            current: item.id === post.id,
+          }))}
+          initialPage={Math.max(0, Math.floor(position / 4))}
+          client:load
+        />
       )}
     </footer>
   </article>
