@@ -27,15 +27,63 @@ interface SearchData {
   plain_excerpt?: string;
   meta: Record<string, string>;
 }
+interface SearchDocument extends SearchData {
+  content: string;
+}
 interface SearchIndex {
   search(
     query: string
   ): Promise<{ results: { data(): Promise<SearchData> }[] }>;
 }
 let index: Promise<SearchIndex> | undefined;
+const normalizeSearch = (value: string) =>
+  value.normalize('NFKC').toLocaleLowerCase('ko');
+async function fallbackIndex(): Promise<SearchIndex> {
+  const response = await fetch('/search-index.json');
+  if (!response.ok) throw new Error('Search index could not be loaded');
+  const documents = (await response.json()) as SearchDocument[];
+  return {
+    search(query) {
+      const normalizedQuery = normalizeSearch(query);
+      const terms = normalizedQuery.split(/\s+/).filter(Boolean);
+      const matches = documents
+        .map((data) => {
+          const title = normalizeSearch(data.meta.title ?? '');
+          const description = normalizeSearch(data.meta.description ?? '');
+          const details = normalizeSearch(
+            `${data.meta.series ?? ''} ${data.meta.tags ?? ''}`
+          );
+          const content = normalizeSearch(data.content);
+          const searchable = `${title} ${description} ${details} ${content}`;
+          if (!terms.every((term) => searchable.includes(term))) return null;
+          const score =
+            (title.includes(normalizedQuery) ? 100 : 0) +
+            (description.includes(normalizedQuery) ? 40 : 0) +
+            (details.includes(normalizedQuery) ? 20 : 0) +
+            (content.includes(normalizedQuery) ? 10 : 0);
+          return { data, score };
+        })
+        .filter((match): match is { data: SearchDocument; score: number } =>
+          Boolean(match)
+        )
+        .sort((a, b) => b.score - a.score);
+      return Promise.resolve({
+        results: matches.map(({ data }) => ({
+          data: () => Promise.resolve(data),
+        })),
+      });
+    },
+  };
+}
 function getIndex(): Promise<SearchIndex> {
+  if (index) return index;
   const path = '/pagefind/pagefind.js';
-  return (index ??= import(/* @vite-ignore */ path).catch((error) => {
+  const load = import.meta.env.DEV
+    ? fallbackIndex()
+    : import(/* @vite-ignore */ path)
+        .then((module) => module as SearchIndex)
+        .catch(fallbackIndex);
+  return (index = load.catch((error: unknown) => {
     index = undefined;
     throw error;
   }));
@@ -43,7 +91,7 @@ function getIndex(): Promise<SearchIndex> {
 function excerpt(data: SearchData) {
   if (data.meta.description) return data.meta.description;
   const el = document.createElement('textarea');
-  el.innerHTML = data.plain_excerpt || '';
+  el.innerHTML = data.plain_excerpt ?? '';
   return el.value;
 }
 export default function SiteControls({ sections }: { sections: NavSection[] }) {

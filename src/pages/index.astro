@@ -168,13 +168,13 @@ const popularTags = content.tags.slice(0, 18);
           모든 시리즈 <ArrowRight className="size-4" />
         </a>
       </div>
-      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         {recentSeries.map((series) => (
           <a
             href={seriesUrl(series.data.slug)}
-            class="group flex flex-col overflow-hidden rounded-xl border bg-card shadow-xs transition-colors hover:bg-accent/40"
+            class="group flex overflow-hidden rounded-xl border bg-card shadow-xs transition-colors hover:bg-accent/40 sm:flex-col"
           >
-            <div class="aspect-[4/3] w-full overflow-hidden bg-muted">
+            <div class="h-28 w-32 shrink-0 overflow-hidden bg-muted sm:aspect-video sm:h-auto sm:w-full">
               {series.latestImage ? (
                 <img
                   src={series.latestImage}
@@ -186,8 +186,8 @@ const popularTags = content.tags.slice(0, 18);
                 <div class="size-full bg-gradient-to-br from-muted to-secondary" />
               )}
             </div>
-            <div class="p-5">
-              <h3 class="text-lg font-semibold leading-7">
+            <div class="min-w-0 flex-1 p-4 sm:p-5">
+              <h3 class="line-clamp-2 text-base font-semibold leading-6 sm:text-lg sm:leading-7">
                 {series.data.name}
               </h3>
               <div class="mt-3 flex items-center justify-between text-xs text-muted-foreground">
