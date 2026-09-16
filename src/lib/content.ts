@@ -4,6 +4,12 @@ import manifest from '../../migration/image-manifest.json';
 
 export type Post = CollectionEntry<'posts'>;
 const aliases: Record<string, string> = taxonomy.tagAliases;
+const dateFormatter = new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Seoul',
+});
+const imagesBySource = new Map(
+  manifest.map((item) => [item.originalUrl, item] as const)
+);
 export const normalizeTag = (tag: string) => aliases[tag] || tag;
 export const tagSlug = (tag: string) =>
   normalizeTag(tag)
@@ -20,8 +26,7 @@ export const seriesUrl = (slug: string) =>
   `/series/${encodeURIComponent(slug)}/`;
 export const tagUrl = (tag: string) =>
   `/tags/${encodeURIComponent(tagSlug(tag))}/`;
-export const dateKey = (date: Date) =>
-  new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' }).format(date);
+export const dateKey = (date: Date) => dateFormatter.format(date);
 export const dateLabel = (date: Date) => dateKey(date).replaceAll('-', '.');
 export const readMinutes = (post: Post) =>
   Math.max(
@@ -35,10 +40,10 @@ export const readMinutes = (post: Post) =>
 export function imageUrl(source?: string) {
   if (!source) return undefined;
   const origin = process.env.MEDIA_BASE_URL?.replace(/\/$/, '');
-  const item = origin && manifest.find((i) => i.originalUrl === source);
+  const item = origin && imagesBySource.get(source);
   return item ? `${origin}/${item.key}` : source;
 }
-export async function getContent() {
+async function buildContent() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
     (a, b) =>
       b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf() ||
@@ -71,4 +76,11 @@ export async function getContent() {
       posts: posts.filter((p) => dateKey(p.data.publishedAt).startsWith(year)),
     }));
   return { posts, series: groups, tags, years };
+}
+
+let content: ReturnType<typeof buildContent> | undefined;
+
+export function getContent() {
+  if (!import.meta.env.PROD) return buildContent();
+  return (content ??= buildContent());
 }
