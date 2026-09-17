@@ -15,7 +15,7 @@ interface Props {
 }
 const {
   title,
-  description = '웹 개발, 컴퓨터 기초와 배움의 과정을 기록합니다.',
+  description = '정승준 테크 블로그',
   seriesId,
   postId,
   image,
@@ -32,8 +32,8 @@ const indexable =
   originConfigured && process.env.ALLOW_INDEXING === 'true' && !noindex;
 const siteTitle =
   title === '테크 블로그'
-    ? 'seungjun.dev — 테크 블로그'
-    : `${title} · seungjun.dev`;
+    ? 'seungjun.sh — 테크 블로그'
+    : `${title} · seungjun.sh`;
 const isHome = Astro.url.pathname === '/';
 ---
 
@@ -58,7 +58,7 @@ const isHome = Astro.url.pathname === '/';
       property="og:description"
       content={description.replace(/[\u0000-\u001f]/g, '')}
     />
-    <meta property="og:site_name" content="seungjun.dev" />
+    <meta property="og:site_name" content="seungjun.sh" />
     <meta property="og:type" content={postId ? 'article' : 'website'} />
     <meta property="og:locale" content="ko_KR" />
     {canonical && <meta property="og:url" content={canonical} />}
@@ -83,7 +83,7 @@ const isHome = Astro.url.pathname === '/';
     <link
       rel="alternate"
       type="application/rss+xml"
-      title="seungjun.dev"
+      title="seungjun.sh"
       href="/rss.xml"
     />
     <script is:inline>
@@ -110,10 +110,10 @@ const isHome = Astro.url.pathname === '/';
       <div class="mx-auto flex h-full max-w-[1540px] items-center gap-4 px-5 md:gap-8 md:px-8">
         <a href="/" class="brand" aria-label="seungjun.dev 홈">
           <span class="brand-mark" aria-hidden="true">
-            sj.
+            sj
           </span>
           <span>
-            seungjun<span class="text-muted-foreground">.dev</span>
+            seungjun<span class="text-muted-foreground">.sh</span>
           </span>
         </a>
         <nav aria-label="주요 메뉴" class="hidden items-center gap-1 md:flex">
@@ -153,19 +153,11 @@ const isHome = Astro.url.pathname === '/';
         id="main"
         tabindex="-1"
         class:list={[
-          'mx-auto w-full min-w-0 pt-[34px] outline-none md:pt-[49px]',
+          'mx-auto w-full min-w-0 pt-[34px] pb-10 outline-none md:pt-[49px]',
           { 'max-w-[790px]': !isHome },
         ]}
       >
         <slot />
-        <footer
-          class="mt-[70px] flex gap-5 border-t border-[var(--border)] pt-[25px] pb-10 text-xs text-[var(--muted-foreground)]"
-          data-pagefind-ignore
-        >
-          <span class="mr-auto">seungjun.dev</span>
-          <a href="/blog/">모든 글</a>
-          <a href="/rss.xml">RSS ↗</a>
-        </footer>
       </main>
       <aside
         class={`${isHome ? 'hidden' : 'sticky top-14 hidden max-h-[calc(100dvh-56px)] self-start overflow-y-auto pt-[53px] pb-8 [scrollbar-width:thin] xl:block'}`}

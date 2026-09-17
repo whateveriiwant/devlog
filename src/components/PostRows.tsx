@@ -1,10 +1,8 @@
-import { ArrowUpRight } from 'lucide-react';
 import {
   Item,
   ItemContent,
   ItemTitle,
   ItemDescription,
-  ItemActions,
 } from '@/components/ui/item';
 import { Badge } from '@/components/ui/badge';
 export interface Row {
@@ -35,7 +33,7 @@ export default function PostRows({
           >
             <a
               href={row.href}
-              className="post-row group grid grid-cols-[96px_minmax(0,1fr)_16px] items-start gap-3 md:grid-cols-[160px_minmax(0,1fr)_16px] md:gap-4"
+              className="post-row group grid grid-cols-[96px_minmax(0,1fr)] items-start gap-3 md:grid-cols-[160px_minmax(0,1fr)] md:gap-4"
             >
               <div className="row-span-2 self-center aspect-[5/3] overflow-hidden rounded-md bg-muted">
                 {row.thumbnail && (
@@ -71,9 +69,6 @@ export default function PostRows({
                   </ItemDescription>
                 )}
               </ItemContent>
-              <ItemActions className="text-muted-foreground">
-                <ArrowUpRight className="size-4 opacity-50 group-hover:opacity-100" />
-              </ItemActions>
             </a>
           </Item>
         </li>
