@@ -1,5 +1,4 @@
 ---
-import { ArrowRight, ArrowUpRight, CalendarDays } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
 import { buttonVariants } from '../components/ui/button';
 import PostList from '../components/PostList.astro';
@@ -40,7 +39,7 @@ const popularTags = content.tags.slice(0, 18);
 
 <BaseLayout title="메인 페이지">
   <div class="min-h-[calc(100dvh-3.5rem)]" aria-label="메인 페이지">
-    <section class="overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm">
+    <section class="overflow-hidden rounded-xl border bg-card text-card-foreground">
       <div class="grid lg:grid-cols-2">
         <a
           href={postUrl(featured)}
@@ -78,12 +77,12 @@ const popularTags = content.tags.slice(0, 18);
             {featured.data.description}
           </p>
 
-          <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground sm:text-sm">
-            <span class="inline-flex items-center gap-2">
-              <CalendarDays className="size-4" />
-              {dateLabel(featured.data.publishedAt)}
-            </span>
-          </div>
+          <time
+            datetime={featured.data.publishedAt.toISOString()}
+            class="mt-5 text-xs text-muted-foreground sm:text-sm"
+          >
+            {dateLabel(featured.data.publishedAt)}
+          </time>
 
           {featured.data.tags.length > 0 && (
             <div class="mt-4 flex flex-wrap gap-2">
@@ -97,7 +96,7 @@ const popularTags = content.tags.slice(0, 18);
             href={postUrl(featured)}
             class={`${buttonVariants({ variant: 'default' })} mt-6 w-fit`}
           >
-            글 읽기 <ArrowRight className="size-4" />
+            글 읽기
           </a>
         </div>
       </div>
@@ -109,9 +108,9 @@ const popularTags = content.tags.slice(0, 18);
           <h2 class="text-2xl font-semibold tracking-tight">최근 업데이트</h2>
           <a
             href="/blog/"
-            class={buttonVariants({ variant: 'ghost', size: 'sm' })}
+            class="text-sm font-medium underline-offset-4 hover:underline"
           >
-            모든 글 <ArrowRight className="size-4" />
+            모든 글
           </a>
         </div>
         <div class="border-b">
@@ -119,36 +118,34 @@ const popularTags = content.tags.slice(0, 18);
         </div>
       </div>
 
-      <aside class="self-start rounded-xl border bg-muted/25 p-6 sm:p-7">
+      <aside class="self-start border-y py-6 sm:py-7 xl:border-y-0 xl:border-l xl:py-0 xl:pl-8">
         <h2 class="text-xl font-semibold tracking-tight">기록 둘러보기</h2>
-        <dl class="mt-7 grid grid-cols-3 gap-3 xl:grid-cols-1">
-          <div class="rounded-lg border bg-background p-4">
+        <dl class="mt-5 grid grid-cols-3 divide-x border-y">
+          <div class="px-3 py-4 first:pl-0">
             <dt class="text-xs text-muted-foreground">전체 글</dt>
             <dd class="mt-1 text-2xl font-semibold tabular-nums">
               {content.posts.length}
             </dd>
           </div>
-          <div class="rounded-lg border bg-background p-4">
+          <div class="px-3 py-4">
             <dt class="text-xs text-muted-foreground">시리즈</dt>
             <dd class="mt-1 text-2xl font-semibold tabular-nums">
               {content.series.length}
             </dd>
           </div>
-          <div class="rounded-lg border bg-background p-4">
+          <div class="px-3 py-4 last:pr-0">
             <dt class="text-xs text-muted-foreground">키워드</dt>
             <dd class="mt-1 text-2xl font-semibold tabular-nums">
               {content.tags.length}
             </dd>
           </div>
         </dl>
-        <div class="mt-4 grid gap-2">
-          <a
-            href="/series/"
-            class={`${buttonVariants({ variant: 'outline' })} justify-between`}
-          >
-            시리즈 탐색 <ArrowUpRight className="size-4" />
-          </a>
-        </div>
+        <a
+          href="/series/"
+          class="mt-5 inline-block text-sm font-medium underline-offset-4 hover:underline"
+        >
+          시리즈 탐색
+        </a>
       </aside>
     </section>
 
@@ -159,18 +156,18 @@ const popularTags = content.tags.slice(0, 18);
         </h2>
         <a
           href="/series/"
-          class={buttonVariants({ variant: 'ghost', size: 'sm' })}
+          class="text-sm font-medium underline-offset-4 hover:underline"
         >
-          모든 시리즈 <ArrowRight className="size-4" />
+          모든 시리즈
         </a>
       </div>
-      <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+      <div class="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 md:grid-cols-4">
         {recentSeries.map((series) => (
           <a
             href={seriesUrl(series.data.slug)}
-            class="group flex overflow-hidden rounded-xl border bg-card shadow-xs transition-colors hover:bg-accent/40 sm:flex-col"
+            class="group flex min-w-0 bg-card p-3 transition-colors hover:bg-accent/60 sm:flex-col sm:p-4"
           >
-            <div class="h-28 w-32 shrink-0 overflow-hidden bg-muted sm:aspect-video sm:h-auto sm:w-full">
+            <div class="h-24 w-28 shrink-0 overflow-hidden rounded-md bg-muted sm:aspect-video sm:h-auto sm:w-full">
               {series.latestImage ? (
                 <img
                   src={series.latestImage}
@@ -182,13 +179,12 @@ const popularTags = content.tags.slice(0, 18);
                 <div class="size-full bg-gradient-to-br from-muted to-secondary" />
               )}
             </div>
-            <div class="min-w-0 flex-1 p-4 sm:p-5">
+            <div class="min-w-0 flex-1 py-2 pl-4 sm:px-0 sm:pt-3 sm:pb-0">
               <h3 class="line-clamp-2 text-base font-semibold leading-6 sm:text-lg sm:leading-7">
                 {series.data.name}
               </h3>
-              <div class="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+              <div class="mt-2 text-xs text-muted-foreground">
                 <span>{series.posts.length}개의 글</span>
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </div>
             </div>
           </a>
@@ -196,7 +192,7 @@ const popularTags = content.tags.slice(0, 18);
       </div>
     </section>
 
-    <section class="mt-24 grid gap-8 rounded-xl border bg-muted/20 p-6 sm:p-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:p-10">
+    <section class="mt-24 grid gap-8 border-y py-8 sm:py-10 lg:grid-cols-[18rem_minmax(0,1fr)]">
       <div>
         <h2 class="text-2xl font-semibold tracking-tight">많이 다룬 키워드</h2>
         <p class="mt-3 text-sm leading-6 text-muted-foreground">
