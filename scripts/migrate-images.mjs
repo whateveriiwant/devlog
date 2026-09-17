@@ -54,6 +54,7 @@ function ensureSource(url) {
   const parsed = new URL(url);
   if (parsed.protocol !== 'https:' || parsed.username || parsed.password)
     throw new Error('Only public HTTPS image URLs are supported');
+  return parsed.href;
 }
 function localRecord(image) {
   const record = downloaded.find(
@@ -72,7 +73,7 @@ if (mode === 'download') {
   const output = [];
   for (const image of images) {
     try {
-      ensureSource(image.originalUrl);
+      const sourceUrl = ensureSource(image.originalUrl);
       const existing = downloaded.find(
         (r) => r.originalUrl === image.originalUrl && r.status === 'downloaded'
       );
@@ -94,7 +95,7 @@ if (mode === 'download') {
         headers,
         '--output',
         partial,
-        image.originalUrl,
+        sourceUrl,
       ]);
       const header = fs.readFileSync(headers, 'utf8');
       const contentType = [

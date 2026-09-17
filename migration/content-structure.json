@@ -537,7 +537,7 @@
     "id": "f84d0f11-d235-4880-b946-c07d7801c442",
     "title": "OAuth 개념과 사용법 정리",
     "slug": "OAuth-개념과-사용법-정리",
-    "characters": 6638,
+    "characters": 6357,
     "headings": [
       {
         "depth": 1,
@@ -629,7 +629,7 @@
     "html": [],
     "links": [],
     "images": 2,
-    "emptyAlt": 2,
+    "emptyAlt": 1,
     "unclosedFence": false
   },
   {
@@ -2061,7 +2061,7 @@
     "id": "859a4071-21cb-4da5-8b19-da7de50cbf3f",
     "title": "[JavaScript/Node.js] 이벤트 루프",
     "slug": "JavaScriptNode.js-이벤트-루프",
-    "characters": 9667,
+    "characters": 9403,
     "headings": [
       {
         "depth": 1,
@@ -2081,72 +2081,72 @@
       {
         "depth": 2,
         "text": "처리 순서 요약",
-        "line": 43
+        "line": 41
       },
       {
         "depth": 3,
         "text": "1. 초기 코드 실행 (콜 스택)",
-        "line": 46
+        "line": 44
       },
       {
         "depth": 3,
         "text": "2. 매크로태스크 큐에서 태스크 가져오기",
-        "line": 64
+        "line": 62
       },
       {
         "depth": 3,
         "text": "3. 콜 스택 실행",
-        "line": 69
+        "line": 67
       },
       {
         "depth": 3,
         "text": "4. (중요) 마이크로태스크 큐 비우기",
-        "line": 73
+        "line": 71
       },
       {
         "depth": 3,
         "text": "5. 렌더링",
-        "line": 78
+        "line": 76
       },
       {
         "depth": 3,
         "text": "6. 반복",
-        "line": 81
+        "line": 79
       },
       {
         "depth": 3,
         "text": "예시 코드를 다시 정리하면...",
-        "line": 84
+        "line": 82
       },
       {
         "depth": 2,
         "text": "코드로 실행 순서 이해하기",
-        "line": 126
+        "line": 124
       },
       {
         "depth": 3,
         "text": "첫 번째 레슨",
-        "line": 127
+        "line": 125
       },
       {
         "depth": 3,
         "text": "두 번째 레슨",
-        "line": 164
+        "line": 162
       },
       {
         "depth": 4,
         "text": "Q. sync()가 끝나고 sync2()가 실행되려던 찰나에 1초가 끝나서 비동기 작업이 먼저 실행된다는 보장은 없을까?",
-        "line": 238
+        "line": 236
       },
       {
         "depth": 4,
         "text": "A. 그런 건 없다.",
-        "line": 242
+        "line": 240
       },
       {
         "depth": 3,
         "text": "세 번째 레슨",
-        "line": 274
+        "line": 272
       }
     ],
     "codeBlocks": [
@@ -2154,61 +2154,61 @@
         "lang": "js",
         "meta": "",
         "sha256": "aca47084853ae79b5b3445debd2148bf9ad769db8d65b8b9fefba8bb53493ec0",
-        "line": 50
+        "line": 48
       },
       {
         "lang": "js",
         "meta": "",
         "sha256": "aca47084853ae79b5b3445debd2148bf9ad769db8d65b8b9fefba8bb53493ec0",
-        "line": 86
+        "line": 84
       },
       {
         "lang": "text",
         "meta": "",
         "sha256": "f123daa99272b0a156dab661aaaa7cbd636e9416297b1cbbb5c698d65accdc2e",
-        "line": 117
+        "line": 115
       },
       {
         "lang": "js",
         "meta": "",
         "sha256": "8fa0ca9f24fbba2431b1be2b478a124df1306f3043a28ba9dd5940537220da3f",
-        "line": 129
+        "line": 127
       },
       {
         "lang": "text",
         "meta": "",
         "sha256": "6a9911db3126916616c0510cdbd48ae7a3cb1430d39c368c92e70acd412c7248",
-        "line": 140
+        "line": 138
       },
       {
         "lang": "js",
         "meta": "",
         "sha256": "ff157f0835d8884ac54aff78ec93bbad223000c6679e23f86ec2b4a6bce59000",
-        "line": 166
+        "line": 164
       },
       {
         "lang": "text",
         "meta": "",
         "sha256": "9e07c7d85f94e5bc9a1148bd4af40151864e265bcf97a69b0de1df525a3654fe",
-        "line": 193
+        "line": 191
       },
       {
         "lang": "js",
         "meta": "",
         "sha256": "c75b850c433dc740c8d86a840cae919c8e5acd51e4b444e73c6c19fb8420588a",
-        "line": 276
+        "line": 274
       },
       {
         "lang": "text",
         "meta": "",
         "sha256": "a514003e37caab724442ea141eaaa97edb99dc312cd2ee6255184b16de26f5b8",
-        "line": 294
+        "line": 292
       }
     ],
     "html": [],
     "links": [],
-    "images": 3,
-    "emptyAlt": 3,
+    "images": 2,
+    "emptyAlt": 2,
     "unclosedFence": false
   },
   {

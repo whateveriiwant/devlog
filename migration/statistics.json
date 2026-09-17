@@ -226,10 +226,10 @@
     "del": 2,
     "h2": 2
   },
-  "images": 238,
-  "uniqueImages": 271,
-  "imageReferencesWithThumbnails": 353,
-  "emptyAlt": 223,
+  "images": 237,
+  "uniqueImages": 270,
+  "imageReferencesWithThumbnails": 352,
+  "emptyAlt": 221,
   "codeBlocks": 282,
   "codeLanguages": {
     "js": 99,
