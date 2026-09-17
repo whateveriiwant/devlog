@@ -172,12 +172,12 @@
   {
     "sourcePost": "f84d0f11-d235-4880-b946-c07d7801c442",
     "sourceTitle": "OAuth 개념과 사용법 정리",
-    "originalUrl": "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2FyFexr%2FbtrTgqsEx31%2FAAAAAAAAAAAAAAAAAAAAAA_nKk7xi0wBUvTyZXxM67IHJTjlQseMZxZGrQOev1Yn%2Fimg.jpg%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1761922799%26allow_ip%3D%26allow_referer%3D%26signature%3D7vYZKoop9UFt1cEOv%252F4%252Bn57vbCM%253D",
-    "filename": "",
-    "alt": "",
+    "originalUrl": "https://developers.payco.com/static/img/@img_guide2.jpg",
+    "filename": "@img_guide2.jpg",
+    "alt": "PAYCO OAuth 2.0 인가 과정",
     "kind": "markdown",
     "line": 64,
-    "key": "velog/a3b8db58a7c4a67828a6.img"
+    "key": "velog/b37fdc327dba9ad3959e.jpg"
   },
   {
     "sourcePost": "f84d0f11-d235-4880-b946-c07d7801c442",
@@ -492,21 +492,11 @@
   {
     "sourcePost": "859a4071-21cb-4da5-8b19-da7de50cbf3f",
     "sourceTitle": "[JavaScript/Node.js] 이벤트 루프",
-    "originalUrl": "https://blog.kakaocdn.net/dna/bfVyEB/btsvNysLSVD/AAAAAAAAAAAAAAAAAAAAAJxhbgrFAtY0raLeVI7bMN_TKvGRcRW7R2jIgwX0x4_o/img.gif?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1756652399&allow_ip=&allow_referer=&signature=EGIGX98PPLDda%2Birs6df9r2iT24%3D",
-    "filename": "img.gif",
-    "alt": "",
-    "kind": "markdown",
-    "line": 41,
-    "key": "velog/20d75990af6cb5b5766c.gif"
-  },
-  {
-    "sourcePost": "859a4071-21cb-4da5-8b19-da7de50cbf3f",
-    "sourceTitle": "[JavaScript/Node.js] 이벤트 루프",
     "originalUrl": "https://images.steamusercontent.com/ugc/607224401095812492/8A898025036151E6BC9DE3B47871A459E916036A/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false",
     "filename": "",
     "alt": "",
     "kind": "markdown",
-    "line": 240,
+    "line": 238,
     "key": "velog/5702ad6da11282a30514.img"
   },
   {

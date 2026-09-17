@@ -202,20 +202,20 @@ for (const file of htmlFiles) {
     }
   }
 }
-const archive = treeFor(path.join(dist, 'archive/index.html'));
-const list = elements(archive, (n) => n.tagName === 'main')[0];
-const archived = elements(
+const blogIndex = treeFor(path.join(dist, 'blog/index.html'));
+const list = elements(blogIndex, (n) => n.tagName === 'main')[0];
+const listedPosts = elements(
   list,
   (n) => n.tagName === 'a' && hasClass(n, 'post-row')
 );
 try {
-  assert.equal(archived.length, posts.length);
+  assert.equal(listedPosts.length, posts.length);
   assert.equal(
-    new Set(archived.map((a) => a.properties.href)).size,
+    new Set(listedPosts.map((a) => a.properties.href)).size,
     posts.length
   );
 } catch (error) {
-  failures.push({ archive: error.message });
+  failures.push({ blogIndex: error.message });
 }
 for (const s of series) {
   const tree = treeFor(path.join(dist, 'series', s.url_slug, 'index.html'));
@@ -244,7 +244,7 @@ const result = {
     'Exact text and internal whitespace; terminal LF normalized. Raw Markdown is separately SHA-256 verified.',
   terminalNewlineDifferences,
   internalLinksChecked: checkedLinks,
-  archiveUniquePosts: archived.length,
+  blogIndexUniquePosts: listedPosts.length,
   seriesChecked: series.length,
   sourceLinkWarnings,
   failures,
