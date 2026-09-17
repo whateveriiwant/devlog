@@ -153,19 +153,11 @@ const isHome = Astro.url.pathname === '/';
         id="main"
         tabindex="-1"
         class:list={[
-          'mx-auto w-full min-w-0 pt-[34px] outline-none md:pt-[49px]',
+          'mx-auto w-full min-w-0 pt-[34px] pb-10 outline-none md:pt-[49px]',
           { 'max-w-[790px]': !isHome },
         ]}
       >
         <slot />
-        <footer
-          class="mt-[70px] flex gap-5 border-t border-[var(--border)] pt-[25px] pb-10 text-xs text-[var(--muted-foreground)]"
-          data-pagefind-ignore
-        >
-          <span class="mr-auto">seungjun.sh</span>
-          <a href="/blog/">모든 글</a>
-          <a href="/rss.xml">RSS ↗</a>
-        </footer>
       </main>
       <aside
         class={`${isHome ? 'hidden' : 'sticky top-14 hidden max-h-[calc(100dvh-56px)] self-start overflow-y-auto pt-[53px] pb-8 [scrollbar-width:thin] xl:block'}`}
