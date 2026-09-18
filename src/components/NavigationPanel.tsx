@@ -70,7 +70,7 @@ export default function NavigationPanel({
                         </a>
                       </SidebarMenuButton>
                       {item.count !== undefined && (
-                        <SidebarMenuBadge className="top-2.5 text-[11px] font-normal text-muted-foreground">
+                        <SidebarMenuBadge className="top-1/2! -translate-y-1/2 text-[11px] font-normal text-muted-foreground">
                           {item.count}
                         </SidebarMenuBadge>
                       )}
