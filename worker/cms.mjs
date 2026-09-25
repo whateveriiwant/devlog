@@ -50,9 +50,9 @@ async function sign(value, secret) {
   );
 }
 
-async function authenticated(request, env) {
+async function authenticated(request, env, name = 'cms_session') {
   if (!env.SESSION_SECRET) return false;
-  const value = cookie(request, 'cms_session');
+  const value = cookie(request, name);
   if (!value) return false;
   const [login, expires, signature] = value.split('.');
   if (
@@ -167,6 +167,10 @@ async function callback(request, env, url) {
     'Set-Cookie',
     `cms_session=${session}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}`
   );
+  result.headers.append(
+    'Set-Cookie',
+    `cms_gate=${session}; Domain=seungjun.sh; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}`
+  );
   return result;
 }
 
@@ -263,6 +267,19 @@ export default {
     }
     if (url.pathname === '/callback' && request.method === 'GET')
       return callback(request, env, url);
+    if (url.pathname === '/session' && request.method === 'GET')
+      return new Response(null, {
+        status: (await authenticated(request, env, 'cms_gate')) ? 204 : 401,
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    if (url.pathname === '/logout' && request.method === 'POST') {
+      const headers = cors(request, env);
+      if (!headers) return json({ error: 'Forbidden origin' }, 403);
+      const result = new Response(null, { status: 204, headers });
+      result.headers.append('Set-Cookie', 'cms_session=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0');
+      result.headers.append('Set-Cookie', 'cms_gate=; Domain=seungjun.sh; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0');
+      return result;
+    }
     if (url.pathname === '/media') return media(request, env, url);
     return json({ error: 'Not found' }, 404);
   },

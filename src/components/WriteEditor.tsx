@@ -125,6 +125,7 @@ export default function WriteEditor({
       ? ''
       : (sessionStorage.getItem('devlog-editor-token') ?? '')
   );
+  const [authorized, setAuthorized] = useState(false);
   const [posts, setPosts] = useState(initialPosts);
   const [series, setSeries] = useState(initialSeries);
   const [drafts, setDrafts] = useState<Draft[]>([]);
@@ -265,11 +266,18 @@ export default function WriteEditor({
     if (!token) return;
     // Loading starts after authentication; all updates happen after network I/O.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadDashboard().catch((error: unknown) =>
-      setStatus((error as Error).message)
-    );
+    void loadDashboard().then(() => setAuthorized(true)).catch(() => {
+      sessionStorage.removeItem('devlog-editor-token');
+      tokenRef.current = '';
+      setToken('');
+      window.location.replace('/login/');
+    });
     // Dashboard only needs to refresh after login or a successful save.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) window.location.replace('/login/');
   }, [token]);
 
   async function login() {
@@ -619,6 +627,11 @@ export default function WriteEditor({
     post.title.toLowerCase().includes(search.toLowerCase())
   );
 
+  if (!token) {
+    return null;
+  }
+  if (!authorized) return <p role="status">로그인 확인 중…</p>;
+
   return (
     <div className="write-shell">
       <main className="write-layout">
@@ -638,6 +651,9 @@ export default function WriteEditor({
                     sessionStorage.removeItem('devlog-editor-token');
                     tokenRef.current = '';
                     setToken('');
+                    void fetch(`${AUTH}/logout`, { method: 'POST', credentials: 'include' }).finally(() => {
+                      window.location.replace('/login/');
+                    });
                   }}
                 >
                   로그아웃
