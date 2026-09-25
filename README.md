@@ -74,7 +74,7 @@ pnpm verify:search
 
 ## 새 글 작성
 
-외부 서비스 연결을 마치면 `https://seungjun.sh/admin/`에서 GitHub로 로그인해 글을 작성합니다. 이미지 버튼으로 R2에 올리고, 초안 저장은 CMS가 PR을 만듭니다. 발행 버튼은 PR을 병합해 `main`의 자동 배포를 시작합니다. `draft`를 켜면 발행 후에도 비공개입니다. 연결 절차는 [`docs/writing-workflow-decisions.md`](docs/writing-workflow-decisions.md)에 있습니다.
+[`https://seungjun.sh/admin/`](https://seungjun.sh/admin/)에서 GitHub로 로그인해 글을 작성합니다. 이미지 버튼으로 R2에 올리고, 초안 저장은 CMS가 PR을 만듭니다. 발행 버튼은 PR을 병합해 `main`의 자동 배포를 시작합니다. `draft`를 켜면 발행 후에도 비공개입니다. 설정 기록은 [`docs/writing-workflow-decisions.md`](docs/writing-workflow-decisions.md)에 있습니다.
 
 `src/content/posts/`에 파일을 만듭니다. 이전 파일 이름은 Velog UUID를 유지하지만 새 글은 읽기 쉬운 파일 이름을 사용해도 됩니다. 실제 URL은 frontmatter의 `slug`로 결정됩니다.
 
