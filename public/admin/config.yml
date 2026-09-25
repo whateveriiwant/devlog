@@ -1,0 +1,78 @@
+backend:
+  name: github
+  repo: whateveriiwant/devlog
+  branch: main
+  base_url: https://cms-api.seungjun.sh
+  auth_endpoint: auth
+  squash_merges: true
+
+publish_mode: editorial_workflow
+site_url: https://seungjun.sh
+display_url: https://seungjun.sh
+# Decap requires a media folder even when a custom library handles every upload.
+media_folder: public/uploads
+public_folder: /uploads
+media_library:
+  name: r2
+
+collections:
+  - name: posts
+    label: 글
+    label_singular: 글
+    folder: src/content/posts
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{year}}-{{month}}-{{day}}-{{slug}}'
+    identifier_field: title
+    summary: '{{title}}'
+    fields:
+      - { label: 제목, name: title, widget: string }
+      - { label: 설명, name: description, widget: text }
+      - {
+          label: 주소 슬러그,
+          name: slug,
+          widget: string,
+          hint: '글 주소 /blog/ 뒤에 붙는 값',
+        }
+      - {
+          label: 발행 일시,
+          name: publishedAt,
+          widget: datetime,
+          date_format: 'YYYY-MM-DD',
+          time_format: 'HH:mm:ss',
+          format: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
+        }
+      - {
+          label: 수정 일시,
+          name: updatedAt,
+          widget: datetime,
+          required: false,
+          date_format: 'YYYY-MM-DD',
+          time_format: 'HH:mm:ss',
+          format: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
+        }
+      - label: 시리즈
+        name: series
+        widget: object
+        required: false
+        fields:
+          - { label: 시리즈 ID, name: id, widget: string }
+          - {
+              label: 순서,
+              name: order,
+              widget: number,
+              value_type: int,
+              min: 1,
+            }
+      - { label: 태그, name: tags, widget: list, required: false, default: [] }
+      - {
+          label: 비공개 유지,
+          name: draft,
+          widget: boolean,
+          default: false,
+          hint: '켜면 발행해도 사이트에 표시되지 않습니다.',
+        }
+      - { label: 원문 URL, name: originalUrl, widget: string, required: false }
+      - { label: 썸네일, name: thumbnail, widget: image, required: false }
+      - { label: 본문, name: body, widget: markdown }

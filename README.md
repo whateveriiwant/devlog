@@ -74,6 +74,8 @@ pnpm verify:search
 
 ## 새 글 작성
 
+외부 서비스 연결을 마치면 `https://seungjun.sh/admin/`에서 GitHub로 로그인해 글을 작성합니다. 이미지 버튼으로 R2에 올리고, 초안 저장은 CMS가 PR을 만듭니다. 발행 버튼은 PR을 병합해 `main`의 자동 배포를 시작합니다. `draft`를 켜면 발행 후에도 비공개입니다. 연결 절차는 [`docs/writing-workflow-decisions.md`](docs/writing-workflow-decisions.md)에 있습니다.
+
 `src/content/posts/`에 파일을 만듭니다. 이전 파일 이름은 Velog UUID를 유지하지만 새 글은 읽기 쉬운 파일 이름을 사용해도 됩니다. 실제 URL은 frontmatter의 `slug`로 결정됩니다.
 
 ```yaml
@@ -82,7 +84,6 @@ title: '새 글 제목'
 description: '글을 한두 문장으로 설명합니다.'
 slug: 'my-new-post'
 publishedAt: '2026-09-08T09:00:00+09:00'
-category: 'web-app'
 tags:
   - JavaScript
 draft: true
@@ -90,8 +91,6 @@ draft: true
 ```
 
 위 값은 작성 형식 예시입니다. 본문은 `##` 이하로 작성하세요. 기존 Velog 본문에 h1이 있는 경우에만 렌더러가 본문 heading을 한 단계 낮춰 글 제목의 h1과 구별합니다. 원본 파일은 변경하지 않습니다. `draft: true`이면 글 목록·상세 페이지·검색·RSS에서 제외됩니다. 공개할 때 `false`로 변경합니다.
-
-`category`에는 `web-app`, `computer-foundations`, `languages-problems`, `engineering-tools`, `experiences` 중 하나를 사용합니다. 카테고리를 추가한다면 `taxonomy.json`의 정의도 추가하세요. UI의 글 수는 Content Collections에서 다시 계산합니다.
 
 시리즈에 속하는 새 글은 `series: { id: "실제 시리즈 ID", order: 양의 정수 }` 형태로 추가합니다. 정확한 ID는 `src/content/series.json`에서 가져오고, 해당 시리즈에서 중복되지 않는 순서를 사용합니다. 새 시리즈는 이 JSON에 새 항목을 먼저 추가합니다. 원문이 없는 새 글에는 `originalUrl`이 필요하지 않습니다.
 
@@ -139,6 +138,7 @@ pnpm verify:migration
 
 ## 보고서와 배포
 
+- `docs/writing-workflow-decisions.md`: 글쓰기 편집기·R2 이미지 첨부·7일 유예 정리의 결정 사항과 외부 서비스 연결 절차
 - `migration/analysis.md`: 실제 글·태그·날짜·시리즈 분포와 IA 결정 근거
 - `migration/manual-review.md`: 원본 HTML, 빈 alt, 코드 언어 누락 등 편집 확인 목록
 - `migration/completion.md`: 구현 범위와 최종 검증 결과
