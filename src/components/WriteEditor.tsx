@@ -266,12 +266,14 @@ export default function WriteEditor({
     if (!token) return;
     // Loading starts after authentication; all updates happen after network I/O.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadDashboard().then(() => setAuthorized(true)).catch(() => {
-      sessionStorage.removeItem('devlog-editor-token');
-      tokenRef.current = '';
-      setToken('');
-      window.location.replace('/login/');
-    });
+    void loadDashboard()
+      .then(() => setAuthorized(true))
+      .catch(() => {
+        sessionStorage.removeItem('devlog-editor-token');
+        tokenRef.current = '';
+        setToken('');
+        window.location.replace('/login/');
+      });
     // Dashboard only needs to refresh after login or a successful save.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
@@ -651,7 +653,10 @@ export default function WriteEditor({
                     sessionStorage.removeItem('devlog-editor-token');
                     tokenRef.current = '';
                     setToken('');
-                    void fetch(`${AUTH}/logout`, { method: 'POST', credentials: 'include' }).finally(() => {
+                    void fetch(`${AUTH}/logout`, {
+                      method: 'POST',
+                      credentials: 'include',
+                    }).finally(() => {
                       window.location.replace('/login/');
                     });
                   }}

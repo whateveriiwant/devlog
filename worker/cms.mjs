@@ -276,8 +276,14 @@ export default {
       const headers = cors(request, env);
       if (!headers) return json({ error: 'Forbidden origin' }, 403);
       const result = new Response(null, { status: 204, headers });
-      result.headers.append('Set-Cookie', 'cms_session=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0');
-      result.headers.append('Set-Cookie', 'cms_gate=; Domain=seungjun.sh; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0');
+      result.headers.append(
+        'Set-Cookie',
+        'cms_session=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0'
+      );
+      result.headers.append(
+        'Set-Cookie',
+        'cms_gate=; Domain=seungjun.sh; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0'
+      );
       return result;
     }
     if (url.pathname === '/media') return media(request, env, url);

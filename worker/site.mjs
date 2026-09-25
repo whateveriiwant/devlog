@@ -10,7 +10,9 @@ export default {
     if (!protectedPath(url.pathname)) return env.ASSETS.fetch(request);
 
     const cookie = request.headers.get('Cookie') || '';
-    if (!cookie.split(';').some((part) => part.trim().startsWith('cms_gate='))) {
+    if (
+      !cookie.split(';').some((part) => part.trim().startsWith('cms_gate='))
+    ) {
       return Response.redirect(`${url.origin}/login/`, 302);
     }
 
@@ -20,7 +22,8 @@ export default {
           headers: { Cookie: cookie },
         })
       );
-      if (session.status !== 204) return Response.redirect(`${url.origin}/login/`, 302);
+      if (session.status !== 204)
+        return Response.redirect(`${url.origin}/login/`, 302);
     } catch {
       return new Response('로그인 확인에 실패했습니다.', { status: 503 });
     }
