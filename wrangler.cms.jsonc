@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "devlog-cms",
+  "main": "./worker/cms.mjs",
+  "compatibility_date": "2026-09-16",
+  "routes": [{ "pattern": "cms-api.seungjun.sh", "custom_domain": true }],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "devlog-assets" }],
+  "vars": {
+    "SITE_ORIGIN": "https://seungjun.sh",
+    "MEDIA_BASE_URL": "https://media.seungjun.sh",
+    "GITHUB_ALLOWED_LOGIN": "whateveriiwant",
+    "GITHUB_CLIENT_ID": "Ov23li71gyBqMQPl86vh",
+  },
+}
