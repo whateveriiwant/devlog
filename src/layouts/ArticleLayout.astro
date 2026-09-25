@@ -26,8 +26,8 @@ const group = series.find((s) => s.id === post.data.series?.id);
 const position = group?.posts.findIndex((p) => p.id === post.id) ?? -1;
 const adjacent = group?.posts || [...posts].reverse();
 const idx = group ? position : adjacent.findIndex((p) => p.id === post.id);
-const previous = adjacent[idx - 1];
-const next = adjacent[idx + 1];
+const previous = group ? adjacent[idx + 1] : adjacent[idx - 1];
+const next = group ? adjacent[idx - 1] : adjacent[idx + 1];
 const mine = tagsFor(post);
 ---
 

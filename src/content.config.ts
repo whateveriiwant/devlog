@@ -15,7 +15,7 @@ const posts = defineCollection({
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
     series: z
-      .object({ id: z.string(), order: z.number().int().positive() })
+      .object({ id: z.string(), order: z.number().int().positive().optional() })
       .optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),

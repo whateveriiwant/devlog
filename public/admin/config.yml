@@ -56,7 +56,7 @@ collections:
         name: series
         widget: object
         required: false
-        hint: 시리즈 글에 포함하려면 시리즈를 선택하고 이 글의 순서를 입력하세요.
+        hint: 시리즈 글에 포함하려면 시리즈를 선택하세요. 글은 최신순으로 표시됩니다.
         fields:
           - label: 시리즈 선택
             name: id
@@ -85,14 +85,6 @@ collections:
               - { label: DEVOCEAN YOUNG, value: 14b70fd7-a1ed-4749-8609-a000d08414c4 }
               - { label: C/C++, value: 27564660-a6c6-451a-9b7a-937c45e6029f }
               - { label: 학교생활, value: 558a9a36-14d1-40a5-aaa1-0f0ed880df53 }
-          - {
-              label: 시리즈 내 글 순서,
-              name: order,
-              widget: number,
-              value_type: int,
-              min: 1,
-              hint: 시리즈에서 이 글을 몇 번째로 보여줄지 입력하세요. 1부터 시작합니다.,
-            }
       - label: 태그
         name: tags
         widget: list
@@ -114,5 +106,6 @@ collections:
           label: 본문,
           name: body,
           widget: markdown,
+          modes: [raw],
           hint: '이미지를 넣으려면 툴바의 + 버튼을 누른 뒤 Image를 선택하세요. 파일은 R2에 업로드됩니다.',
         }
