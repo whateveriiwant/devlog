@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import WriteEditor from '../components/WriteEditor';
+import series from '../content/series.json';
+
+const posts = (await getCollection('posts'))
+  .map((post) => ({
+    id: post.id,
+    title: post.data.title,
+    slug: post.data.slug,
+    publishedAt: post.data.publishedAt.toISOString(),
+  }))
+  .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>글쓰기 · devlog</title>
+  </head>
+  <body>
+    <WriteEditor client:only="react" posts={posts} initialSeries={series} />
+  </body>
+</html>

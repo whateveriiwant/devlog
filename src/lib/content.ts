@@ -54,7 +54,11 @@ async function buildContent() {
       ...s,
       posts: posts
         .filter((p) => p.data.series?.id === s.id)
-        .sort((a, b) => a.data.series!.order - b.data.series!.order),
+        .sort(
+          (a, b) =>
+            b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf() ||
+            a.id.localeCompare(b.id)
+        ),
     }))
     .filter((s) => s.posts.length);
   const tags = [...new Set(posts.flatMap(tagsFor))]
