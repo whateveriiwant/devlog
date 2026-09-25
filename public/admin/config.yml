@@ -56,16 +56,51 @@ collections:
         name: series
         widget: object
         required: false
+        hint: 시리즈 글에 포함하려면 시리즈를 선택하고 이 글의 순서를 입력하세요.
         fields:
-          - { label: 시리즈 ID, name: id, widget: string }
+          - label: 시리즈 선택
+            name: id
+            widget: select
+            options:
+              - { label: React, value: 5ce42d25-c564-4c0e-8513-dff6fdc43d02 }
+              - { label: DevOps, value: 1cbdd12f-0c40-4ad4-bb01-89612f92c551 }
+              - { label: 소프트웨어 아키텍처, value: adcfe515-e537-40c8-ac4e-dafed322ac41 }
+              - { label: 테스팅, value: 928b6b91-8174-41a7-a245-d3a65755410d }
+              - { label: 웹 공통, value: 621a6c96-50f3-4675-85c5-25cc0514f5ff }
+              - { label: Node.js, value: 631448b2-e669-4c0c-a57d-b8c5ad0a4103 }
+              - { label: 데이터베이스, value: 1f8077c0-1951-4186-8e38-4fb615ed1226 }
+              - { label: 프로젝트, value: 1baf0d0f-7066-4257-b245-8f0fcae7af18 }
+              - { label: JavaScript, value: 37ef3aea-e9ea-45da-a659-474fe2ff11e3 }
+              - { label: 네이버 커넥트재단 부스트캠프 웹・모바일 10기 웹 풀스택, value: c1d9eff9-7b4f-4762-ba56-b1670522e74b }
+              - { label: 운영체제, value: d53de5d1-71fd-46d5-b493-e804bef5d183 }
+              - { label: Git, value: b698e6b6-2308-490e-ab9c-a2820a604b90 }
+              - { label: 네트워크, value: fdac1e63-5de4-493d-aab2-6d8281e6c45f }
+              - { label: 프로그래밍 언어론, value: ba7963f4-c100-4788-8a38-bdd9833e52ad }
+              - { label: 자료구조, value: a06d9b9c-af8b-4827-a264-0fa788e25564 }
+              - { label: Flutter, value: c9205480-39d8-44e5-9c86-f061d555a377 }
+              - { label: 내 장비, value: c4812740-152d-4537-b8e3-13eded499f2c }
+              - { label: PS, value: cdfa8dc2-c8f0-478a-af43-b9153eadd24e }
+              - { label: Microsoft Learn Student Ambassadors, value: 46919296-c6a9-44d4-ace3-1fd698ed41d1 }
+              - { label: 코드잇 앰배서더 1기, value: 04b470d9-c254-4e53-8a12-c180c15e01ab }
+              - { label: DEVOCEAN YOUNG, value: 14b70fd7-a1ed-4749-8609-a000d08414c4 }
+              - { label: C/C++, value: 27564660-a6c6-451a-9b7a-937c45e6029f }
+              - { label: 학교생활, value: 558a9a36-14d1-40a5-aaa1-0f0ed880df53 }
           - {
-              label: 순서,
+              label: 시리즈 내 글 순서,
               name: order,
               widget: number,
               value_type: int,
               min: 1,
+              hint: 시리즈에서 이 글을 몇 번째로 보여줄지 입력하세요. 1부터 시작합니다.,
             }
-      - { label: 태그, name: tags, widget: list, required: false, default: [] }
+      - label: 태그
+        name: tags
+        widget: list
+        required: false
+        default: []
+        label_singular: 태그 추가
+        hint: 버튼을 눌러 태그를 하나씩 추가하세요.
+        field: { label: 태그, name: tag, widget: string }
       - {
           label: 비공개 유지,
           name: draft,
@@ -75,4 +110,9 @@ collections:
         }
       - { label: 원문 URL, name: originalUrl, widget: string, required: false }
       - { label: 썸네일, name: thumbnail, widget: image, required: false }
-      - { label: 본문, name: body, widget: markdown }
+      - {
+          label: 본문,
+          name: body,
+          widget: markdown,
+          hint: '이미지를 넣으려면 툴바의 + 버튼을 누른 뒤 Image를 선택하세요. 파일은 R2에 업로드됩니다.',
+        }

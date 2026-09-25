@@ -15,6 +15,44 @@
     return data;
   }
 
+  async function optimizeImage(file) {
+    if (!['image/jpeg', 'image/png'].includes(file.type)) return file;
+    if (typeof createImageBitmap !== 'function') return file;
+
+    let bitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+    } catch {
+      return file;
+    }
+    const scale = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size < 300_000) {
+      bitmap.close();
+      return file;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    const context = canvas.getContext('2d');
+    if (!context) {
+      bitmap.close();
+      return file;
+    }
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+
+    const optimized = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/webp', 0.84)
+    );
+    if (!optimized || optimized.size >= file.size) return file;
+
+    return new File([optimized], file.name.replace(/\.[^.]+$/, '.webp'), {
+      type: 'image/webp',
+      lastModified: file.lastModified,
+    });
+  }
+
   function close() {
     dialog?.remove();
     dialog = undefined;
@@ -42,12 +80,14 @@
       const file = upload.files?.[0];
       if (!file) return;
       upload.disabled = true;
-      status.textContent = '업로드 중…';
+      status.textContent = '이미지 용량을 줄이는 중…';
       try {
+        const optimized = await optimizeImage(file);
+        status.textContent = 'R2에 업로드 중…';
         const data = await request('/media', {
           method: 'POST',
-          headers: { 'Content-Type': file.type },
-          body: file,
+          headers: { 'Content-Type': optimized.type },
+          body: optimized,
         });
         insert(data.url);
         close();
