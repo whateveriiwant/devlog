@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>글쓰기 로그인 · devlog</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: system-ui, sans-serif;
+        color: #222;
+        background: #fafafa;
+      }
+      main {
+        width: min(90vw, 400px);
+        padding: 2rem;
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        text-align: center;
+      }
+      button {
+        padding: 0.8rem 1.3rem;
+        border: 0;
+        border-radius: 6px;
+        background: #212121;
+        color: white;
+        font: inherit;
+        cursor: pointer;
+      }
+      p {
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>devlog 글쓰기</h1>
+      <p>GitHub 계정으로 로그인해야 편집기에 접근할 수 있습니다.</p>
+      <button id="login" type="button">
+        GitHub 로그인
+      </button>
+      <p id="status" role="status"></p>
+    </main>
+    <script>
+      const origin = 'https://cms-api.seungjun.sh';
+      const button = document.querySelector<HTMLButtonElement>('#login')!;
+      const status = document.querySelector<HTMLElement>('#status')!;
+      button.addEventListener('click', () => {
+        const popup = window.open(
+          `${origin}/auth`,
+          'devlog-github-login',
+          'width=620,height=720'
+        );
+        if (!popup) {
+          status.textContent = '로그인 팝업을 열 수 없습니다.';
+          return;
+        }
+        button.disabled = true;
+        const timeout = window.setTimeout(() => {
+          window.removeEventListener('message', receive);
+          button.disabled = false;
+          status.textContent = '로그인 시간이 초과되었습니다.';
+        }, 120_000);
+        const receive = (event: MessageEvent) => {
+          if (event.origin !== origin || event.source !== popup) return;
+          if (event.data === 'authorizing:github') {
+            popup.postMessage('authorizing:github', origin);
+            return;
+          }
+          if (
+            typeof event.data !== 'string' ||
+            !event.data.startsWith('authorization:github:')
+          )
+            return;
+          window.clearTimeout(timeout);
+          window.removeEventListener('message', receive);
+          popup.close();
+          if (event.data.startsWith('authorization:github:success:')) {
+            const data = JSON.parse(
+              event.data.slice('authorization:github:success:'.length)
+            ) as { token: string };
+            sessionStorage.setItem('devlog-editor-token', data.token);
+            window.location.assign('/write/');
+          } else {
+            button.disabled = false;
+            status.textContent = 'GitHub 로그인에 실패했습니다.';
+          }
+        };
+        window.addEventListener('message', receive);
+      });
+    </script>
+  </body>
+</html>

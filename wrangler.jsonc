@@ -1,10 +1,14 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "devlog",
+  "main": "./worker/site.mjs",
   "compatibility_date": "2026-09-16",
+  "services": [{ "binding": "CMS", "service": "devlog-cms" }],
   "assets": {
     "directory": "./dist/",
+    "binding": "ASSETS",
+    "run_worker_first": ["/write", "/write/*", "/admin", "/admin/*"],
     "not_found_handling": "404-page",
-    "html_handling": "auto-trailing-slash"
-  }
+    "html_handling": "auto-trailing-slash",
+  },
 }
