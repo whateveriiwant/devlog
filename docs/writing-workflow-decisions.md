@@ -1,7 +1,7 @@
 # 글쓰기 워크플로 의사 결정 기록
 
 - 기록일: 2026-09-25
-- 상태: 로컬 구현 완료, 외부 서비스 연결·실사용 확인 대기
+- 상태: 구현·외부 서비스 연결·프로덕션 배포·GitHub 로그인 확인 완료
 
 ## 배경
 
@@ -26,10 +26,10 @@
 
 ## 외부 서비스 연결
 
-1. GitHub OAuth 앱을 만든다. 홈페이지는 `https://seungjun.sh/admin/`, 콜백은 `https://cms-api.seungjun.sh/callback`이다. OAuth 요청 범위는 공개 저장소 쓰기가 가능한 `public_repo`다.
-2. 별도 Worker `devlog-cms`에 R2 버킷 `devlog-assets`를 연결하고 `cms-api.seungjun.sh` 사용자 도메인으로 배포한다. Worker 비밀값 `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `SESSION_SECRET`이 필요하다. 비밀값은 저장소에 넣지 않는다.
-3. GitHub Actions 저장소 비밀값 `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`를 설정한다. 정리 워크플로는 GitHub 기본 브랜치 `dev`에서 매일 실행된다. R2 키는 이 버킷으로 한정하고 읽기·쓰기·삭제 권한을 준다.
-4. 구현을 `main`에 병합하면 기존 Cloudflare 연결이 편집기 정적 파일을 자동 배포한다. 별도 Worker도 배포한 다음 브라우저에서 로그인, 이미지 업로드, 초안 저장, 발행, 이미지 정리를 확인한다.
+1. GitHub OAuth 앱 `devlog editor`를 등록했다. 홈페이지는 `https://seungjun.sh/admin/`, 콜백은 `https://cms-api.seungjun.sh/callback`이다. OAuth 요청 범위는 공개 저장소 쓰기가 가능한 `public_repo`다.
+2. 별도 Worker `devlog-cms`에 R2 버킷 `devlog-assets`를 연결하고 `cms-api.seungjun.sh` 사용자 도메인으로 배포했다. `GITHUB_CLIENT_ID`는 일반 변수, `GITHUB_CLIENT_SECRET`과 `SESSION_SECRET`은 암호화된 Worker 비밀값으로 설정했다. 비밀값은 저장소에 넣지 않았다.
+3. GitHub Actions 저장소 비밀값 `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`를 설정했다. 정리 워크플로는 GitHub 기본 브랜치 `dev`에서 매일 실행된다. R2 토큰은 `devlog-assets` 버킷의 객체 읽기·쓰기로 한정했다.
+4. 구현 PR #6을 `main`에 병합했고, 기존 Cloudflare 연결이 편집기 정적 파일을 프로덕션에 배포했다. `https://seungjun.sh/admin/`에서 GitHub OAuth 로그인, 기존 글 목록, 새 글 화면, R2 이미지 선택창을 확인했다. 실제 글과 이미지를 생성하지는 않았다.
 
 ## 구현 중 확인한 주의점
 
@@ -37,4 +37,4 @@
 - **정리 범위:** CMS에서 새로 올린 `posts/` 키만 정리한다. 기존 `velog/`는 정리 대상이 아니다. R2에서 처음 참조 누락을 감지한 시점부터 7일을 센다.
 - **편집 항목:** `category`는 스키마에 없으므로 편집기에 넣지 않았다. README의 오래된 안내는 실제 필드에 맞게 고친다.
 
-외부 서비스에 OAuth 앱·비밀값·별도 Worker가 연결되기 전에는 편집기를 실제로 사용할 수 없다.
+CMS API Worker 코드는 현재 대시보드에서 배포했다. 이후 Worker 코드를 바꾸면 `wrangler.cms.jsonc`로 별도 배포해야 한다.
