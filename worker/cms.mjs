@@ -1028,6 +1028,13 @@ async function publicContent(request, env, url) {
     );
   }
 
+  if (url.pathname === '/stats') {
+    const counts = await env.CONTENT.prepare(
+      'SELECT COUNT(*) AS posts FROM posts WHERE draft=0 AND deleted_at IS NULL'
+    ).first();
+    return json(counts, 200, headers);
+  }
+
   if (url.pathname === '/posts') {
     const limit = Math.min(
       50,
@@ -1199,6 +1206,7 @@ export default {
       url.pathname === '/posts' ||
       url.pathname.startsWith('/posts/') ||
       url.pathname === '/series' ||
+      url.pathname === '/stats' ||
       url.pathname === '/tags' ||
       url.pathname === '/tag-relations' ||
       url.pathname === '/search' ||

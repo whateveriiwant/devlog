@@ -39,10 +39,15 @@ const popularTags = content.tags.slice(0, 18);
 
 <BaseLayout title="메인 페이지">
   <div class="min-h-[calc(100dvh-3.5rem)]" aria-label="메인 페이지">
-    <section class="overflow-hidden rounded-xl border bg-card text-card-foreground">
+    <section
+      data-home-feature
+      class="overflow-hidden rounded-xl border bg-card text-card-foreground"
+    >
       <div class="grid lg:grid-cols-2">
         <a
           href={postUrl(featured)}
+          data-home-feature-link
+          data-home-feature-image
           class="group relative block min-h-64 overflow-hidden bg-muted lg:min-h-[23rem]"
           aria-label={`${featured.data.title} 읽기`}
         >
@@ -68,16 +73,22 @@ const popularTags = content.tags.slice(0, 18);
           <h1 class="text-3xl leading-tight font-semibold tracking-tight text-balance sm:text-4xl">
             <a
               href={postUrl(featured)}
+              data-home-feature-link
+              data-home-feature-title
               class="hover:underline hover:underline-offset-4"
             >
               {featured.data.title}
             </a>
           </h1>
-          <p class="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+          <p
+            data-home-feature-description
+            class="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base"
+          >
             {featured.data.description}
           </p>
 
           <time
+            data-home-feature-date
             datetime={featured.data.publishedAt.toISOString()}
             class="mt-5 text-xs text-muted-foreground sm:text-sm"
           >
@@ -85,7 +96,7 @@ const popularTags = content.tags.slice(0, 18);
           </time>
 
           {featured.data.tags.length > 0 && (
-            <div class="mt-4 flex flex-wrap gap-2">
+            <div data-home-feature-tags class="mt-4 flex flex-wrap gap-2">
               {featured.data.tags.slice(0, 4).map((tag) => (
                 <Badge variant="outline">#{tag}</Badge>
               ))}
@@ -94,6 +105,7 @@ const popularTags = content.tags.slice(0, 18);
 
           <a
             href={postUrl(featured)}
+            data-home-feature-link
             class={`${buttonVariants({ variant: 'default' })} mt-6 w-fit`}
           >
             글 읽기
@@ -113,7 +125,7 @@ const popularTags = content.tags.slice(0, 18);
             모든 글
           </a>
         </div>
-        <div class="border-b">
+        <div data-home-posts class="border-b">
           <PostList posts={recentPosts} />
         </div>
       </div>
@@ -123,19 +135,28 @@ const popularTags = content.tags.slice(0, 18);
         <dl class="mt-5 grid grid-cols-3 divide-x border-y">
           <div class="px-3 py-4 first:pl-0">
             <dt class="text-xs text-muted-foreground">전체 글</dt>
-            <dd class="mt-1 text-2xl font-semibold tabular-nums">
+            <dd
+              data-home-count="posts"
+              class="mt-1 text-2xl font-semibold tabular-nums"
+            >
               {content.posts.length}
             </dd>
           </div>
           <div class="px-3 py-4">
             <dt class="text-xs text-muted-foreground">시리즈</dt>
-            <dd class="mt-1 text-2xl font-semibold tabular-nums">
+            <dd
+              data-home-count="series"
+              class="mt-1 text-2xl font-semibold tabular-nums"
+            >
               {content.series.length}
             </dd>
           </div>
           <div class="px-3 py-4 last:pr-0">
             <dt class="text-xs text-muted-foreground">키워드</dt>
-            <dd class="mt-1 text-2xl font-semibold tabular-nums">
+            <dd
+              data-home-count="tags"
+              class="mt-1 text-2xl font-semibold tabular-nums"
+            >
               {content.tags.length}
             </dd>
           </div>
@@ -161,7 +182,10 @@ const popularTags = content.tags.slice(0, 18);
           모든 시리즈
         </a>
       </div>
-      <div class="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 md:grid-cols-4">
+      <div
+        data-home-series
+        class="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 md:grid-cols-4"
+      >
         {recentSeries.map((series) => (
           <a
             href={seriesUrl(series.data.slug)}
@@ -199,7 +223,7 @@ const popularTags = content.tags.slice(0, 18);
           작성한 글의 수를 기준으로 자주 등장한 주제를 모았습니다.
         </p>
       </div>
-      <div class="flex content-start flex-wrap gap-2">
+      <div data-home-tags class="flex content-start flex-wrap gap-2">
         {popularTags.map((tag) => (
           <a href={tagUrl(tag.name)}>
             <Badge

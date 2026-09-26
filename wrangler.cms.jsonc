@@ -18,7 +18,7 @@
     "MEDIA_BASE_URL": "https://media.seungjun.sh",
     "GITHUB_ALLOWED_LOGIN": "whateveriiwant",
     "GITHUB_CLIENT_ID": "Ov23li71gyBqMQPl86vh",
-    "CONTENT_WRITES": "false",
+    "CONTENT_WRITES": "true",
   },
   "env": {
     "stage": {
