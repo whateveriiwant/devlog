@@ -40,6 +40,11 @@ jobs:
       - name: Check Astro and TypeScript
         run: pnpm check
 
+      - name: Verify unused image deletion guards
+        run: |
+          node --experimental-vm-modules scripts/verify-image-cleanup.mjs
+          node scripts/verify-d1-routes.mjs
+
       - name: Build static site and search index
         run: pnpm build
 
@@ -52,7 +57,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '4.140.0'
-          command: deploy --config wrangler.cms.jsonc
+          command: deploy --config wrangler.cms.jsonc --env=""
 
       - name: Deploy site to Cloudflare
         if: >-
@@ -63,4 +68,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '4.140.0'
-          command: deploy
+          command: deploy --env=""

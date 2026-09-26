@@ -62,10 +62,15 @@ async function renderArticle(request, env, url) {
       )
     );
   } catch {
-    return env.ASSETS.fetch(request);
+    return new Response('Content temporarily unavailable', { status: 503 });
   }
-  if (response.status === 404) return env.ASSETS.fetch(request);
-  if (!response.ok) return env.ASSETS.fetch(request);
+  if (response.status === 404)
+    return new Response('Not found', {
+      status: 404,
+      headers: { 'Cache-Control': 'no-store' },
+    });
+  if (!response.ok)
+    return new Response('Content temporarily unavailable', { status: 503 });
 
   const post = await response.json();
   const template = await env.ASSETS.fetch(
@@ -283,6 +288,132 @@ function tagSlugForRoute(tag) {
     .replace(/^-|-$/g, '');
 }
 
+async function renderHome(request, env) {
+  let posts, series, tags, stats;
+  try {
+    [posts, series, tags, stats] = await Promise.all([
+      cmsJson(env, '/posts?limit=7'),
+      cmsJson(env, '/series'),
+      cmsJson(env, '/tags'),
+      cmsJson(env, '/stats'),
+    ]);
+  } catch {
+    return new Response('Content temporarily unavailable', { status: 503 });
+  }
+  const featured =
+    posts.entries.find((post) => post.thumbnail) || posts.entries[0];
+  const asset = await env.ASSETS.fetch(request);
+  let page = new HTMLRewriter()
+    .on('[data-home-feature]', {
+      element(element) {
+        if (!featured) element.remove();
+      },
+    })
+    .on('[data-home-feature-link]', {
+      element(element) {
+        if (featured)
+          element.setAttribute(
+            'href',
+            `/blog/${encodeURIComponent(featured.slug)}/`
+          );
+      },
+    })
+    .on('[data-home-feature-title]', {
+      element(element) {
+        element.setInnerContent(featured?.title || '');
+      },
+    })
+    .on('[data-home-feature-description]', {
+      element(element) {
+        element.setInnerContent(featured?.description || '');
+      },
+    })
+    .on('[data-home-feature-date]', {
+      element(element) {
+        if (featured) {
+          element.setAttribute('datetime', featured.published_at);
+          element.setInnerContent(dateLabel(featured.published_at));
+        }
+      },
+    })
+    .on('[data-home-feature-image]', {
+      element(element) {
+        element.setInnerContent(
+          featured?.thumbnail
+            ? `<img src="${escapeHtml(featured.thumbnail)}" alt="" class="absolute inset-0 size-full object-cover" loading="eager" fetchpriority="high">`
+            : '',
+          { html: true }
+        );
+      },
+    })
+    .on('[data-home-feature-tags]', {
+      element(element) {
+        element.setInnerContent(
+          (featured?.tags || [])
+            .slice(0, 4)
+            .map(
+              (tag) =>
+                `<span class="rounded-md border px-2.5 py-0.5 text-xs">#${escapeHtml(tag)}</span>`
+            )
+            .join(''),
+          { html: true }
+        );
+      },
+    })
+    .on('[data-home-posts]', {
+      element(element) {
+        element.setInnerContent(
+          postRows(
+            posts.entries.filter((post) => post.id !== featured?.id).slice(0, 6)
+          ),
+          { html: true }
+        );
+      },
+    })
+    .on('[data-home-series]', {
+      element(element) {
+        element.setInnerContent(
+          series.entries
+            .slice(0, 4)
+            .map(
+              (item) =>
+                `<a href="/series/${encodeURIComponent(item.slug)}/" class="group min-w-0 bg-card p-4 transition-colors hover:bg-accent/60"><h3 class="line-clamp-2 text-lg font-semibold leading-7">${escapeHtml(item.name)}</h3><p class="mt-2 text-sm text-muted-foreground">${escapeHtml(item.latest_title || '')}</p><p class="mt-2 text-xs text-muted-foreground">${item.post_count}개의 글</p></a>`
+            )
+            .join(''),
+          { html: true }
+        );
+      },
+    })
+    .on('[data-home-tags]', {
+      element(element) {
+        element.setInnerContent(
+          tags.entries
+            .slice(0, 18)
+            .map(
+              (tag) =>
+                `<a href="/tags/${encodeURIComponent(tagSlug(tag.name))}/" class="rounded-md border bg-background px-3 py-1.5 text-sm hover:bg-accent">#${escapeHtml(tag.name)} <span class="ml-1 text-muted-foreground">${tag.post_count}</span></a>`
+            )
+            .join(''),
+          { html: true }
+        );
+      },
+    });
+  for (const [name, count] of Object.entries({
+    posts: stats.posts,
+    series: series.entries.length,
+    tags: tags.entries.length,
+  }))
+    page = page.on(`[data-home-count="${name}"]`, {
+      element(element) {
+        element.setInnerContent(String(count));
+      },
+    });
+  const response = page.transform(asset);
+  const headers = new Headers(response.headers);
+  headers.set('Cache-Control', 'no-store');
+  return new Response(response.body, { status: response.status, headers });
+}
+
 async function renderCollection(request, env, url) {
   const path = url.pathname.replace(/\/$/, '') || '/';
   let selector;
@@ -305,7 +436,7 @@ async function renderCollection(request, env, url) {
       const series = (await cmsJson(env, '/series')).entries.find(
         (item) => item.slug === slug
       );
-      if (!series) return env.ASSETS.fetch(request);
+      if (!series) return new Response('Not found', { status: 404 });
       collection = {
         title: series.name,
         description:
@@ -330,7 +461,7 @@ async function renderCollection(request, env, url) {
       const tag = (await cmsJson(env, '/tags')).entries.find(
         (item) => tagSlugForRoute(item.name) === slug
       );
-      if (!tag) return env.ASSETS.fetch(request);
+      if (!tag) return new Response('Not found', { status: 404 });
       collection = {
         title: `#${tag.name}`,
         description: `${tag.post_count}개의 글`,
@@ -351,7 +482,7 @@ async function renderCollection(request, env, url) {
       return env.ASSETS.fetch(request);
     }
   } catch {
-    return env.ASSETS.fetch(request);
+    return new Response('Content temporarily unavailable', { status: 503 });
   }
 
   const asset = await env.ASSETS.fetch(
@@ -500,7 +631,7 @@ async function renderFeed(request, env, url) {
       }
     );
   } catch {
-    return env.ASSETS.fetch(request);
+    return new Response('Content temporarily unavailable', { status: 503 });
   }
 }
 
@@ -540,7 +671,7 @@ async function renderSitemap(request, env, url) {
       }
     );
   } catch {
-    return env.ASSETS.fetch(request);
+    return new Response('Content temporarily unavailable', { status: 503 });
   }
 }
 
@@ -562,6 +693,12 @@ function contentApiPath(path) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (
+      contentReadsEnabled(env) &&
+      request.method === 'GET' &&
+      url.pathname === '/'
+    )
+      return renderHome(request, env);
     if (
       url.pathname === '/article-template/' ||
       url.pathname === '/article-template'
