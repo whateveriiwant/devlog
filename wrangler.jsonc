@@ -3,7 +3,10 @@
   "name": "devlog",
   "main": "./worker/site.mjs",
   "compatibility_date": "2026-09-16",
-  "vars": { "SITE_ORIGIN": "https://seungjun.sh" },
+  "vars": {
+    "SITE_ORIGIN": "https://seungjun.sh",
+    "CONTENT_READS": "false",
+  },
   "services": [{ "binding": "CMS", "service": "devlog-cms" }],
   "assets": {
     "directory": "./dist/",
@@ -34,6 +37,7 @@
       "name": "devlog-site-stage",
       "vars": {
         "SITE_ORIGIN": "https://devlog-site-stage.seungjun-jeong10.workers.dev",
+        "CONTENT_READS": "true",
         "STAGE_EDITOR_PREVIEW": "true",
       },
       "services": [{ "binding": "CMS", "service": "devlog-cms-stage" }],

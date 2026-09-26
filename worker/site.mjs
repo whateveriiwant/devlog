@@ -3,6 +3,7 @@ const protectedPath = (path) =>
   path.startsWith('/write/') ||
   path === '/admin' ||
   path.startsWith('/admin/');
+const contentReadsEnabled = (env) => env.CONTENT_READS === 'true';
 
 const escapeHtml = (value) =>
   String(value ?? '').replace(
@@ -574,23 +575,28 @@ export default {
     if (url.pathname === '/list-template/' || url.pathname === '/list-template')
       return new Response('Not found', { status: 404 });
     if (request.method === 'GET' && url.pathname === '/rss.xml')
-      return renderFeed(request, env, url);
+      return contentReadsEnabled(env)
+        ? renderFeed(request, env, url)
+        : env.ASSETS.fetch(request);
     if (
       request.method === 'GET' &&
       (url.pathname === '/sitemap.xml' || url.pathname === '/sitemap-index.xml')
     )
-      return url.pathname === '/sitemap.xml'
-        ? renderSitemap(request, env, url)
-        : new Response(
-            `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>${url.origin}/sitemap.xml</loc></sitemap></sitemapindex>`,
-            {
-              headers: {
-                'Content-Type': 'application/xml; charset=utf-8',
-                'Cache-Control': 'no-store',
-              },
-            }
-          );
+      return !contentReadsEnabled(env)
+        ? env.ASSETS.fetch(request)
+        : url.pathname === '/sitemap.xml'
+          ? renderSitemap(request, env, url)
+          : new Response(
+              `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>${url.origin}/sitemap.xml</loc></sitemap></sitemapindex>`,
+              {
+                headers: {
+                  'Content-Type': 'application/xml; charset=utf-8',
+                  'Cache-Control': 'no-store',
+                },
+              }
+            );
     if (
+      contentReadsEnabled(env) &&
       request.method === 'GET' &&
       (url.pathname === '/blog/' ||
         url.pathname === '/series/' ||
@@ -599,7 +605,11 @@ export default {
         url.pathname.startsWith('/tags/'))
     )
       return renderCollection(request, env, url);
-    if (url.pathname.startsWith('/blog/') && request.method === 'GET')
+    if (
+      contentReadsEnabled(env) &&
+      url.pathname.startsWith('/blog/') &&
+      request.method === 'GET'
+    )
       return renderArticle(request, env, url);
     const contentPath = contentApiPath(url.pathname);
     if (
@@ -610,6 +620,8 @@ export default {
         request.method === 'OPTIONS')
     ) {
       const editorApi = contentPath.startsWith('/editor/');
+      if (!editorApi && !contentReadsEnabled(env))
+        return env.ASSETS.fetch(request);
       const requestOrigin = request.headers.get('Origin');
       if (editorApi && requestOrigin && requestOrigin !== env.SITE_ORIGIN)
         return new Response(JSON.stringify({ error: 'Forbidden origin' }), {

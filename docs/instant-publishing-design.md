@@ -169,9 +169,9 @@ Cloudflare staging D1에 `0002_post_drafts.sql`, `0003_post_draft_images.sql`을
 
 2026-09-26 APAC D1 `devlog-content`(ID `1facc419-3266-4cb5-9515-d8cab3924f1d`)를 생성했다. 마이그레이션 파일 번호 충돌을 발견해 새 DB에서도 실행 순서가 고유하도록 `0001`~`0004`로 정리했다. staging에는 새 마이그레이션을 적용했고, 데이터 125편·시리즈 23개·이미지 참조 199개가 유지됐다. staging CMS·사이트 Worker도 변경 코드로 다시 배포했다. 편집기 설정은 활성, 비로그인 쓰기는 401, 글 목록·태그·RSS·sitemap 사이트 응답은 200이었다.
 
-운영 D1에는 Git Markdown 스냅샷을 넣었다. 운영·staging 각각 125편, 23개 시리즈, 199개 이미지 참조가 일치했고 ID·슬러그·해시 불일치 0, 렌더 누락 0, 오래된 이미지 호스트 0이었다. 운영 D1 전체 SQL 백업은 저장소의 무시 경로 [`migration/backups/devlog-content-before-cutover-2026-09-26.sql`](../migration/backups/devlog-content-before-cutover-2026-09-26.sql)에 보관했다. 별도 SQLite로 복원해 125편·23개 시리즈·199개 이미지 참조·초안 0건을 확인했다. CMS 설정은 이 DB를 바인딩하지만 `CONTENT_WRITES=false`다. 운영 Worker에는 아직 배포하지 않았다.
+운영 D1에는 Git Markdown 스냅샷을 넣었다. 운영·staging 각각 125편, 23개 시리즈, 199개 이미지 참조가 일치했고 ID·슬러그·해시 불일치 0, 렌더 누락 0, 오래된 이미지 호스트 0이었다. 운영 D1 전체 SQL 백업은 저장소의 무시 경로 [`migration/backups/devlog-content-before-cutover-2026-09-26.sql`](../migration/backups/devlog-content-before-cutover-2026-09-26.sql)에 보관했다. 별도 SQLite로 복원해 125편·23개 시리즈·199개 이미지 참조·초안 0건을 확인했다. 운영 설정은 이 DB를 바인딩하되 `CONTENT_READS=false`, `CONTENT_WRITES=false`로 두었다. 운영 Worker에는 아직 배포하지 않았다.
 
-배포 워크플로 코드는 CMS Worker를 먼저 배포하고 사이트 Worker를 이어서 배포하도록 준비했다. 운영 편집기 설정이 꺼져 있으면 기존 GitHub 글쓰기 경로를 유지한다. 이미지 정리 워크플로는 D1과 Git 참조를 합산하도록 변경했지만, 배포 Actions 토큰이 D1 조회 권한을 가졌는지 GitHub 세션이 없어 확인하지 못했다. 이 검증 전에는 운영 전환하면 안 된다. GitHub Actions를 통해 스크립트가 D1을 읽지 못하면 삭제는 중단되도록 되어 있다.
+배포 워크플로 코드는 CMS Worker를 먼저 배포하고 사이트 Worker를 이어서 배포하도록 준비했다. 운영 편집기 설정이 꺼져 있으면 기존 GitHub 글쓰기 경로를 유지한다. 이미지 정리 워크플로는 D1과 Git 참조를 합산하며, 수동 실행은 기본적으로 삭제 없는 dry-run을 하도록 바꿨다. 배포 Actions 토큰이 D1 조회 권한을 가졌는지 이 브랜치의 수동 dry-run으로 확인한다. 권한 확인 전에는 운영 전환하면 안 된다. GitHub Actions를 통해 스크립트가 D1을 읽지 못하면 삭제는 중단되도록 되어 있다.
 
 ## 남은 작업
 
