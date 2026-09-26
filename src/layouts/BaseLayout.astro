@@ -86,6 +86,7 @@ const isHome = Astro.url.pathname === '/';
       title="seungjun.sh"
       href="/rss.xml"
     />
+    <slot name="head" />
     <script is:inline>
       let theme;
       try {

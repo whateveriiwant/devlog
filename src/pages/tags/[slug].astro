@@ -20,5 +20,7 @@ const { tag } = Astro.props;
     <h1>#{tag.name}</h1>
     <p class="page-description">{tag.posts.length}개의 글</p>
   </header>
-  <PostList posts={tag.posts} />
+  <div data-d1-collection="tag-posts" data-tag-slug={Astro.params.slug}>
+    <PostList posts={tag.posts} />
+  </div>
 </BaseLayout>

@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+---
+<BaseLayout title="분류" description="글 모음 페이지" noindex>
+  <link slot="head" rel="canonical" data-collection-canonical href="/" />
+  <article>
+    <header class="page-heading">
+      <a data-collection-root class="eyebrow block" href="/">둘러보기</a>
+      <h1 data-collection-title></h1>
+      <p class="page-description" data-collection-description></p>
+      <div class="stat-line"><span class="rounded-md bg-secondary px-2 py-1 text-sm" data-collection-count></span></div>
+    </header>
+    <div data-collection-posts></div>
+  </article>
+</BaseLayout>

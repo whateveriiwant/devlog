@@ -9,5 +9,7 @@ const { posts } = await getContent();
   <header class="page-heading">
     <h1>전체 글</h1>
   </header>
-  <PostList posts={posts} />
+  <div data-d1-collection="posts">
+    <PostList posts={posts} />
+  </div>
 </BaseLayout>

@@ -5,10 +5,46 @@
   "compatibility_date": "2026-09-16",
   "routes": [{ "pattern": "cms-api.seungjun.sh", "custom_domain": true }],
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "devlog-assets" }],
+  "d1_databases": [
+    {
+      "binding": "CONTENT",
+      "database_name": "devlog-content",
+      "database_id": "1facc419-3266-4cb5-9515-d8cab3924f1d",
+      "migrations_dir": "migrations",
+    },
+  ],
   "vars": {
     "SITE_ORIGIN": "https://seungjun.sh",
     "MEDIA_BASE_URL": "https://media.seungjun.sh",
     "GITHUB_ALLOWED_LOGIN": "whateveriiwant",
     "GITHUB_CLIENT_ID": "Ov23li71gyBqMQPl86vh",
+    "CONTENT_WRITES": "false",
+  },
+  "env": {
+    "stage": {
+      "name": "devlog-cms-stage",
+      "routes": [],
+      "r2_buckets": [
+        { "binding": "MEDIA", "bucket_name": "devlog-assets-stage" },
+      ],
+      "vars": {
+        "SITE_ORIGIN": "https://devlog-site-stage.seungjun-jeong10.workers.dev",
+        "MEDIA_BASE_URL": "https://devlog-cms-stage.seungjun-jeong10.workers.dev/media/objects",
+        "GITHUB_ALLOWED_LOGIN": "whateveriiwant",
+        "GITHUB_CLIENT_ID": "Ov23li71gyBqMQPl86vh",
+        "CONTENT_WRITES": "true",
+        "STAGE_HEALTH": "true",
+        "STAGE_CONTENT_WRITES": "true",
+        "AUTH_ORIGIN": "https://devlog-cms-stage.seungjun-jeong10.workers.dev",
+      },
+      "d1_databases": [
+        {
+          "binding": "CONTENT",
+          "database_name": "devlog-content-stage",
+          "database_id": "3f8889ba-bb17-4d60-b963-0bff45229bca",
+          "migrations_dir": "migrations",
+        },
+      ],
+    },
   },
 }

@@ -14,16 +14,13 @@ try {
 } catch (error) {
   if (error.code !== 'ENOENT') throw error;
 }
-const execute = process.argv.includes('--delete');
-if (
-  process.argv.some(
-    (arg) =>
-      !['--delete'].includes(arg) &&
-      arg !== process.argv[0] &&
-      arg !== process.argv[1]
-  )
-) {
-  throw new Error('Usage: node scripts/cleanup-unused-images.mjs [--delete]');
+const args = process.argv.slice(2);
+const execute = args.includes('--delete');
+const d1Mode = args.includes('--d1');
+if (args.some((arg) => !['--delete', '--d1'].includes(arg))) {
+  throw new Error(
+    'Usage: node scripts/cleanup-unused-images.mjs [--d1] [--delete]'
+  );
 }
 const required = [
   'R2_ACCOUNT_ID',
@@ -43,40 +40,88 @@ function git(args) {
   });
 }
 
-// Always read the current remote refs. A failed fetch stops deletion.
-git(['fetch', '--prune', 'origin', '+refs/heads/*:refs/remotes/origin/*']);
-const refs = git([
-  'for-each-ref',
-  '--format=%(refname)',
-  'refs/remotes/origin/',
-])
-  .trim()
-  .split('\n')
-  .filter(
-    (ref) => ref.startsWith('refs/remotes/origin/') && !ref.endsWith('/HEAD')
+function readD1Used(database, key) {
+  const sql = key
+    ? `SELECT r2_key FROM post_images WHERE r2_key = '${key}' UNION SELECT r2_key FROM post_draft_images WHERE r2_key = '${key}'`
+    : 'SELECT r2_key FROM post_images UNION SELECT r2_key FROM post_draft_images';
+  const command = [
+    'exec',
+    'wrangler',
+    'd1',
+    'execute',
+    database,
+    '--remote',
+    '--json',
+    '--command',
+    sql,
+  ];
+  if (process.env.CLOUDFLARE_D1_CONFIG)
+    command.push('--config', process.env.CLOUDFLARE_D1_CONFIG);
+  if (process.env.CLOUDFLARE_D1_ENV)
+    command.push('--env', process.env.CLOUDFLARE_D1_ENV);
+  const response = JSON.parse(
+    execFileSync('pnpm', command, {
+      cwd: root,
+      encoding: 'utf8',
+      maxBuffer: 32 * 1024 * 1024,
+    })
   );
-if (
-  !refs.includes('refs/remotes/origin/main') ||
-  !refs.includes('refs/remotes/origin/dev')
-) {
-  throw new Error(
-    'Expected main and dev branches were not fetched; refusing to clean up'
+  return new Set(
+    response.flatMap((result) => result.results.map((row) => row.r2_key))
   );
 }
-let matches = '';
-try {
-  matches = git([
-    'grep',
-    '-IhoE',
-    'posts/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(png|jpg|gif|webp|avif)',
-    ...refs,
-    '--',
-    'src/content/posts',
-  ]);
-} catch (error) {
-  if (error.status !== 1) throw error;
+
+function readGitUsed() {
+  // Always read the current remote refs. A failed fetch stops deletion.
+  git(['fetch', '--prune', 'origin', '+refs/heads/*:refs/remotes/origin/*']);
+  const refs = git([
+    'for-each-ref',
+    '--format=%(refname)',
+    'refs/remotes/origin/',
+  ])
+    .trim()
+    .split('\n')
+    .filter(
+      (ref) => ref.startsWith('refs/remotes/origin/') && !ref.endsWith('/HEAD')
+    );
+  if (
+    !refs.includes('refs/remotes/origin/main') ||
+    !refs.includes('refs/remotes/origin/dev')
+  ) {
+    throw new Error(
+      'Expected main and dev branches were not fetched; refusing to clean up'
+    );
+  }
+  let matches = '';
+  try {
+    matches = git([
+      'grep',
+      '-IhoE',
+      'posts/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(png|jpg|gif|webp|avif)',
+      ...refs,
+      '--',
+      'src/content/posts',
+    ]);
+  } catch (error) {
+    if (error.status !== 1) throw error;
+  }
+  return new Set(matches.trim().split('\n').filter(Boolean));
 }
-const used = new Set(matches.trim().split('\n').filter(Boolean));
+
+let used = new Set();
+if (d1Mode) {
+  const database = process.env.CLOUDFLARE_D1_DATABASE;
+  if (!database)
+    throw new Error('CLOUDFLARE_D1_DATABASE is required with --d1');
+  if (process.env.CLOUDFLARE_D1_R2_BUCKET !== process.env.R2_BUCKET)
+    throw new Error(
+      'CLOUDFLARE_D1_R2_BUCKET must exactly match R2_BUCKET with --d1; refusing cross-environment cleanup'
+    );
+  used = readD1Used(database);
+}
+if (!d1Mode || process.env.CLOUDFLARE_D1_INCLUDE_GIT === 'true') {
+  for (const key of readGitUsed()) used.add(key);
+}
 const client = new S3Client({
   endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
   region: 'auto',
@@ -157,6 +202,18 @@ for (const image of images) {
   } catch (error) {
     if (error.$metadata?.httpStatusCode === 404) continue;
     throw error;
+  }
+  if (
+    d1Mode &&
+    readD1Used(process.env.CLOUDFLARE_D1_DATABASE, image.Key).has(image.Key)
+  ) {
+    console.log(`Referenced again before deletion: ${image.Key}`);
+    if (execute)
+      await client.send(
+        new DeleteObjectCommand({ Bucket: bucket, Key: markerKey })
+      );
+    restored++;
+    continue;
   }
   console.log(`Unused for 7 days, delete: ${image.Key}`);
   if (execute) {

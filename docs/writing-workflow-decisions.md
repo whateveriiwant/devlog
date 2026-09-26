@@ -60,3 +60,7 @@ CMS API Worker 코드는 현재 대시보드에서 배포했다. 이후 Worker �
 - 새 화면은 GitHub OAuth 토큰으로 초안 브랜치와 PR을 만들고, 발행 시 PR을 병합한다. 브랜치 보호 및 검사 완료를 기다리는 동안 발행 버튼은 진행 상태를 표시한다. 정적 사이트 배포가 끝나야 공개 목록에 나타난다.
 
 구현 파일: [`src/pages/write.astro`](../src/pages/write.astro), [`src/components/WriteEditor.tsx`](../src/components/WriteEditor.tsx), [`src/components/write-editor.css`](../src/components/write-editor.css).
+
+## 2026-09-26: 발행 후 빌드 대기 문제 조사
+
+추가 빌드 로그 3건에서 전체 약 5분 34초 중 약 79%가 Cloudflare 초기화에 쓰였다. 실제 빌드는 13~16초였고 캐시 복원은 성공했다. 저장소에는 Markdown 글 126편, 원문 약 0.60 MiB가 있어 현재 데이터량만으로 D1이 필요하다고 볼 근거는 없다. 앞서 Astro 요청 시 렌더링과 D1을 우선 추천한 것은 성급했다. 먼저 Markdown과 정적 사이트를 유지한 채 GitHub Actions 배포로 Cloudflare 초기화 구간을 우회하고 총 대기 시간을 측정한다. 수초 내 발행이 반드시 필요하거나 Actions 방식이 속도 기준을 못 맞출 때 D1 전환을 다시 판단한다. D1 데이터 용량은 충분하지만 Workers Free의 요청 CPU 한도와 SSR 실행 비용은 시험 배포로 검증해야 한다. GitHub Actions 배포 전환은 완료했고, D1 조회·편집기 경로는 staging에서 검증 중이다. 프로덕션 D1은 생성·초기 적재했지만 운영 Worker 전환은 아직 하지 않았다. 근거, 현재 상태, 남은 전환 조건과 롤백 기준은 [빌드 대기 없는 글 발행 설계](./instant-publishing-design.md)에 기록했다.

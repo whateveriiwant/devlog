@@ -412,6 +412,50 @@ button:disabled {
   text-align: left;
   color: #343a40;
 }
+.write-trash-list {
+  margin-top: 18px;
+  border-top: 1px solid #e9ecef;
+  padding-top: 14px;
+}
+.write-trash-list h3 {
+  margin: 0 0 8px;
+  color: #868e96;
+  font-size: 12px;
+  font-weight: 600;
+}
+.write-trash-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+}
+.write-trash-row span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.write-trash-row strong {
+  overflow: hidden;
+  color: #495057;
+  font-size: 13px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.write-trash-row small {
+  color: #868e96;
+  font-size: 11px;
+}
+.write-trash-row button {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  background: #fff;
+  color: #495057;
+  font-size: 12px;
+}
 .write-post-list button:hover {
   color: #0ca678;
 }

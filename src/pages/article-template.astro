@@ -1,0 +1,38 @@
+---
+import ArticleBreadcrumb from '../components/ArticleBreadcrumb';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const date = new Date('2000-01-01T00:00:00.000Z');
+---
+
+<BaseLayout
+  title="게시글 템플릿"
+  description=""
+  postId="__article-template__"
+  image="https://media.seungjun.sh/template"
+  publishedAt={date}
+  noindex
+>
+  <link slot="head" rel="canonical" data-template-canonical href="/" />
+  <meta slot="head" property="article:modified_time" data-template-updated-meta content="" />
+  <article>
+    <header class="article-heading">
+      <div data-template-breadcrumb>
+        <ArticleBreadcrumb />
+      </div>
+      <h1 data-template-title></h1>
+      <p class="article-description" data-template-description></p>
+      <div class="article-meta">
+        <time data-template-published datetime=""></time>
+        <time data-template-updated hidden datetime=""></time>
+      </div>
+      <div class="article-tags" data-template-tags></div>
+    </header>
+    <div class="mb-8 xl:hidden" data-template-mobile-toc></div>
+    <div class="prose" data-template-body></div>
+    <footer data-template-footer>
+      <div class="article-pagination" data-template-pagination></div>
+    </footer>
+  </article>
+  <div slot="right" class="desktop-toc" data-template-toc></div>
+</BaseLayout>

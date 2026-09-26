@@ -1,0 +1,3 @@
+ALTER TABLE posts ADD COLUMN rendered_html TEXT NOT NULL DEFAULT '';
+ALTER TABLE posts ADD COLUMN headings_json TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE posts ADD COLUMN searchable_text TEXT NOT NULL DEFAULT '';

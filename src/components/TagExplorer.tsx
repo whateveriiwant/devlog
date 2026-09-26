@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -20,6 +20,13 @@ interface PositionedTag extends TagNode {
   radius: number;
 }
 
+const tagSlug = (tag: string) =>
+  tag
+    .replaceAll('C++', 'cpp')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-|-$/g, '');
+
 function positionTags(nodes: TagNode[]): PositionedTag[] {
   const maxCount = Math.max(...nodes.map((node) => node.count));
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
@@ -39,18 +46,49 @@ function positionTags(nodes: TagNode[]): PositionedTag[] {
 }
 
 export default function TagExplorer({
-  graphNodes,
   graphLinks,
   allTags,
 }: {
-  graphNodes: TagNode[];
   graphLinks: TagLink[];
   allTags: TagNode[];
 }) {
+  const [currentTags, setCurrentTags] = useState(allTags);
+  const [currentLinks, setCurrentLinks] = useState(graphLinks);
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<'popular' | 'alphabetical'>('popular');
-  const positioned = useMemo(() => positionTags(graphNodes), [graphNodes]);
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      fetch('/api/content/tags').then((response) => {
+        if (!response.ok) throw new Error('Tag API unavailable');
+        return response.json();
+      }),
+      fetch('/api/content/tag-relations').then((response) => {
+        if (!response.ok) throw new Error('Tag relations API unavailable');
+        return response.json();
+      }),
+    ])
+      .then(([tagsResponse, linksResponse]) => {
+        if (cancelled) return;
+        const tags = (tagsResponse.entries as { name: string; post_count: number }[]).map((tag) => ({
+          name: tag.name,
+          count: tag.post_count,
+          href: `/tags/${tagSlug(tag.name)}/`,
+        }));
+        setCurrentTags(tags);
+        setCurrentLinks(linksResponse.entries as TagLink[]);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const currentNodes = useMemo(
+    () => currentTags.filter((tag) => tag.count >= 2).slice(0, 30),
+    [currentTags]
+  );
+  const positioned = useMemo(() => positionTags(currentNodes), [currentNodes]);
   const positions = useMemo(
     () => new Map(positioned.map((node) => [node.name, node])),
     [positioned]
@@ -59,25 +97,25 @@ export default function TagExplorer({
     const names = new Set<string>();
     if (!activeTag) return names;
     names.add(activeTag);
-    graphLinks.forEach((link) => {
+    currentLinks.forEach((link) => {
       if (link.source === activeTag) names.add(link.target);
       if (link.target === activeTag) names.add(link.source);
     });
     return names;
-  }, [activeTag, graphLinks]);
+  }, [activeTag, currentLinks]);
   const visibleTags = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('ko');
     const filtered = normalized
-      ? allTags.filter((tag) =>
+      ? currentTags.filter((tag) =>
           tag.name.toLocaleLowerCase('ko').includes(normalized)
         )
-      : [...allTags];
+      : [...currentTags];
     return filtered.sort((a, b) =>
       sort === 'popular'
         ? b.count - a.count || a.name.localeCompare(b.name, 'ko')
         : a.name.localeCompare(b.name, 'ko')
     );
-  }, [allTags, query, sort]);
+  }, [currentTags, query, sort]);
 
   return (
     <div>
@@ -105,7 +143,7 @@ export default function TagExplorer({
             <rect width="760" height="420" fill="url(#tag-stars)" className="text-foreground" />
 
             <g>
-              {graphLinks.map((link) => {
+              {currentLinks.map((link) => {
                 const source = positions.get(link.source);
                 const target = positions.get(link.target);
                 if (!source || !target) return null;
@@ -171,7 +209,7 @@ export default function TagExplorer({
               모든 태그
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {allTags.length}개의 키워드에서 글을 찾아보세요.
+              {currentTags.length}개의 키워드에서 글을 찾아보세요.
             </p>
           </div>
           <div className="inline-flex h-9 w-fit items-center rounded-lg bg-muted p-1" aria-label="태그 정렬 방식">

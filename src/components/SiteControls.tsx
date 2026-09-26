@@ -36,6 +36,7 @@ interface SearchIndex {
   ): Promise<{ results: { data(): Promise<SearchData> }[] }>;
 }
 let index: Promise<SearchIndex> | undefined;
+let staticIndex: Promise<SearchIndex> | undefined;
 const normalizeSearch = (value: string) =>
   value.normalize('NFKC').toLocaleLowerCase('ko');
 async function fallbackIndex(): Promise<SearchIndex> {
@@ -77,15 +78,32 @@ async function fallbackIndex(): Promise<SearchIndex> {
 }
 function getIndex(): Promise<SearchIndex> {
   if (index) return index;
-  const path = '/pagefind/pagefind.js';
-  const load = import.meta.env.DEV
-    ? fallbackIndex()
-    : import(/* @vite-ignore */ path)
-        .then((module) => module as SearchIndex)
-        .catch(fallbackIndex);
-  return (index = load.catch((error: unknown) => {
-    index = undefined;
-    throw error;
+  return (index = Promise.resolve({
+    async search(query) {
+      try {
+        const response = await fetch(
+          `/api/content/search?q=${encodeURIComponent(query)}`
+        );
+        if (!response.ok) throw new Error('Runtime search unavailable');
+        const result = (await response.json()) as {
+          entries: SearchData[];
+        };
+        return {
+          results: result.entries.map((data) => ({ data: () => Promise.resolve(data) })),
+        };
+      } catch {
+        if (!staticIndex) {
+          const path = '/pagefind/pagefind.js';
+          const load = import.meta.env.DEV
+            ? fallbackIndex()
+            : import(/* @vite-ignore */ path)
+                .then((module) => module as SearchIndex)
+                .catch(fallbackIndex);
+          staticIndex = load;
+        }
+        return (await staticIndex).search(query);
+      }
+    },
   }));
 }
 function excerpt(data: SearchData) {
