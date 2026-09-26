@@ -33,5 +33,7 @@ const { group } = Astro.props;
       <Badge variant="secondary">{group.posts.length}개의 글</Badge>
     </div>
   </header>
-  <PostList posts={group.posts} numbered />
+  <div data-d1-collection="series-posts" data-series-slug={group.data.slug}>
+    <PostList posts={group.posts} numbered />
+  </div>
 </BaseLayout>

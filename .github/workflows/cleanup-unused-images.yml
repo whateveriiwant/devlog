@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: '17 3 * * *'
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: List candidates without deleting objects
+        type: boolean
+        required: true
+        default: true
 
 permissions:
   contents: read
@@ -29,10 +35,32 @@ jobs:
           node-version: 24.12.0
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Delete images unused for seven days
-        run: node scripts/cleanup-unused-images.mjs --delete
+      - name: Inspect images without deleting
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        run: node scripts/cleanup-unused-images.mjs --d1
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_D1_DATABASE: devlog-content
+          CLOUDFLARE_D1_R2_BUCKET: devlog-assets
+          CLOUDFLARE_D1_INCLUDE_GIT: 'true'
+          CLOUDFLARE_D1_CONFIG: wrangler.cms.jsonc
+
+      - name: Delete images unused for seven days
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)
+        run: node scripts/cleanup-unused-images.mjs --d1 --delete
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_D1_DATABASE: devlog-content
+          CLOUDFLARE_D1_R2_BUCKET: devlog-assets
+          CLOUDFLARE_D1_INCLUDE_GIT: 'true'
+          CLOUDFLARE_D1_CONFIG: wrangler.cms.jsonc

@@ -8,12 +8,16 @@ const API = 'https://api.github.com/repos/whateveriiwant/devlog';
 const AUTH = 'https://cms-api.seungjun.sh';
 const POST_PATH = 'src/content/posts';
 const SERIES_PATH = 'src/content/series.json';
+const MAX_PREVIEW_CHARS = 100_000;
 
 interface PostSummary {
   id: string;
   title: string;
   slug: string;
   publishedAt: string;
+  revision?: number;
+  hasDraft?: boolean;
+  deletedAt?: string;
 }
 interface Series {
   id: string;
@@ -23,10 +27,12 @@ interface Series {
   originalUrl?: string;
 }
 interface Draft {
-  number: number;
-  branch: string;
+  number?: number;
+  branch?: string;
   id: string;
   title: string;
+  revision?: number;
+  baseRevision?: number;
 }
 interface Frontmatter extends Record<string, unknown> {
   title?: string;
@@ -126,7 +132,10 @@ export default function WriteEditor({
       : (sessionStorage.getItem('devlog-editor-token') ?? '')
   );
   const [authorized, setAuthorized] = useState(false);
+  const [d1Mode, setD1Mode] = useState(false);
+  const [authOrigin, setAuthOrigin] = useState(AUTH);
   const [posts, setPosts] = useState(initialPosts);
+  const [trash, setTrash] = useState<PostSummary[]>([]);
   const [series, setSeries] = useState(initialSeries);
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [id, setId] = useState<string | null>(null);
@@ -153,15 +162,19 @@ export default function WriteEditor({
   const tokenRef = useRef(token);
 
   const slug = titleSlug(title);
+  const previewTooLong = body.length > MAX_PREVIEW_CHARS;
   const previewHtml = useMemo(
-    () => DOMPurify.sanitize(marked.parse(body, { breaks: true }) as string),
-    [body]
+    () =>
+      previewTooLong
+        ? ''
+        : DOMPurify.sanitize(marked.parse(body, { breaks: true }) as string),
+    [body, previewTooLong]
   );
 
   function authenticate() {
     return new Promise<string>((resolve, reject) => {
       const popup = window.open(
-        `${AUTH}/auth`,
+        `${authOrigin}/auth`,
         'devlog-github-login',
         'width=620,height=720'
       );
@@ -174,9 +187,9 @@ export default function WriteEditor({
         reject(new Error('로그인 시간이 초과되었습니다.'));
       }, 120_000);
       const receive = (event: MessageEvent) => {
-        if (event.origin !== AUTH || event.source !== popup) return;
+        if (event.origin !== authOrigin || event.source !== popup) return;
         if (event.data === 'authorizing:github') {
-          popup.postMessage('authorizing:github', AUTH);
+          popup.postMessage('authorizing:github', authOrigin);
           return;
         }
         if (typeof event.data !== 'string') return;
@@ -223,6 +236,25 @@ export default function WriteEditor({
       : ((await response.json()) as T);
   }
 
+  async function editorApi<T>(
+    path: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const headers = new Headers(options.headers);
+    headers.set('Authorization', `Bearer ${tokenRef.current}`);
+    if (options.body) headers.set('Content-Type', 'application/json');
+    const response = await fetch(`/api/content/editor${path}`, {
+      ...options,
+      headers,
+    });
+    const result = (await response.json().catch(() => ({}))) as {
+      error?: string;
+    };
+    if (!response.ok)
+      throw new Error(result.error || `편집기 요청 실패 (${response.status})`);
+    return result as T;
+  }
+
   async function content(path: string, ref: string) {
     return github<{ sha: string; content: string }>(
       `/contents/${path}?ref=${encodeURIComponent(ref)}`
@@ -259,21 +291,50 @@ export default function WriteEditor({
         };
       })
     );
-    setDrafts(loaded.filter((item): item is Draft => item !== null));
+    setDrafts(
+      loaded.filter((item): item is NonNullable<typeof item> => item !== null)
+    );
+  }
+
+  async function loadD1Dashboard() {
+    const result = await editorApi<{
+      posts: PostSummary[];
+      drafts: Draft[];
+      series: Series[];
+      trash: PostSummary[];
+    }>('/posts');
+    setPosts(result.posts);
+    setTrash(result.trash);
+    setDrafts(result.drafts);
+    setSeries(result.series);
   }
 
   useEffect(() => {
     if (!token) return;
     // Loading starts after authentication; all updates happen after network I/O.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadDashboard()
-      .then(() => setAuthorized(true))
-      .catch(() => {
-        sessionStorage.removeItem('devlog-editor-token');
-        tokenRef.current = '';
-        setToken('');
-        window.location.replace('/login/');
-      });
+    void (async () => {
+      const config = await fetch('/api/content/editor-config').then(
+        (response) => {
+          if (!response.ok)
+            throw new Error('편집기 설정을 불러오지 못했습니다.');
+          return response.json() as Promise<{
+            enabled: boolean;
+            authOrigin?: string;
+          }>;
+        }
+      );
+      setAuthOrigin(config.authOrigin || AUTH);
+      setD1Mode(config.enabled);
+      if (config.enabled) await loadD1Dashboard();
+      else await loadDashboard();
+      setAuthorized(true);
+    })().catch(() => {
+      sessionStorage.removeItem('devlog-editor-token');
+      tokenRef.current = '';
+      setToken('');
+      window.location.replace('/login/');
+    });
     // Dashboard only needs to refresh after login or a successful save.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
@@ -314,6 +375,59 @@ export default function WriteEditor({
   async function openPost(postId: string, ref = 'main', selectedDraft?: Draft) {
     setBusy(true);
     try {
+      if (d1Mode) {
+        const post = await editorApi<{
+          id: string;
+          title: string;
+          slug: string;
+          description: string;
+          markdown: string;
+          tags: string[];
+          seriesId: string | null;
+          newSeries: Series | null;
+          thumbnail: string | null;
+          revision: number;
+          baseRevision: number;
+          publishedAt: string | null;
+          publishedRevision: number | null;
+          isDraft: boolean;
+        }>(`/posts/${encodeURIComponent(postId)}`);
+        setId(post.id);
+        setDraft(
+          post.isDraft
+            ? {
+                id: post.id,
+                title: post.title,
+                revision: post.revision,
+                baseRevision: post.baseRevision,
+              }
+            : null
+        );
+        setSource({
+          title: post.title,
+          slug: post.slug,
+          description: post.description,
+          publishedAt: post.publishedAt ?? undefined,
+          revision: post.publishedRevision ?? 0,
+        });
+        setTitle(post.title);
+        setDescription(post.description);
+        setTags(post.tags);
+        setBody(post.markdown);
+        setSeriesId(post.seriesId ?? '');
+        setThumbnail(post.thumbnail ?? '');
+        setNewSeries(post.newSeries);
+        const draftSeries = post.newSeries;
+        if (draftSeries)
+          setSeries((current) =>
+            current.some((item) => item.id === draftSeries.id)
+              ? current
+              : [...current, draftSeries]
+          );
+        setPanel(null);
+        setStatus('');
+        return;
+      }
       const file = await content(`${POST_PATH}/${postId}.md`, ref);
       const parsed = parsePost(decodeBase64(file.content));
       if (
@@ -431,10 +545,13 @@ export default function WriteEditor({
     setStatus('이미지를 R2에 업로드하고 있습니다…');
     try {
       const optimized = await optimizeImage(file);
-      const response = await fetch(`${AUTH}/media`, {
+      const response = await fetch(`${authOrigin}/media`, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': optimized.type },
+        headers: {
+          'Content-Type': optimized.type,
+          Authorization: `Bearer ${tokenRef.current}`,
+        },
         body: optimized,
       });
       const result = (await response.json()) as {
@@ -509,6 +626,90 @@ export default function WriteEditor({
     setBusy(true);
     setStatus(publish ? '발행 준비 중…' : '초안 저장 중…');
     try {
+      if (d1Mode) {
+        const postId = id ?? crypto.randomUUID();
+        const expectedRevision = draft?.revision ?? 0;
+        const baseRevision =
+          draft?.baseRevision ?? Number(source.revision ?? 0);
+        const result = await editorApi<{
+          id: string;
+          revision: number;
+          baseRevision?: number;
+          publishedAt?: string;
+          updatedAt?: string;
+          url?: string;
+        }>('/posts', {
+          method: 'POST',
+          body: JSON.stringify({
+            requestId: crypto.randomUUID(),
+            operation: publish ? 'publish' : 'save',
+            id: postId,
+            title: title.trim(),
+            slug,
+            description: description.trim(),
+            markdown: body.trimEnd(),
+            tags,
+            seriesId: seriesId || null,
+            newSeries,
+            thumbnail: thumbnail || null,
+            expectedRevision,
+            baseRevision,
+          }),
+        });
+        setId(postId);
+        setSource((current) => ({
+          ...current,
+          title: title.trim(),
+          slug,
+          description: description.trim(),
+          tags,
+          series: seriesId ? { id: seriesId } : undefined,
+          thumbnail: thumbnail || undefined,
+          publishedAt: result.publishedAt ?? current.publishedAt,
+          updatedAt: result.updatedAt ?? current.updatedAt,
+          revision: result.revision,
+        }));
+        if (publish) {
+          setDraft(null);
+          setDrafts((current) => current.filter((item) => item.id !== postId));
+          setPosts((current) => [
+            {
+              id: postId,
+              title: title.trim(),
+              slug,
+              publishedAt: result.publishedAt ?? clickedAt,
+              revision: result.revision,
+            },
+            ...current.filter((item) => item.id !== postId),
+          ]);
+          if (newSeries) {
+            setSeries((current) =>
+              current.some((item) => item.id === newSeries.id)
+                ? current
+                : [...current, newSeries]
+            );
+            setNewSeries(null);
+          }
+          setPanel(null);
+          setStatus(`발행했습니다. 공개 URL: ${result.url}`);
+          return;
+        }
+        const nextDraft = {
+          id: postId,
+          title: title.trim(),
+          revision: result.revision,
+          baseRevision,
+        };
+        setDraft(nextDraft);
+        setDrafts((current) => [
+          nextDraft,
+          ...current.filter((item) => item.id !== postId),
+        ]);
+        setStatus(
+          '초안을 D1에 저장했습니다. 공개 글에는 아직 반영되지 않았습니다.'
+        );
+        return;
+      }
       const postId = id ?? crypto.randomUUID();
       let branch = draft?.branch;
       if (!branch) {
@@ -625,7 +826,54 @@ export default function WriteEditor({
     }
   }
 
+  async function moveToTrash() {
+    if (!d1Mode || !id || !posts.some((post) => post.id === id)) return;
+    setBusy(true);
+    try {
+      const result = await editorApi<{ id: string; deletedAt: string }>(
+        `/posts/${encodeURIComponent(id)}`,
+        {
+          method: 'DELETE',
+          body: JSON.stringify({ requestId: crypto.randomUUID() }),
+        }
+      );
+      const deleted = posts.find((post) => post.id === result.id);
+      setPosts((current) => current.filter((post) => post.id !== result.id));
+      if (deleted)
+        setTrash((current) => [
+          { ...deleted, deletedAt: result.deletedAt },
+          ...current.filter((post) => post.id !== result.id),
+        ]);
+      setPanel('posts');
+      setStatus('글을 휴지통으로 이동했습니다. 언제든 복구할 수 있습니다.');
+    } catch (error) {
+      setStatus((error as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function restoreFromTrash(post: PostSummary) {
+    setBusy(true);
+    try {
+      await editorApi(`/posts/${encodeURIComponent(post.id)}/restore`, {
+        method: 'POST',
+        body: JSON.stringify({ requestId: crypto.randomUUID() }),
+      });
+      setTrash((current) => current.filter((item) => item.id !== post.id));
+      setPosts((current) => [post, ...current.filter((item) => item.id !== post.id)]);
+      setStatus(`“${post.title}” 글을 복구했습니다.`);
+    } catch (error) {
+      setStatus((error as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const visiblePosts = posts.filter((post) =>
+    post.title.toLowerCase().includes(search.toLowerCase())
+  );
+  const visibleTrash = trash.filter((post) =>
     post.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -832,6 +1080,11 @@ export default function WriteEditor({
               >
                 임시저장
               </button>
+              {d1Mode && id && posts.some((post) => post.id === id) && (
+                <button disabled={busy || uploads > 0} onClick={moveToTrash}>
+                  휴지통으로
+                </button>
+              )}
               <button
                 className="write-publish-button"
                 disabled={busy || uploads > 0}
@@ -859,10 +1112,16 @@ export default function WriteEditor({
                 ))}
               </div>
             )}
-            <div
-              className="write-markdown"
-              dangerouslySetInnerHTML={{ __html: previewHtml }}
-            />
+            {previewTooLong ? (
+              <p className="write-preview-placeholder">
+                본문이 100,000자를 넘어 미리보기를 생략했습니다. 임시저장과 출간은 계속할 수 있습니다.
+              </p>
+            ) : (
+              <div
+                className="write-markdown"
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
+              />
+            )}
           </div>
         </section>
       </main>
@@ -908,7 +1167,7 @@ export default function WriteEditor({
                 <div className="write-post-list">
                   {drafts.map((item) => (
                     <button
-                      key={item.number}
+                      key={item.id}
                       onClick={() => void openPost(item.id, item.branch, item)}
                     >
                       <span className="write-draft-badge">초안</span>{' '}
@@ -926,6 +1185,27 @@ export default function WriteEditor({
                       </small>
                     </button>
                   ))}
+                  {visibleTrash.length > 0 && (
+                    <div className="write-trash-list" aria-label="휴지통">
+                      <h3>휴지통</h3>
+                      {visibleTrash.map((post) => (
+                        <div className="write-trash-row" key={post.id}>
+                          <span>
+                            <strong>{post.title}</strong>
+                            <small>
+                              삭제 {new Date(post.deletedAt || '').toLocaleDateString('ko-KR')}
+                            </small>
+                          </span>
+                          <button
+                            disabled={busy}
+                            onClick={() => void restoreFromTrash(post)}
+                          >
+                            복구
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </>
             ) : (

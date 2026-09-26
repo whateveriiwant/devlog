@@ -9,3 +9,5 @@ dist/
 work/images/
 migration/image-downloads.json
 migration/image-uploads.json
+
+migration/backups/*.sql

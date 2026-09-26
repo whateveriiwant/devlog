@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+---
+<BaseLayout title="글" description="모든 개발 기록을 모아둔 글 페이지입니다." noindex>
+  <link slot="head" rel="canonical" data-list-canonical href="/blog/" />
+  <header class="page-heading">
+    <h1>전체 글</h1>
+  </header>
+  <div data-d1-collection="posts"></div>
+</BaseLayout>

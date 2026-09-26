@@ -47,9 +47,12 @@
       <p id="status" role="status"></p>
     </main>
     <script>
-      const origin = 'https://cms-api.seungjun.sh';
       const button = document.querySelector<HTMLButtonElement>('#login')!;
       const status = document.querySelector<HTMLElement>('#status')!;
+      const origin =
+        location.hostname === 'devlog-site-stage.seungjun-jeong10.workers.dev'
+          ? 'https://devlog-cms-stage.seungjun-jeong10.workers.dev'
+          : 'https://cms-api.seungjun.sh';
       button.addEventListener('click', () => {
         const popup = window.open(
           `${origin}/auth`,
