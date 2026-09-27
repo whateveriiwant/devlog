@@ -53,6 +53,10 @@
         location.hostname === 'devlog-site-stage.seungjun-jeong10.workers.dev'
           ? 'https://devlog-cms-stage.seungjun-jeong10.workers.dev'
           : 'https://cms-api.seungjun.sh';
+      const requestedNext = new URLSearchParams(location.search).get('next');
+      const nextPath = requestedNext === '/admin/' || requestedNext === '/admin'
+        ? '/admin/'
+        : '/write/';
       button.addEventListener('click', () => {
         const popup = window.open(
           `${origin}/auth`,
@@ -88,7 +92,7 @@
               event.data.slice('authorization:github:success:'.length)
             ) as { token: string };
             sessionStorage.setItem('devlog-editor-token', data.token);
-            window.location.assign('/write/');
+            window.location.assign(nextPath);
           } else {
             button.disabled = false;
             status.textContent = 'GitHub 로그인에 실패했습니다.';
