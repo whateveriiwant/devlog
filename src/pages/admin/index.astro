@@ -1,0 +1,20 @@
+---
+import '../../styles/global.css';
+import AdminDashboard from '../../components/AdminDashboard';
+
+const title = '글 관리 · devlog';
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <AdminDashboard client:only="react" />
+  </body>
+</html>

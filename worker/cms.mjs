@@ -216,6 +216,9 @@ function editorSummary(post) {
     publishedAt: post.published_at,
     revision: post.revision,
     hasDraft: Boolean(post.has_draft),
+    seriesId: post.series_id,
+    seriesName: post.series_name,
+    updatedAt: post.updated_at,
   };
 }
 
@@ -314,21 +317,30 @@ async function editorContent(request, env, url) {
   if (url.pathname === '/editor/posts' && request.method === 'GET') {
     const [posts, drafts, series, trash] = await Promise.all([
       env.CONTENT.prepare(
-        `SELECT p.id, p.title, p.slug, p.published_at, p.revision,
+        `SELECT p.id, p.title, p.slug, p.published_at, p.updated_at, p.revision, p.series_id,
+          s.name AS series_name,
           EXISTS(SELECT 1 FROM post_drafts d WHERE d.post_id=p.id) AS has_draft
-         FROM posts p WHERE p.draft=0 AND p.deleted_at IS NULL
+         FROM posts p LEFT JOIN series s ON s.id=p.series_id
+         WHERE p.draft=0 AND p.deleted_at IS NULL
          ORDER BY p.published_at DESC, p.id DESC LIMIT 500`
       ).all(),
       env.CONTENT.prepare(
-        `SELECT post_id AS id, title, slug, revision, base_revision
-         FROM post_drafts ORDER BY updated_at DESC LIMIT 500`
+        `SELECT d.post_id AS id, d.title, d.slug, d.revision, d.base_revision, d.updated_at,
+          d.series_id, s.name AS series_name,
+          CASE WHEN p.id IS NULL THEN 0 ELSE 1 END AS is_published
+         FROM post_drafts d LEFT JOIN posts p ON p.id=d.post_id AND p.draft=0 AND p.deleted_at IS NULL
+         LEFT JOIN series s ON s.id=d.series_id
+         WHERE NOT EXISTS(SELECT 1 FROM posts deleted WHERE deleted.id=d.post_id AND deleted.deleted_at IS NOT NULL)
+         ORDER BY d.updated_at DESC LIMIT 500`
       ).all(),
       env.CONTENT.prepare(
         'SELECT id, name, slug, description FROM series ORDER BY name COLLATE NOCASE'
       ).all(),
       env.CONTENT.prepare(
-        `SELECT id, title, slug, published_at, revision, deleted_at
-         FROM posts WHERE draft=0 AND deleted_at IS NOT NULL
+        `SELECT p.id, p.title, p.slug, p.published_at, p.updated_at, p.revision, p.deleted_at,
+          p.series_id, s.name AS series_name
+         FROM posts p LEFT JOIN series s ON s.id=p.series_id
+         WHERE p.draft=0 AND p.deleted_at IS NOT NULL
          ORDER BY deleted_at DESC LIMIT 500`
       ).all(),
     ]);
@@ -340,6 +352,10 @@ async function editorContent(request, env, url) {
           title: draft.title,
           revision: draft.revision,
           baseRevision: draft.base_revision,
+          isPublished: Boolean(draft.is_published),
+          seriesId: draft.series_id,
+          seriesName: draft.series_name,
+          updatedAt: draft.updated_at,
         })),
         series: series.results,
         trash: trash.results.map((post) => ({

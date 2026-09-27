@@ -160,6 +160,7 @@ export default function WriteEditor({
   const editor = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const tokenRef = useRef(token);
+  const openedDeepLink = useRef(false);
 
   const slug = titleSlug(title);
   const previewTooLong = body.length > MAX_PREVIEW_CHARS;
@@ -342,6 +343,16 @@ export default function WriteEditor({
   useEffect(() => {
     if (!token) window.location.replace('/login/');
   }, [token]);
+
+  useEffect(() => {
+    if (!authorized || openedDeepLink.current) return;
+    const postId = new URLSearchParams(window.location.search).get('post');
+    if (!postId) return;
+    openedDeepLink.current = true;
+    void openPost(postId);
+    // Open a selected post only after the dashboard config has loaded.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authorized]);
 
   async function login() {
     try {
@@ -894,6 +905,7 @@ export default function WriteEditor({
               devlog
             </button>
             <div className="write-head-actions">
+              <a href="/admin/">글 관리</a>
               <button onClick={() => setPanel('posts')}>내 글</button>
               {token ? (
                 <button
