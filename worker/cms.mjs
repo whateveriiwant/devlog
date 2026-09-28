@@ -792,6 +792,7 @@ async function callback(request, env) {
           Authorization: `Basic ${btoa(`${env.GITHUB_CLIENT_ID}:${env.GITHUB_CLIENT_SECRET}`)}`,
           'Content-Type': 'application/json',
           'X-GitHub-Api-Version': '2026-03-10',
+          'User-Agent': 'devlog-cms',
         },
         body: JSON.stringify({ access_token: tokenData.access_token }),
       }
