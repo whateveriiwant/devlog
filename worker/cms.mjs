@@ -74,6 +74,10 @@ function json(data, status = 200, headers = {}) {
   });
 }
 
+function redirect(location) {
+  return new Response(null, { status: 302, headers: { Location: location } });
+}
+
 function cookie(request, name) {
   return request.headers
     .get('Cookie')
@@ -725,9 +729,8 @@ async function callback(request, env) {
     '__Host-cms_oauth_verifier=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
   ];
   const fail = (reason) => {
-    const response = Response.redirect(
-      new URL(`/login/?error=${encodeURIComponent(reason)}`, env.SITE_ORIGIN),
-      302
+    const response = redirect(
+      new URL(`/login/?error=${encodeURIComponent(reason)}`, env.SITE_ORIGIN)
     );
     for (const value of clearState) response.headers.append('Set-Cookie', value);
     return response;
@@ -800,12 +803,11 @@ async function callback(request, env) {
       .bind('github_read_user_scope', Math.floor(Date.now() / 1000))
       .run();
     const next = cookie(request, '__Host-cms_oauth_next') || '/write/';
-    const response = Response.redirect(
+    const response = redirect(
       new URL(
         `/api/auth/start?next=${encodeURIComponent(next)}`,
         env.SITE_ORIGIN
-      ),
-      302
+      )
     );
     for (const value of clearState) response.headers.append('Set-Cookie', value);
     return response;
@@ -829,7 +831,7 @@ async function callback(request, env) {
 
   const next = cookie(request, '__Host-cms_oauth_next');
   const destination = ['/admin/', '/write/'].includes(next) ? next : '/write/';
-  const result = Response.redirect(new URL(destination, env.SITE_ORIGIN), 302);
+  const result = redirect(new URL(destination, env.SITE_ORIGIN));
   for (const value of clearState) result.headers.append('Set-Cookie', value);
   result.headers.append(
     'Set-Cookie',
