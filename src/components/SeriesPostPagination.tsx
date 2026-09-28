@@ -31,7 +31,8 @@ export function D1SeriesPostPagination() {
     const slug = window.location.pathname
       .slice('/blog/'.length)
       .replace(/\/$/, '');
-    const query = requestedPage === null ? '' : `?page=${String(requestedPage)}`;
+    const query =
+      requestedPage === null ? '' : `?page=${String(requestedPage)}`;
     void fetch(`/api/content/posts/${slug}/series${query}`, {
       signal: controller.signal,
     })
