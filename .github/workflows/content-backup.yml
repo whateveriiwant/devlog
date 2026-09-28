@@ -50,7 +50,15 @@ jobs:
         run: |
           umask 077
           mkdir -p "$RUNNER_TEMP/devlog-backup"
-          pnpm exec wrangler d1 export devlog-content --remote --config wrangler.cms.jsonc --output "$RUNNER_TEMP/devlog-backup/content.sql" > "$RUNNER_TEMP/devlog-backup/export.log" 2>&1
+          if ! pnpm exec wrangler d1 export devlog-content --remote --config wrangler.cms.jsonc --output "$RUNNER_TEMP/devlog-backup/content.sql" > "$RUNNER_TEMP/devlog-backup/export.log" 2>&1; then
+            node --input-type=module -e '
+            import fs from "node:fs";
+            let log=fs.readFileSync(process.env.RUNNER_TEMP+"/devlog-backup/export.log","utf8").replace(/https?:\/\/\S+/g,"[URL omitted]");
+            for (const [name,value] of Object.entries(process.env)) if (/TOKEN|SECRET|KEY/.test(name) && value.length>7) log=log.replaceAll(value,"[redacted]");
+            console.error(log);
+            '
+            exit 1
+          fi
           node scripts/backup-content.mjs capture "$RUNNER_TEMP/devlog-backup/content.sql" "$RUNNER_TEMP/devlog-backup/snapshot"
           node scripts/backup-content.mjs restore "$RUNNER_TEMP/devlog-backup/snapshot" "$RUNNER_TEMP/devlog-backup/restore"
       - name: Encrypt and store private backup
