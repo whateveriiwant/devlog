@@ -17,6 +17,7 @@
       "/write/*",
       "/admin",
       "/admin/*",
+      "/api/auth/*",
       "/api/content/*",
       "/blog/*",
       "/series",
