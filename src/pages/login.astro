@@ -47,58 +47,24 @@
       <p id="status" role="status"></p>
     </main>
     <script>
+      sessionStorage.removeItem('devlog-editor-token');
       const button = document.querySelector<HTMLButtonElement>('#login')!;
       const status = document.querySelector<HTMLElement>('#status')!;
-      const origin =
-        location.hostname === 'devlog-site-stage.seungjun-jeong10.workers.dev'
-          ? 'https://devlog-cms-stage.seungjun-jeong10.workers.dev'
-          : 'https://cms-api.seungjun.sh';
+      const reason = new URLSearchParams(location.search).get('error');
+      if (reason) {
+        status.textContent = reason === 'revoke'
+          ? '기존 GitHub 권한을 정리하지 못했습니다. 다시 시도해 주세요.'
+          : 'GitHub 로그인에 실패했습니다. 다시 시도해 주세요.';
+      }
       const requestedNext = new URLSearchParams(location.search).get('next');
       const nextPath = requestedNext === '/admin/' || requestedNext === '/admin'
         ? '/admin/'
         : '/write/';
       button.addEventListener('click', () => {
-        const popup = window.open(
-          `${origin}/auth`,
-          'devlog-github-login',
-          'width=620,height=720'
-        );
-        if (!popup) {
-          status.textContent = '로그인 팝업을 열 수 없습니다.';
-          return;
-        }
         button.disabled = true;
-        const timeout = window.setTimeout(() => {
-          window.removeEventListener('message', receive);
-          button.disabled = false;
-          status.textContent = '로그인 시간이 초과되었습니다.';
-        }, 120_000);
-        const receive = (event: MessageEvent) => {
-          if (event.origin !== origin || event.source !== popup) return;
-          if (event.data === 'authorizing:github') {
-            popup.postMessage('authorizing:github', origin);
-            return;
-          }
-          if (
-            typeof event.data !== 'string' ||
-            !event.data.startsWith('authorization:github:')
-          )
-            return;
-          window.clearTimeout(timeout);
-          window.removeEventListener('message', receive);
-          popup.close();
-          if (event.data.startsWith('authorization:github:success:')) {
-            const data = JSON.parse(
-              event.data.slice('authorization:github:success:'.length)
-            ) as { token: string };
-            sessionStorage.setItem('devlog-editor-token', data.token);
-            window.location.assign(nextPath);
-          } else {
-            button.disabled = false;
-            status.textContent = 'GitHub 로그인에 실패했습니다.';
-          }
-        };
-        window.addEventListener('message', receive);
+        window.location.assign(
+          `/api/auth/start?next=${encodeURIComponent(nextPath)}`
+        );
       });
     </script>
   </body>

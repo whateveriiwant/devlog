@@ -677,6 +677,7 @@ async function renderSitemap(request, env, url) {
 
 function contentApiPath(path) {
   if (path === '/api/content/editor-config') return '/editor/config';
+  if (path === '/api/content/editor/media') return '/media';
   if (path === '/api/content/editor/posts') return '/editor/posts';
   if (path.startsWith('/api/content/editor/posts/'))
     return `/editor/posts/${path.slice('/api/content/editor/posts/'.length)}`;
@@ -687,6 +688,14 @@ function contentApiPath(path) {
   if (path === '/api/content/tags') return '/tags';
   if (path === '/api/content/tag-relations') return '/tag-relations';
   if (path === '/api/content/search') return '/search';
+  return null;
+}
+
+function authApiPath(path) {
+  if (path === '/api/auth/start') return '/auth';
+  if (path === '/api/auth/callback') return '/callback';
+  if (path === '/api/auth/session') return '/session';
+  if (path === '/api/auth/logout') return '/logout';
   return null;
 }
 
@@ -748,7 +757,21 @@ export default {
       request.method === 'GET'
     )
       return renderArticle(request, env, url);
+    const authPath = authApiPath(url.pathname);
     const contentPath = contentApiPath(url.pathname);
+    if (authPath) {
+      if (
+        authPath === '/logout' &&
+        request.headers.get('Origin') !== env.SITE_ORIGIN
+      )
+        return new Response(JSON.stringify({ error: 'Forbidden origin' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        });
+      const target = new URL(request.url);
+      target.pathname = authPath;
+      return env.CMS.fetch(new Request(target, request));
+    }
     if (
       contentPath &&
       (request.method === 'GET' ||
@@ -799,9 +822,7 @@ export default {
     }
 
     const cookie = request.headers.get('Cookie') || '';
-    if (
-      !cookie.split(';').some((part) => part.trim().startsWith('cms_gate='))
-    ) {
+    if (!cookie.split(';').some((part) => part.trim().startsWith('__Host-cms_session='))) {
       const next = `${url.pathname}${url.search}`;
       return Response.redirect(
         `${url.origin}/login/?next=${encodeURIComponent(next)}`,

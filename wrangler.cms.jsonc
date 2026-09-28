@@ -35,7 +35,6 @@
         "CONTENT_WRITES": "true",
         "STAGE_HEALTH": "true",
         "STAGE_CONTENT_WRITES": "true",
-        "AUTH_ORIGIN": "https://devlog-cms-stage.seungjun-jeong10.workers.dev",
       },
       "d1_databases": [
         {

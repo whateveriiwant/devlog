@@ -5,7 +5,6 @@ import YAML from 'yaml';
 import './write-editor.css';
 
 const API = 'https://api.github.com/repos/whateveriiwant/devlog';
-const AUTH = 'https://cms-api.seungjun.sh';
 const POST_PATH = 'src/content/posts';
 const SERIES_PATH = 'src/content/series.json';
 const MAX_PREVIEW_CHARS = 100_000;
@@ -126,14 +125,8 @@ export default function WriteEditor({
   posts: PostSummary[];
   initialSeries: Series[];
 }) {
-  const [token, setToken] = useState(() =>
-    typeof window === 'undefined'
-      ? ''
-      : (sessionStorage.getItem('devlog-editor-token') ?? '')
-  );
   const [authorized, setAuthorized] = useState(false);
   const [d1Mode, setD1Mode] = useState(false);
-  const [authOrigin, setAuthOrigin] = useState(AUTH);
   const [posts, setPosts] = useState(initialPosts);
   const [trash, setTrash] = useState<PostSummary[]>([]);
   const [series, setSeries] = useState(initialSeries);
@@ -159,7 +152,7 @@ export default function WriteEditor({
   const [preview, setPreview] = useState(false);
   const editor = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
-  const tokenRef = useRef(token);
+  const tokenRef = useRef('');
   const openedDeepLink = useRef(false);
 
   const slug = titleSlug(title);
@@ -173,49 +166,15 @@ export default function WriteEditor({
   );
 
   function authenticate() {
-    return new Promise<string>((resolve, reject) => {
-      const popup = window.open(
-        `${authOrigin}/auth`,
-        'devlog-github-login',
-        'width=620,height=720'
-      );
-      if (!popup) {
-        reject(new Error('로그인 팝업을 열 수 없습니다.'));
-        return;
-      }
-      const timeout = window.setTimeout(() => {
-        window.removeEventListener('message', receive);
-        reject(new Error('로그인 시간이 초과되었습니다.'));
-      }, 120_000);
-      const receive = (event: MessageEvent) => {
-        if (event.origin !== authOrigin || event.source !== popup) return;
-        if (event.data === 'authorizing:github') {
-          popup.postMessage('authorizing:github', authOrigin);
-          return;
-        }
-        if (typeof event.data !== 'string') return;
-        if (!event.data.startsWith('authorization:github:')) return;
-        window.clearTimeout(timeout);
-        window.removeEventListener('message', receive);
-        popup.close();
-        const result = event.data.slice('authorization:github:'.length);
-        if (result.startsWith('success:')) {
-          const received = parseJson<{ token: string }>(
-            result.slice('success:'.length)
-          ).token;
-          resolve(received);
-        } else {
-          reject(new Error('GitHub 로그인에 실패했습니다.'));
-        }
-      };
-      window.addEventListener('message', receive);
-    });
+    window.location.assign('/api/auth/start?next=%2Fwrite%2F');
   }
 
   async function github<T>(
     path: string,
     options: RequestInit = {}
   ): Promise<T> {
+    if (!tokenRef.current)
+      throw new Error('Git 기반 편집 기능은 비활성화되어 있습니다.');
     const headers = new Headers(options.headers);
     headers.set('Accept', 'application/vnd.github+json');
     headers.set('Authorization', `Bearer ${tokenRef.current}`);
@@ -242,11 +201,11 @@ export default function WriteEditor({
     options: RequestInit = {}
   ): Promise<T> {
     const headers = new Headers(options.headers);
-    headers.set('Authorization', `Bearer ${tokenRef.current}`);
     if (options.body) headers.set('Content-Type', 'application/json');
     const response = await fetch(`/api/content/editor${path}`, {
       ...options,
       headers,
+      credentials: 'same-origin',
     });
     const result = (await response.json().catch(() => ({}))) as {
       error?: string;
@@ -311,38 +270,36 @@ export default function WriteEditor({
   }
 
   useEffect(() => {
-    if (!token) return;
+    sessionStorage.removeItem('devlog-editor-token');
     // Loading starts after authentication; all updates happen after network I/O.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void (async () => {
+      const session = await fetch('/api/auth/session', {
+        credentials: 'same-origin',
+      });
+      if (!session.ok) {
+        window.location.replace('/login/?next=%2Fwrite%2F');
+        return;
+      }
       const config = await fetch('/api/content/editor-config').then(
         (response) => {
           if (!response.ok)
             throw new Error('편집기 설정을 불러오지 못했습니다.');
           return response.json() as Promise<{
             enabled: boolean;
-            authOrigin?: string;
           }>;
         }
       );
-      setAuthOrigin(config.authOrigin || AUTH);
       setD1Mode(config.enabled);
-      if (config.enabled) await loadD1Dashboard();
-      else await loadDashboard();
+      if (!config.enabled) throw new Error('D1 기반 편집기가 비활성화되어 있습니다.');
+      await loadD1Dashboard();
       setAuthorized(true);
     })().catch(() => {
-      sessionStorage.removeItem('devlog-editor-token');
-      tokenRef.current = '';
-      setToken('');
-      window.location.replace('/login/');
+      window.location.replace('/login/?next=%2Fwrite%2F');
     });
     // Dashboard only needs to refresh after login or a successful save.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
-
-  useEffect(() => {
-    if (!token) window.location.replace('/login/');
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     if (!authorized || openedDeepLink.current) return;
@@ -354,16 +311,8 @@ export default function WriteEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authorized]);
 
-  async function login() {
-    try {
-      const received = await authenticate();
-      tokenRef.current = received;
-      sessionStorage.setItem('devlog-editor-token', received);
-      setToken(received);
-      setStatus('');
-    } catch (error) {
-      setStatus((error as Error).message);
-    }
+  function login() {
+    authenticate();
   }
 
   function reset() {
@@ -556,12 +505,11 @@ export default function WriteEditor({
     setStatus('이미지를 R2에 업로드하고 있습니다…');
     try {
       const optimized = await optimizeImage(file);
-      const response = await fetch(`${authOrigin}/media`, {
+      const response = await fetch('/api/content/editor/media', {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'same-origin',
         headers: {
           'Content-Type': optimized.type,
-          Authorization: `Bearer ${tokenRef.current}`,
         },
         body: optimized,
       });
@@ -610,7 +558,7 @@ export default function WriteEditor({
   }
 
   async function save(publish: boolean) {
-    if (!tokenRef.current) {
+    if (!d1Mode && !tokenRef.current) {
       setStatus('먼저 GitHub에 로그인해 주세요.');
       return;
     }
@@ -888,9 +836,6 @@ export default function WriteEditor({
     post.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (!token) {
-    return null;
-  }
   if (!authorized) return <p role="status">로그인 확인 중…</p>;
 
   return (
@@ -907,15 +852,12 @@ export default function WriteEditor({
             <div className="write-head-actions">
               <a href="/admin/">글 관리</a>
               <button onClick={() => setPanel('posts')}>내 글</button>
-              {token ? (
+              {authorized ? (
                 <button
                   onClick={() => {
-                    sessionStorage.removeItem('devlog-editor-token');
-                    tokenRef.current = '';
-                    setToken('');
-                    void fetch(`${AUTH}/logout`, {
+                    void fetch('/api/auth/logout', {
                       method: 'POST',
-                      credentials: 'include',
+                      credentials: 'same-origin',
                     }).finally(() => {
                       window.location.replace('/login/');
                     });
@@ -1165,7 +1107,7 @@ export default function WriteEditor({
                 <button className="write-new-post" onClick={reset}>
                   + 새 글 쓰기
                 </button>
-                {!token && (
+                {!authorized && (
                   <button className="write-login-hint" onClick={login}>
                     GitHub 로그인하여 글 불러오기
                   </button>

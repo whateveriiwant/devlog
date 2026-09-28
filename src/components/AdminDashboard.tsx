@@ -71,11 +71,6 @@ function dateLabel(value?: string) {
 }
 
 export default function AdminDashboard() {
-  const [token] = useState(() =>
-    typeof window === 'undefined'
-      ? ''
-      : (sessionStorage.getItem('devlog-editor-token') ?? '')
-  );
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [status, setStatus] = useState<Status>('published');
   const [search, setSearch] = useState('');
@@ -86,15 +81,15 @@ export default function AdminDashboard() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!token) {
-      window.location.replace('/login/?next=%2Fadmin%2F');
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (!token) return;
-    const headers = new Headers({ Authorization: `Bearer ${token}` });
-    void fetch('/api/content/editor-config')
+    sessionStorage.removeItem('devlog-editor-token');
+    void fetch('/api/auth/session', { credentials: 'same-origin' })
+      .then((response) => {
+        if (!response.ok) {
+          window.location.replace('/login/?next=%2Fadmin%2F');
+          throw new Error('로그인이 필요합니다.');
+        }
+        return fetch('/api/content/editor-config');
+      })
       .then(async (response) => {
         if (!response.ok) throw new Error('편집기 설정을 확인하지 못했습니다.');
         return (await response.json()) as { enabled: boolean };
@@ -102,7 +97,7 @@ export default function AdminDashboard() {
       .then(async (config) => {
         if (!config.enabled)
           throw new Error('현재 글 관리 API를 사용할 수 없습니다.');
-        const response = await fetch('/api/content/editor/posts', { headers });
+        const response = await fetch('/api/content/editor/posts');
         const result = (await response.json()) as Dashboard & {
           error?: string;
         };
@@ -119,11 +114,10 @@ export default function AdminDashboard() {
             : '글 목록을 불러오지 못했습니다.'
         );
         if (reason instanceof Error && reason.message.includes('로그인')) {
-          sessionStorage.removeItem('devlog-editor-token');
           window.location.replace('/login/?next=%2Fadmin%2F');
         }
       });
-  }, [token]);
+  }, []);
 
   const source = useMemo(() => {
     if (!dashboard) return [];
@@ -155,11 +149,11 @@ export default function AdminDashboard() {
 
   async function editorRequest(path: string, options: RequestInit = {}) {
     const headers = new Headers(options.headers);
-    headers.set('Authorization', `Bearer ${token}`);
     if (options.body) headers.set('Content-Type', 'application/json');
     const response = await fetch(`/api/content/editor${path}`, {
       ...options,
       headers,
+      credentials: 'same-origin',
     });
     const result = (await response.json().catch(() => ({}))) as {
       error?: string;

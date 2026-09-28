@@ -90,33 +90,23 @@ function base64url(bytes) {
     .replace(/=+$/, '');
 }
 
-async function sign(value, secret) {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
+async function authenticated(request, env) {
+  if (!env.CONTENT) return false;
+  const value = cookie(request, '__Host-cms_session');
+  if (!value || !/^[A-Za-z0-9_-]{40,60}$/.test(value)) return false;
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(value)
   );
-  return base64url(
-    new Uint8Array(
-      await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(value))
-    )
-  );
-}
-
-async function authenticated(request, env, name = 'cms_session') {
-  if (!env.SESSION_SECRET) return false;
-  const value = cookie(request, name);
-  if (!value) return false;
-  const [login, expires, signature] = value.split('.');
-  if (
-    login !== env.GITHUB_ALLOWED_LOGIN ||
-    !/^\d+$/.test(expires) ||
-    Number(expires) < Date.now()
+  const idHash = [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+  const row = await env.CONTENT.prepare(
+    'SELECT login FROM admin_sessions WHERE id_hash=? AND expires_at>?'
   )
-    return false;
-  return signature === (await sign(`${login}.${expires}`, env.SESSION_SECRET));
+    .bind(idHash, Math.floor(Date.now() / 1000))
+    .first();
+  return row?.login === env.GITHUB_ALLOWED_LOGIN;
 }
 
 function cors(request, env) {
@@ -125,33 +115,10 @@ function cors(request, env) {
         'Access-Control-Allow-Origin': env.SITE_ORIGIN,
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type',
         Vary: 'Origin',
       }
     : null;
-}
-
-async function isEditor(request, env) {
-  if (request.headers.get('Origin') !== env.SITE_ORIGIN) return false;
-  if (await authenticated(request, env)) return true;
-  const token = request.headers
-    .get('Authorization')
-    ?.match(/^Bearer (.+)$/)?.[1];
-  if (!token) return false;
-  try {
-    const response = await fetch('https://api.github.com/user', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json',
-        'User-Agent': 'devlog-cms',
-      },
-    });
-    if (!response.ok) return false;
-    const user = await response.json();
-    return user.login === env.GITHUB_ALLOWED_LOGIN;
-  } catch {
-    return false;
-  }
 }
 
 function editorHeaders(request, env) {
@@ -160,7 +127,7 @@ function editorHeaders(request, env) {
     'Access-Control-Allow-Origin': env.SITE_ORIGIN,
     'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type',
     Vary: 'Origin',
   };
 }
@@ -231,14 +198,13 @@ async function editorContent(request, env, url) {
     return json(
       {
         enabled: contentWritesEnabled(env),
-        authOrigin: env.AUTH_ORIGIN || 'https://cms-api.seungjun.sh',
       },
       200,
       headers
     );
   if (!env.CONTENT || !contentWritesEnabled(env))
     return json({ error: 'Editor D1 writes are disabled' }, 404, headers);
-  if (!(await isEditor(request, env)))
+  if (!(await authenticated(request, env)))
     return json(
       { error: '로그인이 필요하거나 허용되지 않은 계정입니다.' },
       401,
@@ -748,45 +714,35 @@ async function editorContent(request, env, url) {
   return json({ error: 'Not found' }, 404, headers);
 }
 
-function popup(origin, message, headers = {}) {
-  const safeMessage = JSON.stringify(message).replace(/</g, '\\u003c');
-  const safeOrigin = JSON.stringify(origin);
-  const html = `<!doctype html><meta charset="utf-8"><title>GitHub 로그인</title><script>
-    const message = ${safeMessage};
-    const origin = ${safeOrigin};
-    if (window.opener) {
-      window.addEventListener('message', (event) => {
-        if (event.source === window.opener && event.origin === origin && event.data === 'authorizing:github') {
-          window.opener.postMessage(message, origin);
-        }
-      });
-      window.opener.postMessage('authorizing:github', origin);
-    }
-  </script><p>로그인 결과를 편집기로 전달하는 중입니다. 이 창은 곧 닫힙니다.</p>`;
-  return new Response(html, {
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-store',
-      'Content-Security-Policy':
-        "default-src 'none'; script-src 'unsafe-inline'; style-src 'none'; base-uri 'none'",
-      ...headers,
-    },
-  });
-}
-
-async function callback(request, env, url) {
-  const state = url.searchParams.get('state');
-  const code = url.searchParams.get('code');
-  const valid = state && code && state === cookie(request, 'cms_oauth_state');
-  const clearState =
-    'cms_oauth_state=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0';
-  if (!valid)
-    return popup(
-      env.SITE_ORIGIN,
-      'authorization:github:error:{"message":"Invalid OAuth state"}',
-      { 'Set-Cookie': clearState }
+async function callback(request, env) {
+  const params = new URL(request.url).searchParams;
+  const state = params.get('state');
+  const code = params.get('code');
+  const verifier = cookie(request, '__Host-cms_oauth_verifier');
+  const clearState = [
+    '__Host-cms_oauth_state=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
+    '__Host-cms_oauth_next=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
+    '__Host-cms_oauth_verifier=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
+    '__Host-cms_oauth_fresh=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
+  ];
+  const fail = (reason) => {
+    const response = Response.redirect(
+      new URL(`/login/?error=${encodeURIComponent(reason)}`, env.SITE_ORIGIN),
+      302
     );
+    for (const value of clearState) response.headers.append('Set-Cookie', value);
+    return response;
+  };
+  if (
+    !state ||
+    !code ||
+    !verifier ||
+    state !== cookie(request, '__Host-cms_oauth_state') ||
+    !env.CONTENT
+  )
+    return fail('state');
 
+  const redirectUri = `${env.SITE_ORIGIN}/api/auth/callback`;
   const tokenResponse = await fetch(
     'https://github.com/login/oauth/access_token',
     {
@@ -799,18 +755,14 @@ async function callback(request, env, url) {
         client_id: env.GITHUB_CLIENT_ID,
         client_secret: env.GITHUB_CLIENT_SECRET,
         code,
-        redirect_uri: `${url.origin}/callback`,
+        redirect_uri: redirectUri,
         state,
+        code_verifier: verifier,
       }),
     }
   );
   const tokenData = await tokenResponse.json();
-  if (!tokenResponse.ok || !tokenData.access_token)
-    return popup(
-      env.SITE_ORIGIN,
-      'authorization:github:error:{"message":"GitHub token exchange failed"}',
-      { 'Set-Cookie': clearState }
-    );
+  if (!tokenResponse.ok || !tokenData.access_token) return fail('github');
 
   const userResponse = await fetch('https://api.github.com/user', {
     headers: {
@@ -821,27 +773,66 @@ async function callback(request, env, url) {
   });
   const user = await userResponse.json();
   if (!userResponse.ok || user.login !== env.GITHUB_ALLOWED_LOGIN)
-    return popup(
-      env.SITE_ORIGIN,
-      'authorization:github:error:{"message":"Unauthorized GitHub account"}',
-      { 'Set-Cookie': clearState }
-    );
+    return fail('account');
 
-  const expires = Date.now() + SESSION_SECONDS * 1000;
-  const body = `${user.login}.${expires}`;
-  const session = `${body}.${await sign(body, env.SESSION_SECRET)}`;
-  const result = popup(
-    env.SITE_ORIGIN,
-    `authorization:github:success:${JSON.stringify({ provider: 'github', token: tokenData.access_token })}`
+  if (cookie(request, '__Host-cms_oauth_fresh') !== '1') {
+    const revoke = await fetch(
+      `https://api.github.com/applications/${encodeURIComponent(env.GITHUB_CLIENT_ID)}/grant`,
+      {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Basic ${btoa(`${env.GITHUB_CLIENT_ID}:${env.GITHUB_CLIENT_SECRET}`)}`,
+          'Content-Type': 'application/json',
+          'X-GitHub-Api-Version': '2026-03-10',
+        },
+        body: JSON.stringify({ access_token: tokenData.access_token }),
+      }
+    );
+    if (!revoke.ok) return fail('revoke');
+    const next = cookie(request, '__Host-cms_oauth_next') || '/write/';
+    const response = Response.redirect(
+      new URL(
+        `/api/auth/start?fresh=1&next=${encodeURIComponent(next)}`,
+        env.SITE_ORIGIN
+      ),
+      302
+    );
+    for (const value of clearState) response.headers.append('Set-Cookie', value);
+    return response;
+  }
+
+  const session = base64url(crypto.getRandomValues(new Uint8Array(32)));
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(session)
   );
-  result.headers.append('Set-Cookie', clearState);
+  const idHash = [...new Uint8Array(digest)]
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+  const now = Math.floor(Date.now() / 1000);
+  await env.CONTENT.batch([
+    env.CONTENT.prepare('DELETE FROM admin_sessions WHERE expires_at<=?').bind(now),
+    env.CONTENT.prepare(
+      'INSERT INTO admin_sessions(id_hash,login,created_at,expires_at) VALUES(?,?,?,?)'
+    ).bind(idHash, user.login, now, now + SESSION_SECONDS),
+  ]);
+
+  const next = cookie(request, '__Host-cms_oauth_next');
+  const destination = ['/admin/', '/write/'].includes(next) ? next : '/write/';
+  const result = Response.redirect(new URL(destination, env.SITE_ORIGIN), 302);
+  for (const value of clearState) result.headers.append('Set-Cookie', value);
   result.headers.append(
     'Set-Cookie',
-    `cms_session=${session}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}`
+    `__Host-cms_session=${session}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}`
   );
   result.headers.append(
     'Set-Cookie',
-    `cms_gate=${session}; Domain=seungjun.sh; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}`
+    'cms_session=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0'
+  );
+  result.headers.append(
+    'Set-Cookie',
+    'cms_gate=; Domain=seungjun.sh; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0'
   );
   return result;
 }
@@ -851,7 +842,7 @@ async function media(request, env, url) {
   if (!headers) return json({ error: 'Forbidden origin' }, 403);
   if (request.method === 'OPTIONS')
     return new Response(null, { status: 204, headers });
-  if (!(await authenticated(request, env)) && !(await isEditor(request, env)))
+  if (!(await authenticated(request, env)))
     return json(
       { error: '로그인이 필요합니다. 편집기에서 다시 로그인하세요.' },
       401,
@@ -1234,38 +1225,84 @@ export default {
       if (
         !env.GITHUB_CLIENT_ID ||
         !env.GITHUB_CLIENT_SECRET ||
-        !env.SESSION_SECRET
+        !env.CONTENT
       )
         return json({ error: 'CMS secrets are missing' }, 503);
       const state = crypto.randomUUID();
+      const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+      const challenge = base64url(
+        new Uint8Array(
+          await crypto.subtle.digest(
+            'SHA-256',
+            new TextEncoder().encode(verifier)
+          )
+        )
+      );
       const authorize = new URL('https://github.com/login/oauth/authorize');
       authorize.searchParams.set('client_id', env.GITHUB_CLIENT_ID);
-      authorize.searchParams.set('redirect_uri', `${url.origin}/callback`);
-      authorize.searchParams.set('scope', 'public_repo');
+      authorize.searchParams.set(
+        'redirect_uri',
+        `${env.SITE_ORIGIN}/api/auth/callback`
+      );
+      authorize.searchParams.set('scope', 'read:user');
       authorize.searchParams.set('state', state);
-      return new Response(null, {
-        status: 302,
-        headers: {
-          Location: authorize.href,
-          'Set-Cookie': `cms_oauth_state=${state}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=600`,
-          'Cache-Control': 'no-store',
-        },
+      authorize.searchParams.set('code_challenge', challenge);
+      authorize.searchParams.set('code_challenge_method', 'S256');
+      const next = ['/admin/', '/admin', '/write/', '/write'].includes(
+        url.searchParams.get('next')
+      )
+        ? url.searchParams.get('next').replace(/\/$/, '') + '/'
+        : '/write/';
+      const headers = new Headers({
+        Location: authorize.href,
+        'Cache-Control': 'no-store',
       });
+      headers.append(
+        'Set-Cookie',
+        `__Host-cms_oauth_state=${state}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=600`
+      );
+      headers.append(
+        'Set-Cookie',
+        `__Host-cms_oauth_next=${next}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=600`
+      );
+      headers.append(
+        'Set-Cookie',
+        `__Host-cms_oauth_verifier=${verifier}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=600`
+      );
+      headers.append(
+        'Set-Cookie',
+        `__Host-cms_oauth_fresh=${url.searchParams.get('fresh') === '1' ? '1' : ''}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=600`
+      );
+      return new Response(null, { status: 302, headers });
     }
     if (url.pathname === '/callback' && request.method === 'GET')
-      return callback(request, env, url);
+      return callback(request, env);
     if (url.pathname === '/session' && request.method === 'GET')
       return new Response(null, {
-        status: (await authenticated(request, env, 'cms_gate')) ? 204 : 401,
+        status: (await authenticated(request, env)) ? 204 : 401,
         headers: { 'Cache-Control': 'no-store' },
       });
     if (url.pathname === '/logout' && request.method === 'POST') {
-      const headers = cors(request, env);
-      if (!headers) return json({ error: 'Forbidden origin' }, 403);
+      if (request.headers.get('Origin') !== env.SITE_ORIGIN)
+        return json({ error: 'Forbidden origin' }, 403);
+      const session = cookie(request, '__Host-cms_session');
+      if (session) {
+        const digest = await crypto.subtle.digest(
+          'SHA-256',
+          new TextEncoder().encode(session)
+        );
+        const idHash = [...new Uint8Array(digest)]
+          .map((byte) => byte.toString(16).padStart(2, '0'))
+          .join('');
+        await env.CONTENT.prepare('DELETE FROM admin_sessions WHERE id_hash=?')
+          .bind(idHash)
+          .run();
+      }
+      const headers = new Headers({ 'Cache-Control': 'no-store' });
       const result = new Response(null, { status: 204, headers });
       result.headers.append(
         'Set-Cookie',
-        'cms_session=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0'
+        '__Host-cms_session=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0'
       );
       result.headers.append(
         'Set-Cookie',
