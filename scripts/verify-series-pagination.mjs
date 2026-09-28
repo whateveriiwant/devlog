@@ -43,6 +43,7 @@ insert.run('draft', 'draft', '초안', 'series', 1, null);
 insert.run('deleted', 'deleted', '휴지통', 'series', 0, '2026-09-28');
 insert.run('other', 'other', '다른 글', 'other', 0, null);
 insert.run('solo', 'solo', '개별 글', null, 0, null);
+insert.run('series-slug', 'series', 'series 주소 글', null, 0, null);
 
 async function read(slug, query = '', origin) {
   return cms.fetch(
@@ -91,6 +92,15 @@ assert.equal(
   403
 );
 assert.equal((await (await read('solo')).json()).totalCount, 0);
+const existingDetail = await cms.fetch(
+  new Request('https://cms.example/posts/series'),
+  env
+);
+assert.equal(
+  existingDetail.status,
+  200,
+  'A post named series must keep its existing detail route'
+);
 
 // A publish, delete, restore and series change must appear on the next read.
 insert.run('new', 'new', '새 글', 'series', 0, null);

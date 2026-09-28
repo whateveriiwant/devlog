@@ -998,12 +998,11 @@ async function publicContent(request, env, url) {
   if (!env.CONTENT)
     return json({ error: 'Content database is unavailable' }, 503, headers);
 
-  if (url.pathname.startsWith('/posts/') && url.pathname.endsWith('/series')) {
+  const seriesRoute = url.pathname.match(/^\/posts\/([^/]+)\/series$/);
+  if (seriesRoute) {
     let slug;
     try {
-      slug = decodeURIComponent(
-        url.pathname.slice('/posts/'.length, -'/series'.length)
-      );
+      slug = decodeURIComponent(seriesRoute[1]);
     } catch {
       return json({ error: 'Invalid slug' }, 400, headers);
     }
