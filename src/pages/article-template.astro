@@ -1,5 +1,6 @@
 ---
 import ArticleBreadcrumb from '../components/ArticleBreadcrumb';
+import { D1SeriesPostPagination } from '../components/SeriesPostPagination';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const date = new Date('2000-01-01T00:00:00.000Z');
@@ -32,6 +33,9 @@ const date = new Date('2000-01-01T00:00:00.000Z');
     <div class="prose" data-template-body></div>
     <footer data-template-footer>
       <div class="article-pagination" data-template-pagination></div>
+      <div data-template-series>
+        <D1SeriesPostPagination client:only="react" />
+      </div>
     </footer>
   </article>
   <div slot="right" class="desktop-toc" data-template-toc></div>
