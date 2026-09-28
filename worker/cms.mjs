@@ -796,7 +796,11 @@ async function callback(request, env) {
         body: JSON.stringify({ access_token: tokenData.access_token }),
       }
     );
-    if (!revoke.ok) return fail('revoke');
+    if (!revoke.ok) {
+      const { message } = await revoke.json().catch(() => ({}));
+      console.error('OAuth grant reset rejected', revoke.status, message);
+      return fail('revoke');
+    }
     await env.CONTENT.prepare(
       'INSERT OR IGNORE INTO auth_migrations(name,completed_at) VALUES(?,?)'
     )
