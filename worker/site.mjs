@@ -214,6 +214,11 @@ async function renderArticle(request, env, url) {
         element.setInnerContent(markup.pagination, { html: true });
       },
     })
+    .on('[data-template-series]', {
+      element(element) {
+        if (!post.series_id || !post.series_name) element.remove();
+      },
+    })
     .on('[data-template-mobile-toc]', {
       element(element) {
         if (post.headings.length)

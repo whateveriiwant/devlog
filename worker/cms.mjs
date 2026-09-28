@@ -998,6 +998,80 @@ async function publicContent(request, env, url) {
   if (!env.CONTENT)
     return json({ error: 'Content database is unavailable' }, 503, headers);
 
+  if (url.pathname.startsWith('/posts/') && url.pathname.endsWith('/series')) {
+    let slug;
+    try {
+      slug = decodeURIComponent(
+        url.pathname.slice('/posts/'.length, -'/series'.length)
+      );
+    } catch {
+      return json({ error: 'Invalid slug' }, 400, headers);
+    }
+    if (!slug || slug.includes('/'))
+      return json({ error: 'Invalid slug' }, 400, headers);
+    const requestedPage = url.searchParams.get('page');
+    if (requestedPage !== null && !/^\d{1,9}$/.test(requestedPage))
+      return json({ error: 'Invalid page' }, 400, headers);
+    const post = await env.CONTENT.prepare(
+      `SELECT p.id, p.published_at, p.series_id, s.name AS series_name
+       FROM posts p LEFT JOIN series s ON s.id = p.series_id
+       WHERE p.slug = ? AND p.draft = 0 AND p.deleted_at IS NULL`
+    )
+      .bind(slug)
+      .first();
+    if (!post) return json({ error: 'Not found' }, 404, headers);
+    if (!post.series_id || !post.series_name)
+      return json(
+        { name: '', posts: [], page: 0, totalCount: 0 },
+        200,
+        headers
+      );
+
+    // ponytail: count/offset scans one series; use cursors if deep-page reads become a measured bottleneck.
+    const stats = await env.CONTENT.prepare(
+      `SELECT COUNT(*) AS total,
+        SUM(CASE WHEN (published_at, id) > (?, ?) THEN 1 ELSE 0 END) AS newer
+       FROM posts WHERE series_id = ? AND draft = 0 AND deleted_at IS NULL`
+    )
+      .bind(post.published_at, post.id, post.series_id)
+      .first();
+    const pageSize = 4;
+    const pageCount = Math.ceil(stats.total / pageSize);
+    const page = Math.max(
+      0,
+      Math.min(
+        requestedPage === null
+          ? Math.floor(stats.newer / pageSize)
+          : Number(requestedPage),
+        pageCount - 1
+      )
+    );
+    const result = await env.CONTENT.prepare(
+      `SELECT id, slug, title, published_at FROM posts
+       WHERE series_id = ? AND draft = 0 AND deleted_at IS NULL
+       ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?`
+    )
+      .bind(post.series_id, pageSize, page * pageSize)
+      .all();
+    const date = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' });
+    return json(
+      {
+        name: post.series_name,
+        page,
+        totalCount: stats.total,
+        posts: result.results.map((item, index) => ({
+          href: `/blog/${encodeURIComponent(item.slug)}/`,
+          title: item.title,
+          date: date.format(new Date(item.published_at)).replaceAll('-', '.'),
+          position: page * pageSize + index + 1,
+          current: item.id === post.id,
+        })),
+      },
+      200,
+      headers
+    );
+  }
+
   if (url.pathname.startsWith('/posts/')) {
     let slug;
     try {
