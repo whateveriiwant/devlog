@@ -1,0 +1,62 @@
+name: Back up production content
+
+on:
+  schedule:
+    - cron: '47 18 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-content-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: vars.CONTENT_BACKUPS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      R2_BUCKET: devlog-assets
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      CONTENT_BACKUP_BUCKET: devlog-content-backups
+      BACKUP_R2_ACCESS_KEY_ID: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+      BACKUP_R2_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
+      CONTENT_BACKUP_KEY: ${{ secrets.CONTENT_BACKUP_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.28.0
+          run_install: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.12.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check required configuration
+        run: |
+          node --input-type=module -e '
+          for (const name of ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "BACKUP_R2_ACCESS_KEY_ID", "BACKUP_R2_SECRET_ACCESS_KEY", "CONTENT_BACKUP_KEY"])
+            if (!process.env[name]) throw new Error("Missing secret: " + name);
+          '
+      - name: Export and verify content with its images
+        run: |
+          umask 077
+          mkdir -p "$RUNNER_TEMP/devlog-backup"
+          pnpm exec wrangler d1 export devlog-content --remote --config wrangler.cms.jsonc --output "$RUNNER_TEMP/devlog-backup/content.sql" > "$RUNNER_TEMP/devlog-backup/export.log" 2>&1
+          node scripts/backup-content.mjs capture "$RUNNER_TEMP/devlog-backup/content.sql" "$RUNNER_TEMP/devlog-backup/snapshot"
+          node scripts/backup-content.mjs restore "$RUNNER_TEMP/devlog-backup/snapshot" "$RUNNER_TEMP/devlog-backup/restore"
+      - name: Encrypt and store private backup
+        run: |
+          node scripts/content-backup-archive.mjs encrypt "$RUNNER_TEMP/devlog-backup/snapshot" "$RUNNER_TEMP/devlog-backup/content.bin"
+          node scripts/store-content-backup.mjs "$RUNNER_TEMP/devlog-backup/content.bin"
+      - name: Remove temporary private content
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/devlog-backup"
