@@ -723,7 +723,6 @@ async function callback(request, env) {
     '__Host-cms_oauth_state=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
     '__Host-cms_oauth_next=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
     '__Host-cms_oauth_verifier=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
-    '__Host-cms_oauth_fresh=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0',
   ];
   const fail = (reason) => {
     const response = Response.redirect(
@@ -775,7 +774,12 @@ async function callback(request, env) {
   if (!userResponse.ok || user.login !== env.GITHUB_ALLOWED_LOGIN)
     return fail('account');
 
-  if (cookie(request, '__Host-cms_oauth_fresh') !== '1') {
+  const grantReset = await env.CONTENT.prepare(
+    'SELECT name FROM auth_migrations WHERE name=?'
+  )
+    .bind('github_read_user_scope')
+    .first();
+  if (!grantReset) {
     const revoke = await fetch(
       `https://api.github.com/applications/${encodeURIComponent(env.GITHUB_CLIENT_ID)}/grant`,
       {
@@ -790,10 +794,15 @@ async function callback(request, env) {
       }
     );
     if (!revoke.ok) return fail('revoke');
+    await env.CONTENT.prepare(
+      'INSERT OR IGNORE INTO auth_migrations(name,completed_at) VALUES(?,?)'
+    )
+      .bind('github_read_user_scope', Math.floor(Date.now() / 1000))
+      .run();
     const next = cookie(request, '__Host-cms_oauth_next') || '/write/';
     const response = Response.redirect(
       new URL(
-        `/api/auth/start?fresh=1&next=${encodeURIComponent(next)}`,
+        `/api/auth/start?next=${encodeURIComponent(next)}`,
         env.SITE_ORIGIN
       ),
       302
@@ -1268,10 +1277,6 @@ export default {
       headers.append(
         'Set-Cookie',
         `__Host-cms_oauth_verifier=${verifier}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=600`
-      );
-      headers.append(
-        'Set-Cookie',
-        `__Host-cms_oauth_fresh=${url.searchParams.get('fresh') === '1' ? '1' : ''}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=600`
       );
       return new Response(null, { status: 302, headers });
     }
