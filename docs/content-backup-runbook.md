@@ -23,7 +23,7 @@
 - 암호화 파일의 바이트를 변경한 별도 사본은 복호화가 거절됐고, 실패한 평문 출력과 임시 파일이 남지 않는 것을 확인했다.
 - 암호화 키: GitHub Actions `CONTENT_BACKUP_KEY`와 로컬 `devlog-backups/keys/content-backup.key`. 로컬 키는 소유자만 읽고 쓰는 0600 권한이다. 키 내용은 문서·Git·로그에 남기지 않는다.
 - 2026-09-28: 백업 전용 R2 키를 등록하고 `dev`의 예약 워크플로와 `main`의 백업 도구를 반영했다. 기존 배포 토큰의 D1 Read로 내보내기가 인증 오류(10000)로 거절되어, 승인받은 별도 `devlog-content-backup-export` 토큰을 `CONTENT_BACKUP_D1_TOKEN`에 연결했다. 계정 전체 D1 Write 범위이며 기존 배포 토큰은 변경하지 않았다. [Actions 실행 36387646550](https://github.com/whateveriiwant/devlog/actions/runs/36387646550)은 1분 33초 만에 성공했다. 주간 `weekly/2026-09-28T06-41-44-831Z.bin`과 월간 `monthly/2026-09.bin`을 API 목록에서 확인했다(각 142,123,871 bytes). 월간 원격 파일을 내려받아 복호화하고 별도 복원했다: 글 126건, 초안 1건, 시리즈 23개, 객체 278개, 이미지 참조 201개, 무결성 ok, 외래 키 오류 0, 운영 쓰기 0. 보고서는 로컬 `devlog-backups/restore-check/2026-09-28-actions/verified/restore-report.json`에 있다.
-- 발급 화면 확인 중 새 D1 토큰이 도구 출력에 포함되어 동일 권한으로 교체 및 기존 토큰 폐기 승인을 받았다. 대체 토큰을 발급했고 GitHub 비밀값 저장 전 본인 확인을 기다리고 있다. 이 보안 정리 전에는 A1을 최종 완료 표시하지 않는다.
+- 발급 화면 확인 중 새 D1 토큰이 도구 출력에 포함되어 승인받은 동일 권한의 `devlog-content-backup-export-v2`로 교체했다. GitHub 비밀값 갱신과 기존 `devlog-content-backup-export`의 영구 삭제를 확인했다. [교체 토큰의 Actions 실행 36388167681](https://github.com/whateveriiwant/devlog/actions/runs/36388167681)도 1분 26초 만에 성공했다. `CONTENT_BACKUPS_ENABLED=true`를 확인했고 A1을 완료했다.
 - 위 로컬 사본은 이 컴퓨터에 의존한다. 컴퓨터를 잃어도 복구하려면 암호화 키를 별도 안전한 개인 저장소에 추가로 보관해야 한다. GitHub secret은 원래 값 조회 기능을 제공하지 않으므로 유일한 키 사본으로 쓰지 않는다.
 
 ## 수동 백업
