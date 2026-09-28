@@ -797,8 +797,8 @@ async function callback(request, env) {
       }
     );
     if (!revoke.ok) {
-      const { message } = await revoke.json().catch(() => ({}));
-      console.error('OAuth grant reset rejected', revoke.status, message);
+      const detail = await revoke.text();
+      console.error('OAuth grant reset rejected', revoke.status, detail.slice(0, 300));
       return fail('revoke');
     }
     await env.CONTENT.prepare(
