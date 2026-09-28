@@ -22,7 +22,8 @@
 - 원격 파일을 다시 다운로드해 업로드 전 파일과 SHA-256이 같은지 확인했다. 복호화·별도 SQLite 복원 및 전체 278개 객체/201개 참조 검증을 통과했다.
 - 암호화 파일의 바이트를 변경한 별도 사본은 복호화가 거절됐고, 실패한 평문 출력과 임시 파일이 남지 않는 것을 확인했다.
 - 암호화 키: GitHub Actions `CONTENT_BACKUP_KEY`와 로컬 `devlog-backups/keys/content-backup.key`. 로컬 키는 소유자만 읽고 쓰는 0600 권한이다. 키 내용은 문서·Git·로그에 남기지 않는다.
-- 자동 워크플로는 준비 상태이며 **아직 활성화하지 않았다**. 백업 전용 R2 자격 증명 등록과 실제 Actions 성공 확인이 남아 있다.
+- 2026-09-28: 백업 전용 R2 키를 등록하고 `dev`의 예약 워크플로와 `main`의 백업 도구를 반영했다. 기존 배포 토큰의 D1 Read로 내보내기가 인증 오류(10000)로 거절되어, 승인받은 별도 `devlog-content-backup-export` 토큰을 `CONTENT_BACKUP_D1_TOKEN`에 연결했다. 계정 전체 D1 Write 범위이며 기존 배포 토큰은 변경하지 않았다. [Actions 실행 36387646550](https://github.com/whateveriiwant/devlog/actions/runs/36387646550)은 1분 33초 만에 성공했다. 주간 `weekly/2026-09-28T06-41-44-831Z.bin`과 월간 `monthly/2026-09.bin`을 API 목록에서 확인했다(각 142,123,871 bytes). 월간 원격 파일을 내려받아 복호화하고 별도 복원했다: 글 126건, 초안 1건, 시리즈 23개, 객체 278개, 이미지 참조 201개, 무결성 ok, 외래 키 오류 0, 운영 쓰기 0. 보고서는 로컬 `devlog-backups/restore-check/2026-09-28-actions/verified/restore-report.json`에 있다.
+- 발급 화면 확인 중 새 D1 토큰이 도구 출력에 포함되어 승인받은 동일 권한의 `devlog-content-backup-export-v2`로 교체했다. GitHub 비밀값 갱신과 기존 `devlog-content-backup-export`의 영구 삭제를 확인했다. [교체 토큰의 Actions 실행 36388167681](https://github.com/whateveriiwant/devlog/actions/runs/36388167681)도 1분 26초 만에 성공했다. `CONTENT_BACKUPS_ENABLED=true`를 확인했고 A1을 완료했다.
 - 위 로컬 사본은 이 컴퓨터에 의존한다. 컴퓨터를 잃어도 복구하려면 암호화 키를 별도 안전한 개인 저장소에 추가로 보관해야 한다. GitHub secret은 원래 값 조회 기능을 제공하지 않으므로 유일한 키 사본으로 쓰지 않는다.
 
 ## 수동 백업
@@ -71,9 +72,9 @@ node scripts/backup-content.mjs restore /private/restore/snapshot /private/resto
 - 매주 월요일 03:47 KST에 실행한다. GitHub 스케줄은 정각 실행이나 누락 없는 실행을 보장하는 복구 SLA로 가정하지 않는다.
 - 원본 버킷에는 기존 `R2_ACCESS_KEY_ID`/`R2_SECRET_ACCESS_KEY`를 사용한다. 백업 도구는 원본 버킷에 쓰거나 삭제하지 않는다.
 - 백업용 R2 키는 **`devlog-content-backups`만** 객체 읽기·쓰기 범위를 갖게 만든다. 원본 버킷이나 다른 버킷 권한을 추가하지 않는다.
-- 새 GitHub secrets: `BACKUP_R2_ACCESS_KEY_ID`, `BACKUP_R2_SECRET_ACCESS_KEY`, `CONTENT_BACKUP_KEY`.
+- 새 GitHub secrets: `BACKUP_R2_ACCESS_KEY_ID`, `BACKUP_R2_SECRET_ACCESS_KEY`, `CONTENT_BACKUP_KEY`, `CONTENT_BACKUP_D1_TOKEN`. D1 내보내기용 토큰은 배포 토큰과 분리한다.
 - 변수 `CONTENT_BACKUPS_ENABLED=true`는 모든 설정과 수동 Actions 실행이 가능한 상태에서만 활성화한다. 기본은 비활성이다.
-- 현재 저장소 기본 브랜치는 `dev`이고 배포 브랜치는 `main`이다. 예약 워크플로가 기본 브랜치에 있어야 하므로 워크플로를 `dev`에도 반영해야 한다. 스크립트는 워크플로의 `checkout ref: main`에 맞춰 `main`에 반영한다. 기본 브랜치 변경을 이 작업에 포함하지 않는다.
+- 현재 저장소 기본 브랜치는 `dev`이고 배포 브랜치는 `main`이다. 예약 워크플로가 기본 브랜치에 있어야 하므로 워크플로를 `dev`에도 반영했다. 스크립트는 워크플로의 `checkout ref: main`에 맞춰 `main`에 반영한다. 기본 브랜치 변경을 이 작업에 포함하지 않는다.
 - 자동 실행은 SQL 복원과 전체 객체 해시 검사를 통과한 경우에만 암호화·업로드한다. plaintext를 Actions artifact로 올리지 않고 임시 파일은 `always()` 단계에서 지운다.
 - 실패 시 기존 성공 백업을 보존한다. Actions 로그에서 실패 단계를 확인하되 export 로그의 임시 다운로드 URL과 내용은 공개 출력하지 않는다.
 - 자동화 완료 조건: 실제 Actions 성공, 비공개 버킷의 새 주간·월간 암호화 객체, 원격 사본 다운로드·복호화·별도 복원 확인.
