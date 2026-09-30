@@ -20,6 +20,7 @@
     "migrate": "node scripts/migrate-velog.mjs",
     "verify:migration": "node scripts/verify-migration.mjs",
     "verify:build": "node scripts/verify-build.mjs",
+    "verify:content": "node --experimental-vm-modules scripts/verify-content-consistency.mjs",
     "verify:search": "node scripts/verify-search.mjs",
     "d1:export": "node scripts/export-d1-snapshot.mjs",
     "d1:verify": "node scripts/verify-d1-snapshot.mjs",

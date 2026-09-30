@@ -193,6 +193,15 @@ function editorSummary(post) {
   };
 }
 
+async function contentHash(post) {
+  const value = `${post.title}\0${post.slug}\0${post.description}\0${post.markdown}\0${post.tags_json}\0${post.series_id || ''}\0${post.thumbnail || ''}${post.series_json ? `\0${post.series_json}` : ''}`;
+  return base64url(
+    new Uint8Array(
+      await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
+    )
+  );
+}
+
 async function editorContent(request, env, url) {
   const headers = editorHeaders(request, env);
   if (!headers) return json({ error: 'Forbidden origin' }, 403);
@@ -242,7 +251,7 @@ async function editorContent(request, env, url) {
     if (!/^[\w-]{8,80}$/.test(requestId))
       return json({ error: '요청 ID가 올바르지 않습니다.' }, 400, headers);
     const previous = await env.CONTENT.prepare(
-      'SELECT post_id, operation FROM content_write_requests WHERE request_id=?'
+      'SELECT post_id, operation, created_at FROM content_write_requests WHERE request_id=?'
     )
       .bind(requestId)
       .first();
@@ -253,7 +262,26 @@ async function editorContent(request, env, url) {
           409,
           headers
         );
-      return json({ ok: true, duplicate: true, id }, 200, headers);
+      const post = await env.CONTENT.prepare(
+        'SELECT deleted_at FROM posts WHERE id=? AND draft=0'
+      )
+        .bind(id)
+        .first();
+      if (
+        !post ||
+        (operation === 'delete'
+          ? post.deleted_at !== previous.created_at
+          : post.deleted_at !== null)
+      )
+        return json(
+          {
+            error:
+              '이전 요청 이후 글 상태가 변경되었습니다. 목록을 새로고침해 주세요.',
+          },
+          409,
+          headers
+        );
+      return json({ ok: true, id, deletedAt: post.deleted_at }, 200, headers);
     }
     const now = new Date().toISOString();
     const update =
@@ -441,8 +469,29 @@ async function editorContent(request, env, url) {
         headers
       );
 
+    const seriesJson =
+      newSeries && newSeries.id === seriesId
+        ? JSON.stringify({
+            id: seriesId,
+            name: String(newSeries.name || '').slice(0, 160),
+            slug: String(newSeries.slug || '').slice(0, 180),
+            description: String(newSeries.description || '').slice(0, 2000),
+          })
+        : null;
+    const sourceHash = await contentHash({
+      title,
+      slug,
+      description,
+      markdown,
+      tags_json: JSON.stringify(tags),
+      series_id: seriesId,
+      series_json: seriesJson,
+      thumbnail: input.thumbnail
+        ? String(input.thumbnail).slice(0, 2048)
+        : null,
+    });
     const previousRequest = await env.CONTENT.prepare(
-      'SELECT post_id, operation FROM content_write_requests WHERE request_id=?'
+      'SELECT post_id, operation, created_at FROM content_write_requests WHERE request_id=?'
     )
       .bind(requestId)
       .first();
@@ -456,7 +505,50 @@ async function editorContent(request, env, url) {
           409,
           headers
         );
-      return json({ ok: true, duplicate: true, id }, 200, headers);
+      const post =
+        operation === 'save'
+          ? await env.CONTENT.prepare(
+              'SELECT * FROM post_drafts WHERE post_id=? AND request_id=?'
+            )
+              .bind(id, requestId)
+              .first()
+          : await env.CONTENT.prepare(
+              'SELECT * FROM posts WHERE id=? AND draft=0 AND deleted_at IS NULL AND updated_at=?'
+            )
+              .bind(id, previousRequest.created_at)
+              .first();
+      if (
+        !post ||
+        (operation === 'save' ? await contentHash(post) : post.source_hash) !==
+          sourceHash
+      )
+        return json(
+          {
+            error:
+              '이전 요청 이후 글이 변경되었거나 요청 내용이 다릅니다. 글을 다시 열어 주세요.',
+          },
+          409,
+          headers
+        );
+      return json(
+        operation === 'save'
+          ? {
+              ok: true,
+              id,
+              revision: post.revision,
+              baseRevision: post.base_revision,
+            }
+          : {
+              ok: true,
+              id,
+              revision: post.revision,
+              publishedAt: post.published_at,
+              updatedAt: post.updated_at,
+              url: `/blog/${encodeURIComponent(post.slug)}/`,
+            },
+        200,
+        headers
+      );
     }
 
     const published = await env.CONTENT.prepare(
@@ -484,7 +576,7 @@ async function editorContent(request, env, url) {
       );
 
     const duplicateSlug = await env.CONTENT.prepare(
-      `SELECT id FROM posts WHERE slug=? AND id<>? AND deleted_at IS NULL
+      `SELECT id FROM posts WHERE slug=? AND id<>?
        UNION SELECT post_id AS id FROM post_drafts WHERE slug=? AND post_id<>? LIMIT 1`
     )
       .bind(slug, id, slug, id)
@@ -514,24 +606,6 @@ async function editorContent(request, env, url) {
     const thumbnail = input.thumbnail
       ? String(input.thumbnail).slice(0, 2048)
       : null;
-    const seriesJson =
-      newSeries && newSeries.id === seriesId
-        ? JSON.stringify({
-            id: seriesId,
-            name: String(newSeries.name || '').slice(0, 160),
-            slug: String(newSeries.slug || '').slice(0, 180),
-            description: String(newSeries.description || '').slice(0, 2000),
-          })
-        : null;
-    const hash = async (value) =>
-      base64url(
-        new Uint8Array(
-          await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
-        )
-      );
-    const sourceHash = await hash(
-      `${title}\0${slug}\0${description}\0${markdown}\0${tagsJson}\0${seriesId || ''}\0${thumbnail || ''}`
-    );
     if (operation === 'save') {
       const write = env.CONTENT.prepare(
         `INSERT INTO post_drafts (post_id,title,slug,description,markdown,tags_json,

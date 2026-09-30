@@ -1,3 +1,4 @@
+import { editorRequest } from '../lib/editor-api';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowDownUp,
@@ -147,21 +148,6 @@ export default function AdminDashboard() {
     trash: dashboard?.trash.length ?? 0,
   };
 
-  async function editorRequest(path: string, options: RequestInit = {}) {
-    const headers = new Headers(options.headers);
-    if (options.body) headers.set('Content-Type', 'application/json');
-    const response = await fetch(`/api/content/editor${path}`, {
-      ...options,
-      headers,
-      credentials: 'same-origin',
-    });
-    const result = (await response.json().catch(() => ({}))) as {
-      error?: string;
-    };
-    if (!response.ok)
-      throw new Error(result.error ?? '요청을 처리하지 못했습니다.');
-  }
-
   async function restore(post: Post) {
     setBusyId(post.id);
     setError('');
@@ -194,7 +180,7 @@ export default function AdminDashboard() {
   async function moveToTrash(post: Post) {
     if (
       !window.confirm(
-        `“${post.title}” 글을 휴지통으로 이동할까요? 7일 안에는 복구할 수 있습니다.`
+        `“${post.title}” 글을 휴지통으로 이동할까요? 휴지통에서 복구할 수 있습니다.`
       )
     )
       return;
@@ -587,7 +573,8 @@ export default function AdminDashboard() {
         </section>
         <p className="mt-4 flex items-center gap-1.5 px-1 text-xs text-muted-foreground">
           <ArrowDownUp className="size-3.5" />
-          최신순으로 정렬됩니다. 휴지통의 글은 7일 안에 복구할 수 있습니다.
+          최신순으로 정렬됩니다. 휴지통의 글은 복구할 수 있으며, 참조 이미지는
+          보존됩니다.
         </p>
       </div>
     </main>

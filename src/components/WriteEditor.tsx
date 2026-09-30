@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { editorRequest as editorApi } from '../lib/editor-api';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import './write-editor.css';
@@ -119,25 +120,6 @@ export default function WriteEditor() {
         : DOMPurify.sanitize(marked.parse(body, { breaks: true }) as string),
     [body, previewTooLong]
   );
-
-  async function editorApi<T>(
-    path: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const headers = new Headers(options.headers);
-    if (options.body) headers.set('Content-Type', 'application/json');
-    const response = await fetch(`/api/content/editor${path}`, {
-      ...options,
-      headers,
-      credentials: 'same-origin',
-    });
-    const result = (await response.json().catch(() => ({}))) as {
-      error?: string;
-    };
-    if (!response.ok)
-      throw new Error(result.error || `편집기 요청 실패 (${response.status})`);
-    return result as T;
-  }
 
   async function loadD1Dashboard() {
     const result = await editorApi<{
@@ -417,6 +399,7 @@ export default function WriteEditor() {
     setStatus(publish ? '발행 준비 중…' : '초안 저장 중…');
     try {
       const postId = id ?? crypto.randomUUID();
+      setId(postId);
       const expectedRevision = draft?.revision ?? 0;
       const baseRevision = draft?.baseRevision ?? Number(source.revision ?? 0);
       const result = await editorApi<{
