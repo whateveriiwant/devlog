@@ -33,14 +33,14 @@
 
 ## 남은 작업 실행 순서 — 2026-09-28 재조정
 
-A1과 A2는 완료 기록을 유지한다. 1번 시리즈 목록 복원과 2번 A3.2 운영 반영을 완료했다. 3번 A3.3도 PR #27 머지·자동 배포 성공을 확인했다. 다음 실행은 4번 A4.1이다. 표의 나머지 순서대로 진행한다. A/B/C 번호는 기존 근거와 연결하기 위한 분류이며, 번호만으로 실행 순서를 정하지 않는다.
+A1과 A2는 완료 기록을 유지한다. 1번 시리즈 목록 복원과 2번 A3.2 운영 반영을 완료했다. 3번 A3.3도 PR #27 머지·자동 배포 성공을 확인했다. 4번 A4.1도 PR #28 머지·운영 배포와 호환성 확인을 완료했다. 다음 실행은 5번 A4.2다. 표의 나머지 순서대로 진행한다. A/B/C 번호는 기존 근거와 연결하기 위한 분류이며, 번호만으로 실행 순서를 정하지 않는다.
 
 | 순서                   | 작업                                                   | 체크리스트 위치 | 우선순위 판단과 선행 조건                                                                                                                      |
 | ---------------------- | ------------------------------------------------------ | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1 (완료)               | 상세 페이지 시리즈 목록·페이지네이션 복원              | A3.1            | PR #23 머지·프로덕션 배포 및 공개 페이지 이동 확인 완료.                                                                                       |
 | 2 (완료)               | 정적 검색 원문·fallback·레거시 편집 정리               | A3.2            | Git/Decap 데이터 보존, D1 전용 편집·검색과 이전 원문 경로 차단을 완료했다. PR #26 머지와 자동 배포 후 운영 검색·과거 원문 경로 404를 확인했다. |
 | 3 (완료) | 저장·발행·삭제·복원 결과와 이미지 보존 확인            | A3.3            | 콘텐츠 불일치·중복 저장·덮어쓰기·이미지 손실을 막는 핵심 안정화다. 기존 방어를 확인하고 부족한 부분만 수정한다.                                |
-| 4                      | 관리자 보안 헤더·요청 크기 제한·개발 도구 의존성 정리  | A4.1            | 알려진 코드상의 위험을 보완한다. 기존 로그인·업로드·미리보기와의 호환을 확인한다.                                                              |
+| 4 (완료)               | 관리자 보안 헤더·요청 크기 제한·개발 도구 의존성 정리  | A4.1            | 알려진 코드상의 위험을 보완한다. 기존 로그인·업로드·미리보기와의 호환을 확인한다.                                                              |
 | 5                      | 필수 검증을 CI에 고정하고 배포 복구 절차 완성          | A4.2            | 1–4의 회귀를 막고 실패한 배포를 되돌릴 근거를 남긴다. 기존 검증 도구와 백업을 재사용한다.                                                      |
 | 6                      | 실제 사용량·지연 측정과 공개 API 호출 제한             | B1              | 성능·비용 최적화의 기준값을 확보하고 기존 WAF 보호를 확인한다. 현재 공격·한도 임박은 확인하지 않았다.                                          |
 | 7                      | 백오피스 서버 페이지네이션과 편집기 불필요한 작업 제거 | B2              | 현재 코드의 상태별 500개 제한과 전체 목록 조회를 해결한다. 현재 운영 목록 누락이나 지연 크기는 미확인이다.                                     |
@@ -159,11 +159,11 @@ A1과 A2는 완료 기록을 유지한다. 1번 시리즈 목록 복원과 2번 
 
 #### A4.1. 남은 보안 방어 보완
 
-- [ ] 관리자/로그인에 프레임 제한과 CSP를 적용한다. Astro 인라인 코드·OAuth·미리보기·이미지 업로드와의 호환을 확인한다. (S05)
-- [ ] 요청 전체 크기 상한을 전체 버퍼링 전에 적용한다. 잘못된 JSON·이미지와 Content-Length가 없는 요청도 다룬다. (S08)
-- [ ] 취약한 커밋 도구 의존성을 상위 도구 업데이트 또는 미사용 도구 제거로 해결한다. 실행 시 의존성 감사 결과를 다시 확인하고 호환성 없는 강제 override는 피한다. (S09)
+- [x] 관리자/로그인에 프레임 제한과 CSP를 적용한다. Astro 인라인 코드·OAuth·미리보기·이미지 업로드와의 호환을 확인한다. (S05)
+- [x] 요청 전체 크기 상한을 전체 버퍼링 전에 적용한다. 잘못된 JSON·이미지와 Content-Length가 없는 요청도 다룬다. (S08)
+- [x] 취약한 커밋 도구 의존성을 상위 도구 업데이트 또는 미사용 도구 제거로 해결한다. 실행 시 의존성 감사 결과를 다시 확인하고 호환성 없는 강제 override는 피한다. (S09)
 
-**A4.1 구현·검증 — 2026-09-30 (운영 반영 대기):** `worker/site.mjs`의 공통 관리 HTML 응답에 `frame-ancestors 'none'`, `X-Frame-Options: DENY`, CSP를 적용했다. `wrangler.jsonc`에 로그인 경로를 Worker 우선 대상으로 추가했다. Workers의 HTMLRewriter가 응답마다 만든 nonce를 Astro 스크립트에 붙이며 인라인 이벤트·eval·object·base 삽입을 차단한다. React·미리보기의 스타일 호환을 위해 `style-src 'unsafe-inline'`은 유지하고, 본문 이미지의 HTTPS/data/blob는 허용한다. 공개 페이지 전체 CSP 적용이나 전체 보안 감사는 이번 범위가 아니다. 정책 근거는 [Cloudflare HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/), [MDN script-src](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/script-src), [MDN frame-ancestors](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/frame-ancestors)다.
+**A4.1 완료 — 2026-09-30:** `worker/site.mjs`의 공통 관리 HTML 응답에 `frame-ancestors 'none'`, `X-Frame-Options: DENY`, CSP를 적용했다. `wrangler.jsonc`에 로그인 경로를 Worker 우선 대상으로 추가했다. Workers의 HTMLRewriter가 응답마다 만든 nonce를 Astro 스크립트에 붙이며 인라인 이벤트·eval·object·base 삽입을 차단한다. React·미리보기의 스타일 호환을 위해 `style-src 'unsafe-inline'`은 유지하고, 본문 이미지의 HTTPS/data/blob는 허용한다. 공개 페이지 전체 CSP 적용이나 전체 보안 감사는 이번 범위가 아니다. 정책 근거는 [Cloudflare HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/), [MDN script-src](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/script-src), [MDN frame-ancestors](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/frame-ancestors)다.
 
 **요청 제한:** 저장·발행·삭제·복원 JSON과 이미지 업로드가 같은 제한 읽기 함수를 사용한다. 요청 전체 상한은 10MiB(10,485,760 bytes), 기존 Markdown 상한 1,500,000 bytes는 유지한다. JSON escaping 여유와 기존 10MiB 이미지 상한을 보존했다. Content-Length 초과는 읽기 전 413, 길이 없음·과소 신고는 실제 수신 바이트가 상한을 넘는 즉시 읽기를 취소하고 413을 반환한다. 잘못된 길이·UTF-8·JSON·JSON 객체가 아닌 값·이미지 서명·읽기 실패는 400으로 거절한다. 제한 이내 본문은 파싱/기존 이미지 검사에 필요한 만큼 버퍼링하며, 플랫폼이 한 번에 전달하는 chunk 자체의 할당까지 제어하는 것은 아니다. 기존 이미지 검사 수준을 유지했으며 이미지 전체 디코딩 검증을 새로 추가하지 않았다.
 
@@ -171,9 +171,11 @@ A1과 A2는 완료 기록을 유지한다. 1번 시리즈 목록 복원과 2번 
 
 **검증:** `pnpm verify:security`를 빌드 후 CI에 연결했다. CMS의 실제 핸들러로 크기 사전 거절·길이 없는/과소 신고 스트림의 즉시 중단·정확한 10MiB 경계·잘못된 JSON/이미지·거절 요청의 R2 미기록을 확인한다. Wrangler에 이미 설치된 Miniflare의 실제 Workers 런타임으로 빌드된 로그인/관리/편집 HTML과 index.html 경로의 nonce·CSP·프레임 헤더, 응답마다 nonce 변경, 비로그인 이동을 검증한다. Astro 검사 오류 0·경고 0(기존 hint 5), 빌드, 콘텐츠 일관성·검색·D1 경로·시리즈 회귀 검사를 통과했다. 새 검사 파일의 ESLint와 Worker 문법 검사를 통과했다. Worker 파일 기본 ESLint는 기존 전역 API 설정 누락과 기존 정규식 escape 때문에 실패하므로 전체 lint 통과로 기록하지 않는다.
 
-**스테이징:** CMS `472fbffa-f8cf-4a12-9fa7-bade7fe5016a`, 사이트 `32f4a296-a116-45a5-b0ce-bf52aa308aca`로 배포했다. Chrome에서 본인 GitHub OAuth 로그인→편집기 초기화, Markdown 미리보기, 합성 1px PNG 업로드·미리보기 로딩(`naturalWidth=1`), 관리자 목록 초기화를 확인했고 조회한 브라우저 error/warn 로그는 없었다. 검증 글은 저장·발행하지 않았고 운영 데이터로 변경 실험을 하지 않았다. 스테이징 업로드 `posts/6877c20f-025c-4a20-bb08-f5841c3f4207.png`는 기존 7일 미사용 이미지 정리 정책에 맡긴다. OAuth 팝업 경로는 A2에서 제거된 상태이며 현재 페이지 이동 흐름을 검증했다. 초과 요청의 스트림 중단은 격리 런타임 검사이며 운영 부하 실험을 하지 않았다.
+**스테이징:** CMS `472fbffa-f8cf-4a12-9fa7-bade7fe5016a`(읽기 실패 처리 보완 후 `0dc7f0d4-f5db-4648-b41f-4bb986b60e91`), 사이트 `32f4a296-a116-45a5-b0ce-bf52aa308aca`로 배포했다. Chrome에서 본인 GitHub OAuth 로그인→편집기 초기화, Markdown 미리보기, 합성 1px PNG 업로드·미리보기 로딩(`naturalWidth=1`), 관리자 목록 초기화를 확인했고 조회한 브라우저 error/warn 로그는 없었다. 별도 로컬 HTML에서 스테이징 로그인 페이지를 iframe으로 불러오면 브라우저가 표시를 거절하는 것도 확인했다. 검증 글은 저장·발행하지 않았고 운영 데이터로 변경 실험을 하지 않았다. 스테이징 업로드 `posts/6877c20f-025c-4a20-bb08-f5841c3f4207.png`는 기존 7일 미사용 이미지 정리 정책에 맡긴다. OAuth 팝업 경로는 A2에서 제거된 상태이며 현재 페이지 이동 흐름을 검증했다. 초과 요청의 스트림 중단은 격리 런타임 검사이며 운영 부하 실험을 하지 않았다.
 
-**배포·복구:** PR·CI·main 머지·프로덕션 확인을 마친 뒤 운영 완료 기록을 추가한다. DB 스키마/이미지 주소 변경은 없다. 문제가 생기면 호환되는 사이트/CMS 코드를 수정 배포하거나 이전 코드로 복구할 수 있지만, A4.1 방어가 빠지는 완전 롤백은 해당 보호를 제거한다. 실제 이전 버전 롤백 훈련은 다음 A4.2에 남겨 둔다.
+**운영 반영:** [PR #28](https://github.com/whateveriiwant/devlog/pull/28)의 [PR CI](https://github.com/whateveriiwant/devlog/actions/runs/36702321560)가 통과했고 `ab587d8`로 main에 머지했다. [프로덕션 자동 배포](https://github.com/whateveriiwant/devlog/actions/runs/36702537864)의 CMS·사이트 배포 단계가 모두 성공했다. Wrangler 배포 조회에서 CMS `f451a0cd-45e8-4b80-914e-1b1c8b18e48f`와 사이트 `16f9fc88-98cb-4a8b-8d53-27defa21dd9f`를 각각 100% 배포로 확인했다. 운영 `/login/`의 CSP·DENY·HTML 스크립트 nonce 일치, `/login/index.html`의 같은 헤더와 307, 비로그인 관리자·편집기 302 및 세션 401, 공개 목록·검색·상세 200, 폐기된 검색 원문 404를 확인했다. Chrome에서 본인 OAuth 로그인 후 관리자와 편집기 초기화 및 조회한 error/warn 로그 없음도 확인했다. 운영 글 저장·발행·삭제·이미지 업로드는 하지 않았다.
+
+**복구·한계:** DB 스키마/이미지 주소 변경은 없다. 문제가 생기면 호환되는 사이트/CMS 코드를 수정 배포하거나 이전 코드로 복구할 수 있지만, A4.1 방어가 빠지는 완전 롤백은 해당 보호를 제거한다. 실제 이전 버전 롤백 훈련은 다음 A4.2에 남겨 둔다.
 
 #### A4.2. 배포 검증과 복구 절차 고정
 
