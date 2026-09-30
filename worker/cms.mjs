@@ -194,7 +194,7 @@ function editorSummary(post) {
 }
 
 async function contentHash(post) {
-  const value = `${post.title}\0${post.slug}\0${post.description}\0${post.markdown}\0${post.tags_json}\0${post.series_id || ''}\0${post.thumbnail || ''}`;
+  const value = `${post.title}\0${post.slug}\0${post.description}\0${post.markdown}\0${post.tags_json}\0${post.series_id || ''}\0${post.thumbnail || ''}${post.series_json ? `\0${post.series_json}` : ''}`;
   return base64url(
     new Uint8Array(
       await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
@@ -469,6 +469,15 @@ async function editorContent(request, env, url) {
         headers
       );
 
+    const seriesJson =
+      newSeries && newSeries.id === seriesId
+        ? JSON.stringify({
+            id: seriesId,
+            name: String(newSeries.name || '').slice(0, 160),
+            slug: String(newSeries.slug || '').slice(0, 180),
+            description: String(newSeries.description || '').slice(0, 2000),
+          })
+        : null;
     const sourceHash = await contentHash({
       title,
       slug,
@@ -476,6 +485,7 @@ async function editorContent(request, env, url) {
       markdown,
       tags_json: JSON.stringify(tags),
       series_id: seriesId,
+      series_json: seriesJson,
       thumbnail: input.thumbnail
         ? String(input.thumbnail).slice(0, 2048)
         : null,
@@ -596,15 +606,6 @@ async function editorContent(request, env, url) {
     const thumbnail = input.thumbnail
       ? String(input.thumbnail).slice(0, 2048)
       : null;
-    const seriesJson =
-      newSeries && newSeries.id === seriesId
-        ? JSON.stringify({
-            id: seriesId,
-            name: String(newSeries.name || '').slice(0, 160),
-            slug: String(newSeries.slug || '').slice(0, 180),
-            description: String(newSeries.description || '').slice(0, 2000),
-          })
-        : null;
     if (operation === 'save') {
       const write = env.CONTENT.prepare(
         `INSERT INTO post_drafts (post_id,title,slug,description,markdown,tags_json,

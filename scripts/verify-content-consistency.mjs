@@ -184,6 +184,16 @@ const publication = write({
 });
 const published = await (await call('/posts', publication)).json();
 assert.equal(published.revision, 1);
+assert.equal(
+  (
+    await call('/posts', {
+      ...publication,
+      newSeries: { ...publication.newSeries, name: '다른 시리즈명' },
+    })
+  ).status,
+  409,
+  'The same request ID must not acknowledge different series metadata'
+);
 assert.deepEqual(await (await call('/posts', publication)).json(), published);
 assert.equal(
   (await call('/posts', { ...publication, title: '바뀐 재사용 요청' })).status,
