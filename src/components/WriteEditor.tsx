@@ -1,12 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
-import YAML from 'yaml';
 import './write-editor.css';
 
-const API = 'https://api.github.com/repos/whateveriiwant/devlog';
-const POST_PATH = 'src/content/posts';
-const SERIES_PATH = 'src/content/series.json';
 const MAX_PREVIEW_CHARS = 100_000;
 
 interface PostSummary {
@@ -26,8 +22,6 @@ interface Series {
   originalUrl?: string;
 }
 interface Draft {
-  number?: number;
-  branch?: string;
   id: string;
   title: string;
   revision?: number;
@@ -45,12 +39,6 @@ interface Frontmatter extends Record<string, unknown> {
   draft?: boolean;
 }
 
-// The caller supplies the expected shape for these fixed API endpoints.
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-function parseJson<T>(value: string): T {
-  return JSON.parse(value) as T;
-}
-
 function titleSlug(title: string) {
   return title
     .trim()
@@ -58,31 +46,6 @@ function titleSlug(title: string) {
     .replace(/[\\/?#%]+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
-}
-
-function encodeBase64(value: string) {
-  const bytes = new TextEncoder().encode(value);
-  let binary = '';
-  for (let index = 0; index < bytes.length; index += 8192) {
-    binary += String.fromCharCode(...bytes.subarray(index, index + 8192));
-  }
-  return btoa(binary);
-}
-
-function decodeBase64(value: string) {
-  const binary = atob(value.replace(/\s/g, ''));
-  return new TextDecoder().decode(
-    Uint8Array.from(binary, (character) => character.charCodeAt(0))
-  );
-}
-
-function parsePost(source: string) {
-  const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/.exec(source);
-  if (!match) throw new Error('글의 frontmatter를 읽을 수 없습니다.');
-  return {
-    data: YAML.parse(match[1]) as Frontmatter,
-    body: source.slice(match[0].length),
-  };
 }
 
 async function optimizeImage(file: File) {
@@ -118,18 +81,11 @@ async function optimizeImage(file: File) {
   });
 }
 
-export default function WriteEditor({
-  posts: initialPosts,
-  initialSeries,
-}: {
-  posts: PostSummary[];
-  initialSeries: Series[];
-}) {
+export default function WriteEditor() {
   const [authorized, setAuthorized] = useState(false);
-  const [d1Mode, setD1Mode] = useState(false);
-  const [posts, setPosts] = useState(initialPosts);
+  const [posts, setPosts] = useState<PostSummary[]>([]);
   const [trash, setTrash] = useState<PostSummary[]>([]);
-  const [series, setSeries] = useState(initialSeries);
+  const [series, setSeries] = useState<Series[]>([]);
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [id, setId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -152,7 +108,6 @@ export default function WriteEditor({
   const [preview, setPreview] = useState(false);
   const editor = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
-  const tokenRef = useRef('');
   const openedDeepLink = useRef(false);
 
   const slug = titleSlug(title);
@@ -164,37 +119,6 @@ export default function WriteEditor({
         : DOMPurify.sanitize(marked.parse(body, { breaks: true }) as string),
     [body, previewTooLong]
   );
-
-  function authenticate() {
-    window.location.assign('/api/auth/start?next=%2Fwrite%2F');
-  }
-
-  async function github<T>(
-    path: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    if (!tokenRef.current)
-      throw new Error('Git 기반 편집 기능은 비활성화되어 있습니다.');
-    const headers = new Headers(options.headers);
-    headers.set('Accept', 'application/vnd.github+json');
-    headers.set('Authorization', `Bearer ${tokenRef.current}`);
-    headers.set('Content-Type', 'application/json');
-    const response = await fetch(`${API}${path}`, {
-      ...options,
-      headers,
-    });
-    if (!response.ok) {
-      const error = (await response.json().catch(() => ({}))) as {
-        message?: string;
-      };
-      throw new Error(
-        error.message ?? `GitHub 요청 실패 (${String(response.status)})`
-      );
-    }
-    return response.status === 204
-      ? (undefined as T)
-      : ((await response.json()) as T);
-  }
 
   async function editorApi<T>(
     path: string,
@@ -213,47 +137,6 @@ export default function WriteEditor({
     if (!response.ok)
       throw new Error(result.error || `편집기 요청 실패 (${response.status})`);
     return result as T;
-  }
-
-  async function content(path: string, ref: string) {
-    return github<{ sha: string; content: string }>(
-      `/contents/${path}?ref=${encodeURIComponent(ref)}`
-    );
-  }
-
-  async function loadDashboard() {
-    const [seriesFile, openPulls] = await Promise.all([
-      content(SERIES_PATH, 'main'),
-      github<{ number: number; title: string; head: { ref: string } }[]>(
-        '/pulls?state=open&per_page=100'
-      ),
-    ]);
-    setSeries(parseJson<Series[]>(decodeBase64(seriesFile.content)));
-    const ownPulls = openPulls.filter((pull) =>
-      pull.head.ref.startsWith('cms/write/')
-    );
-    const loaded = await Promise.all(
-      ownPulls.map(async (pull) => {
-        const files = await github<{ filename: string }[]>(
-          `/pulls/${String(pull.number)}/files?per_page=100`
-        );
-        const postFile = files.find((file) =>
-          file.filename.startsWith(`${POST_PATH}/`)
-        );
-        if (!postFile) return null;
-        return {
-          number: pull.number,
-          branch: pull.head.ref,
-          id: postFile.filename
-            .slice(POST_PATH.length + 1)
-            .replace(/\.md$/, ''),
-          title: pull.title.replace(/^글 초안: /, ''),
-        };
-      })
-    );
-    setDrafts(
-      loaded.filter((item): item is NonNullable<typeof item> => item !== null)
-    );
   }
 
   async function loadD1Dashboard() {
@@ -290,8 +173,8 @@ export default function WriteEditor({
           }>;
         }
       );
-      setD1Mode(config.enabled);
-      if (!config.enabled) throw new Error('D1 기반 편집기가 비활성화되어 있습니다.');
+      if (!config.enabled)
+        throw new Error('D1 기반 편집기가 비활성화되어 있습니다.');
       await loadD1Dashboard();
       setAuthorized(true);
     })().catch(() => {
@@ -311,10 +194,6 @@ export default function WriteEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authorized]);
 
-  function login() {
-    authenticate();
-  }
-
   function reset() {
     setId(null);
     setDraft(null);
@@ -332,81 +211,57 @@ export default function WriteEditor({
     setStatus('');
   }
 
-  async function openPost(postId: string, ref = 'main', selectedDraft?: Draft) {
+  async function openPost(postId: string) {
     setBusy(true);
     try {
-      if (d1Mode) {
-        const post = await editorApi<{
-          id: string;
-          title: string;
-          slug: string;
-          description: string;
-          markdown: string;
-          tags: string[];
-          seriesId: string | null;
-          newSeries: Series | null;
-          thumbnail: string | null;
-          revision: number;
-          baseRevision: number;
-          publishedAt: string | null;
-          publishedRevision: number | null;
-          isDraft: boolean;
-        }>(`/posts/${encodeURIComponent(postId)}`);
-        setId(post.id);
-        setDraft(
-          post.isDraft
-            ? {
-                id: post.id,
-                title: post.title,
-                revision: post.revision,
-                baseRevision: post.baseRevision,
-              }
-            : null
+      const post = await editorApi<{
+        id: string;
+        title: string;
+        slug: string;
+        description: string;
+        markdown: string;
+        tags: string[];
+        seriesId: string | null;
+        newSeries: Series | null;
+        thumbnail: string | null;
+        revision: number;
+        baseRevision: number;
+        publishedAt: string | null;
+        publishedRevision: number | null;
+        isDraft: boolean;
+      }>(`/posts/${encodeURIComponent(postId)}`);
+      setId(post.id);
+      setDraft(
+        post.isDraft
+          ? {
+              id: post.id,
+              title: post.title,
+              revision: post.revision,
+              baseRevision: post.baseRevision,
+            }
+          : null
+      );
+      setSource({
+        title: post.title,
+        slug: post.slug,
+        description: post.description,
+        publishedAt: post.publishedAt ?? undefined,
+        revision: post.publishedRevision ?? 0,
+      });
+      setTitle(post.title);
+      setDescription(post.description);
+      setTags(post.tags);
+      setBody(post.markdown);
+      setSeriesId(post.seriesId ?? '');
+      setThumbnail(post.thumbnail ?? '');
+      setNewSeries(post.newSeries);
+      const draftSeries = post.newSeries;
+      if (draftSeries)
+        setSeries((current) =>
+          current.some((item) => item.id === draftSeries.id)
+            ? current
+            : [...current, draftSeries]
         );
-        setSource({
-          title: post.title,
-          slug: post.slug,
-          description: post.description,
-          publishedAt: post.publishedAt ?? undefined,
-          revision: post.publishedRevision ?? 0,
-        });
-        setTitle(post.title);
-        setDescription(post.description);
-        setTags(post.tags);
-        setBody(post.markdown);
-        setSeriesId(post.seriesId ?? '');
-        setThumbnail(post.thumbnail ?? '');
-        setNewSeries(post.newSeries);
-        const draftSeries = post.newSeries;
-        if (draftSeries)
-          setSeries((current) =>
-            current.some((item) => item.id === draftSeries.id)
-              ? current
-              : [...current, draftSeries]
-          );
-        setPanel(null);
-        setStatus('');
-        return;
-      }
-      const file = await content(`${POST_PATH}/${postId}.md`, ref);
-      const parsed = parsePost(decodeBase64(file.content));
-      if (
-        parsed.data.series?.id &&
-        !series.some((item) => item.id === parsed.data.series?.id)
-      ) {
-        const seriesFile = await content(SERIES_PATH, ref);
-        setSeries(parseJson<Series[]>(decodeBase64(seriesFile.content)));
-      }
-      setId(postId);
-      setDraft(selectedDraft ?? null);
-      setSource(parsed.data);
-      setTitle(parsed.data.title ?? '');
-      setDescription(parsed.data.description ?? '');
-      setTags(parsed.data.tags ?? []);
-      setBody(parsed.body);
-      setSeriesId(parsed.data.series?.id ?? '');
-      setThumbnail(parsed.data.thumbnail ?? '');
-      setNewSeries(null);
       setPanel(null);
       setStatus('');
     } catch (error) {
@@ -537,31 +392,7 @@ export default function WriteEditor({
     }
   }
 
-  async function putFile(path: string, branch: string, value: string) {
-    let sha: string | undefined;
-    try {
-      sha = (await content(path, branch)).sha;
-    } catch (error) {
-      if (!(error instanceof Error) || !error.message.includes('Not Found')) {
-        throw error;
-      }
-    }
-    return github<{ commit: { sha: string } }>(`/contents/${path}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message: `docs: update ${path.split('/').at(-1) ?? path}`,
-        content: encodeBase64(value),
-        branch,
-        ...(sha ? { sha } : {}),
-      }),
-    });
-  }
-
   async function save(publish: boolean) {
-    if (!d1Mode && !tokenRef.current) {
-      setStatus('먼저 GitHub에 로그인해 주세요.');
-      return;
-    }
     if (!title.trim() || !body.trim()) {
       setStatus('제목과 본문을 입력해 주세요.');
       return;
@@ -585,199 +416,86 @@ export default function WriteEditor({
     setBusy(true);
     setStatus(publish ? '발행 준비 중…' : '초안 저장 중…');
     try {
-      if (d1Mode) {
-        const postId = id ?? crypto.randomUUID();
-        const expectedRevision = draft?.revision ?? 0;
-        const baseRevision =
-          draft?.baseRevision ?? Number(source.revision ?? 0);
-        const result = await editorApi<{
-          id: string;
-          revision: number;
-          baseRevision?: number;
-          publishedAt?: string;
-          updatedAt?: string;
-          url?: string;
-        }>('/posts', {
-          method: 'POST',
-          body: JSON.stringify({
-            requestId: crypto.randomUUID(),
-            operation: publish ? 'publish' : 'save',
-            id: postId,
-            title: title.trim(),
-            slug,
-            description: description.trim(),
-            markdown: body.trimEnd(),
-            tags,
-            seriesId: seriesId || null,
-            newSeries,
-            thumbnail: thumbnail || null,
-            expectedRevision,
-            baseRevision,
-          }),
-        });
-        setId(postId);
-        setSource((current) => ({
-          ...current,
+      const postId = id ?? crypto.randomUUID();
+      const expectedRevision = draft?.revision ?? 0;
+      const baseRevision = draft?.baseRevision ?? Number(source.revision ?? 0);
+      const result = await editorApi<{
+        id: string;
+        revision: number;
+        baseRevision?: number;
+        publishedAt?: string;
+        updatedAt?: string;
+        url?: string;
+      }>('/posts', {
+        method: 'POST',
+        body: JSON.stringify({
+          requestId: crypto.randomUUID(),
+          operation: publish ? 'publish' : 'save',
+          id: postId,
           title: title.trim(),
           slug,
           description: description.trim(),
+          markdown: body.trimEnd(),
           tags,
-          series: seriesId ? { id: seriesId } : undefined,
-          thumbnail: thumbnail || undefined,
-          publishedAt: result.publishedAt ?? current.publishedAt,
-          updatedAt: result.updatedAt ?? current.updatedAt,
-          revision: result.revision,
-        }));
-        if (publish) {
-          setDraft(null);
-          setDrafts((current) => current.filter((item) => item.id !== postId));
-          setPosts((current) => [
-            {
-              id: postId,
-              title: title.trim(),
-              slug,
-              publishedAt: result.publishedAt ?? clickedAt,
-              revision: result.revision,
-            },
-            ...current.filter((item) => item.id !== postId),
-          ]);
-          if (newSeries) {
-            setSeries((current) =>
-              current.some((item) => item.id === newSeries.id)
-                ? current
-                : [...current, newSeries]
-            );
-            setNewSeries(null);
-          }
-          setPanel(null);
-          setStatus(`발행했습니다. 공개 URL: ${result.url}`);
-          return;
-        }
-        const nextDraft = {
-          id: postId,
-          title: title.trim(),
-          revision: result.revision,
+          seriesId: seriesId || null,
+          newSeries,
+          thumbnail: thumbnail || null,
+          expectedRevision,
           baseRevision,
-        };
-        setDraft(nextDraft);
-        setDrafts((current) => [
-          nextDraft,
+        }),
+      });
+      setId(postId);
+      setSource((current) => ({
+        ...current,
+        title: title.trim(),
+        slug,
+        description: description.trim(),
+        tags,
+        series: seriesId ? { id: seriesId } : undefined,
+        thumbnail: thumbnail || undefined,
+        publishedAt: result.publishedAt ?? current.publishedAt,
+        updatedAt: result.updatedAt ?? current.updatedAt,
+        revision: result.revision,
+      }));
+      if (publish) {
+        setDraft(null);
+        setDrafts((current) => current.filter((item) => item.id !== postId));
+        setPosts((current) => [
+          {
+            id: postId,
+            title: title.trim(),
+            slug,
+            publishedAt: result.publishedAt ?? clickedAt,
+            revision: result.revision,
+          },
           ...current.filter((item) => item.id !== postId),
         ]);
-        setStatus(
-          '초안을 D1에 저장했습니다. 공개 글에는 아직 반영되지 않았습니다.'
-        );
+        if (newSeries) {
+          setSeries((current) =>
+            current.some((item) => item.id === newSeries.id)
+              ? current
+              : [...current, newSeries]
+          );
+          setNewSeries(null);
+        }
+        setPanel(null);
+        setStatus(`발행했습니다. 공개 URL: ${result.url}`);
         return;
       }
-      const postId = id ?? crypto.randomUUID();
-      let branch = draft?.branch;
-      if (!branch) {
-        const main = await github<{ object: { sha: string } }>(
-          '/git/ref/heads/main'
-        );
-        branch = `cms/write/${postId}-${String(Date.now())}`;
-        await github('/git/refs', {
-          method: 'POST',
-          body: JSON.stringify({
-            ref: `refs/heads/${branch}`,
-            sha: main.object.sha,
-          }),
-        });
-      }
-      if (newSeries) {
-        const file = await content(SERIES_PATH, branch);
-        const currentSeries = parseJson<Series[]>(decodeBase64(file.content));
-        if (!currentSeries.some((item) => item.id === newSeries.id)) {
-          currentSeries.push(newSeries);
-          await putFile(
-            SERIES_PATH,
-            branch,
-            JSON.stringify(currentSeries, null, 2) + '\n'
-          );
-        }
-      }
-      const now = clickedAt;
-      const data: Frontmatter = {
-        ...source,
+      const nextDraft = {
+        id: postId,
         title: title.trim(),
-        description: description.trim(),
-        slug,
-        publishedAt: source.publishedAt ?? now,
-        ...(publish ? { updatedAt: now } : {}),
-        tags,
-        draft: !publish,
+        revision: result.revision,
+        baseRevision,
       };
-      if (publish && !posts.some((post) => post.id === postId)) {
-        data.publishedAt = now;
-      }
-      if (!data.updatedAt && publish) data.updatedAt = now;
-      if (seriesId) data.series = { id: seriesId };
-      else delete data.series;
-      if (thumbnail) data.thumbnail = thumbnail;
-      else delete data.thumbnail;
-      const document = `---\n${YAML.stringify(data, { lineWidth: 0 })}---\n${body.trimEnd()}\n`;
-      await putFile(`${POST_PATH}/${postId}.md`, branch, document);
-
-      let pullNumber = draft?.number;
-      if (!pullNumber) {
-        const pull = await github<{ number: number }>('/pulls', {
-          method: 'POST',
-          body: JSON.stringify({
-            title: `글 초안: ${title.trim()}`,
-            head: branch,
-            base: 'main',
-            body: '글쓰기 화면에서 작성한 글입니다.',
-          }),
-        });
-        pullNumber = pull.number;
-      }
-      const nextDraft = { number: pullNumber, branch, id: postId, title };
-      setId(postId);
       setDraft(nextDraft);
-      setSource(data);
-      setNewSeries(null);
-      if (!publish) {
-        setDrafts((current) => [
-          nextDraft,
-          ...current.filter((item) => item.number !== pullNumber),
-        ]);
-        setStatus(
-          '초안을 저장했습니다. 발행 전까지 사이트에 표시되지 않습니다.'
-        );
-        return;
-      }
-      setStatus('검사 완료를 기다린 뒤 PR을 병합합니다…');
-      for (let attempt = 0; attempt < 48; attempt++) {
-        try {
-          await github(`/pulls/${String(pullNumber)}/merge`, {
-            method: 'PUT',
-            body: JSON.stringify({ merge_method: 'squash' }),
-          });
-          setDraft(null);
-          setDrafts((current) =>
-            current.filter((item) => item.number !== pullNumber)
-          );
-          setPosts((current) => [
-            { id: postId, title, slug, publishedAt: data.publishedAt ?? now },
-            ...current.filter((item) => item.id !== postId),
-          ]);
-          setPanel(null);
-          setStatus('발행했습니다. 사이트 빌드가 끝나면 목록에 표시됩니다.');
-          return;
-        } catch (error) {
-          const message = (error as Error).message;
-          if (
-            !/merge|status|checks|405|not mergeable/i.test(message) ||
-            attempt === 47
-          ) {
-            throw new Error(
-              `PR #${String(pullNumber)} 발행 대기 중: ${message}. GitHub에서 확인해 주세요.`,
-              { cause: error }
-            );
-          }
-          await new Promise((resolve) => setTimeout(resolve, 5000));
-        }
-      }
+      setDrafts((current) => [
+        nextDraft,
+        ...current.filter((item) => item.id !== postId),
+      ]);
+      setStatus(
+        '초안을 D1에 저장했습니다. 공개 글에는 아직 반영되지 않았습니다.'
+      );
     } catch (error) {
       setStatus((error as Error).message);
     } finally {
@@ -786,7 +504,7 @@ export default function WriteEditor({
   }
 
   async function moveToTrash() {
-    if (!d1Mode || !id || !posts.some((post) => post.id === id)) return;
+    if (!id || !posts.some((post) => post.id === id)) return;
     setBusy(true);
     try {
       const result = await editorApi<{ id: string; deletedAt: string }>(
@@ -820,7 +538,10 @@ export default function WriteEditor({
         body: JSON.stringify({ requestId: crypto.randomUUID() }),
       });
       setTrash((current) => current.filter((item) => item.id !== post.id));
-      setPosts((current) => [post, ...current.filter((item) => item.id !== post.id)]);
+      setPosts((current) => [
+        post,
+        ...current.filter((item) => item.id !== post.id),
+      ]);
       setStatus(`“${post.title}” 글을 복구했습니다.`);
     } catch (error) {
       setStatus((error as Error).message);
@@ -852,22 +573,18 @@ export default function WriteEditor({
             <div className="write-head-actions">
               <a href="/admin/">글 관리</a>
               <button onClick={() => setPanel('posts')}>내 글</button>
-              {authorized ? (
-                <button
-                  onClick={() => {
-                    void fetch('/api/auth/logout', {
-                      method: 'POST',
-                      credentials: 'same-origin',
-                    }).finally(() => {
-                      window.location.replace('/login/');
-                    });
-                  }}
-                >
-                  로그아웃
-                </button>
-              ) : (
-                <button onClick={login}>GitHub 로그인</button>
-              )}
+              <button
+                onClick={() => {
+                  void fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                  }).finally(() => {
+                    window.location.replace('/login/');
+                  });
+                }}
+              >
+                로그아웃
+              </button>
             </div>
           </div>
           <div className="write-fields">
@@ -1034,7 +751,7 @@ export default function WriteEditor({
               >
                 임시저장
               </button>
-              {d1Mode && id && posts.some((post) => post.id === id) && (
+              {id && posts.some((post) => post.id === id) && (
                 <button disabled={busy || uploads > 0} onClick={moveToTrash}>
                   휴지통으로
                 </button>
@@ -1068,7 +785,8 @@ export default function WriteEditor({
             )}
             {previewTooLong ? (
               <p className="write-preview-placeholder">
-                본문이 100,000자를 넘어 미리보기를 생략했습니다. 임시저장과 출간은 계속할 수 있습니다.
+                본문이 100,000자를 넘어 미리보기를 생략했습니다. 임시저장과
+                출간은 계속할 수 있습니다.
               </p>
             ) : (
               <div
@@ -1107,11 +825,6 @@ export default function WriteEditor({
                 <button className="write-new-post" onClick={reset}>
                   + 새 글 쓰기
                 </button>
-                {!authorized && (
-                  <button className="write-login-hint" onClick={login}>
-                    GitHub 로그인하여 글 불러오기
-                  </button>
-                )}
                 <input
                   className="write-search"
                   placeholder="글 제목 검색"
@@ -1122,7 +835,7 @@ export default function WriteEditor({
                   {drafts.map((item) => (
                     <button
                       key={item.id}
-                      onClick={() => void openPost(item.id, item.branch, item)}
+                      onClick={() => void openPost(item.id)}
                     >
                       <span className="write-draft-badge">초안</span>{' '}
                       {item.title}
@@ -1147,7 +860,10 @@ export default function WriteEditor({
                           <span>
                             <strong>{post.title}</strong>
                             <small>
-                              삭제 {new Date(post.deletedAt || '').toLocaleDateString('ko-KR')}
+                              삭제{' '}
+                              {new Date(
+                                post.deletedAt || ''
+                              ).toLocaleDateString('ko-KR')}
                             </small>
                           </span>
                           <button

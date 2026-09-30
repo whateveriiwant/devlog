@@ -52,7 +52,8 @@ async function renderArticle(request, env, url) {
   const slug = decodeURIComponent(
     url.pathname.slice('/blog/'.length).replace(/\/$/, '')
   );
-  if (!slug || slug.includes('/')) return env.ASSETS.fetch(request);
+  if (!slug || slug.includes('/'))
+    return new Response('Not found', { status: 404 });
 
   let response;
   try {
@@ -707,6 +708,29 @@ function authApiPath(path) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // Reject retired assets even if an old deployment still contains them.
+    let path;
+    try {
+      path = decodeURIComponent(url.pathname).replace(/\/$/, '');
+    } catch {
+      return new Response('Invalid path', { status: 400 });
+    }
+    if (
+      path === '/search-index.json' ||
+      path.startsWith('/search-index.json/') ||
+      path === '/pagefind' ||
+      path.startsWith('/pagefind/') ||
+      [
+        '/admin/legacy.html',
+        '/admin/config.yml',
+        '/admin/admin.css',
+        '/admin/r2-media.js',
+      ].some((retired) => path === retired || path.startsWith(`${retired}/`))
+    )
+      return new Response('Not found', {
+        status: 404,
+        headers: { 'Cache-Control': 'no-store' },
+      });
     if (
       contentReadsEnabled(env) &&
       request.method === 'GET' &&
@@ -771,7 +795,10 @@ export default {
       )
         return new Response(JSON.stringify({ error: 'Forbidden origin' }), {
           status: 403,
-          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store',
+          },
         });
       const target = new URL(request.url);
       target.pathname = authPath;
@@ -827,7 +854,11 @@ export default {
     }
 
     const cookie = request.headers.get('Cookie') || '';
-    if (!cookie.split(';').some((part) => part.trim().startsWith('__Host-cms_session='))) {
+    if (
+      !cookie
+        .split(';')
+        .some((part) => part.trim().startsWith('__Host-cms_session='))
+    ) {
       const next = `${url.pathname}${url.search}`;
       return Response.redirect(
         `${url.origin}/login/?next=${encodeURIComponent(next)}`,

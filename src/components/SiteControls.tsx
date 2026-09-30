@@ -20,92 +20,9 @@ import {
   SheetTrigger,
 } from './ui/sheet';
 import NavigationPanel from './NavigationPanel';
+import { searchPosts, type SearchData } from '../lib/search';
 import type { NavSection } from '../lib/navigation';
 
-interface SearchData {
-  url: string;
-  plain_excerpt?: string;
-  meta: Record<string, string>;
-}
-interface SearchDocument extends SearchData {
-  content: string;
-}
-interface SearchIndex {
-  search(
-    query: string
-  ): Promise<{ results: { data(): Promise<SearchData> }[] }>;
-}
-let index: Promise<SearchIndex> | undefined;
-let staticIndex: Promise<SearchIndex> | undefined;
-const normalizeSearch = (value: string) =>
-  value.normalize('NFKC').toLocaleLowerCase('ko');
-async function fallbackIndex(): Promise<SearchIndex> {
-  const response = await fetch('/search-index.json');
-  if (!response.ok) throw new Error('Search index could not be loaded');
-  const documents = (await response.json()) as SearchDocument[];
-  return {
-    search(query) {
-      const normalizedQuery = normalizeSearch(query);
-      const terms = normalizedQuery.split(/\s+/).filter(Boolean);
-      const matches = documents
-        .map((data) => {
-          const title = normalizeSearch(data.meta.title ?? '');
-          const description = normalizeSearch(data.meta.description ?? '');
-          const details = normalizeSearch(
-            `${data.meta.series ?? ''} ${data.meta.tags ?? ''}`
-          );
-          const content = normalizeSearch(data.content);
-          const searchable = `${title} ${description} ${details} ${content}`;
-          if (!terms.every((term) => searchable.includes(term))) return null;
-          const score =
-            (title.includes(normalizedQuery) ? 100 : 0) +
-            (description.includes(normalizedQuery) ? 40 : 0) +
-            (details.includes(normalizedQuery) ? 20 : 0) +
-            (content.includes(normalizedQuery) ? 10 : 0);
-          return { data, score };
-        })
-        .filter((match): match is { data: SearchDocument; score: number } =>
-          Boolean(match)
-        )
-        .sort((a, b) => b.score - a.score);
-      return Promise.resolve({
-        results: matches.map(({ data }) => ({
-          data: () => Promise.resolve(data),
-        })),
-      });
-    },
-  };
-}
-function getIndex(): Promise<SearchIndex> {
-  if (index) return index;
-  return (index = Promise.resolve({
-    async search(query) {
-      try {
-        const response = await fetch(
-          `/api/content/search?q=${encodeURIComponent(query)}`
-        );
-        if (!response.ok) throw new Error('Runtime search unavailable');
-        const result = (await response.json()) as {
-          entries: SearchData[];
-        };
-        return {
-          results: result.entries.map((data) => ({ data: () => Promise.resolve(data) })),
-        };
-      } catch {
-        if (!staticIndex) {
-          const path = '/pagefind/pagefind.js';
-          const load = import.meta.env.DEV
-            ? fallbackIndex()
-            : import(/* @vite-ignore */ path)
-                .then((module) => module as SearchIndex)
-                .catch(fallbackIndex);
-          staticIndex = load;
-        }
-        return (await staticIndex).search(query);
-      }
-    },
-  }));
-}
 function excerpt(data: SearchData) {
   if (data.meta.description) return data.meta.description;
   const el = document.createElement('textarea');
@@ -119,6 +36,8 @@ export default function SiteControls({ sections }: { sections: NavSection[] }) {
     [limit, setLimit] = useState(12);
   const [results, setResults] = useState<SearchData[]>([]),
     [total, setTotal] = useState(0);
+  const [searchFailed, setSearchFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
   const [status, setStatus] = useState('모든 글의 제목과 본문을 검색합니다.');
   const [photo, setPhoto] = useState<{
     src: string;
@@ -214,6 +133,7 @@ export default function SiteControls({ sections }: { sections: NavSection[] }) {
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
+    setSearchFailed(false);
     setResults([]);
     setTotal(0);
     if (!query.trim()) {
@@ -223,10 +143,8 @@ export default function SiteControls({ sections }: { sections: NavSection[] }) {
     setStatus('검색하고 있습니다…');
     const timer = setTimeout(async () => {
       try {
-        const response = await (await getIndex()).search(query.trim());
-        const items = await Promise.all(
-          response.results.slice(0, limit).map((hit) => hit.data())
-        );
+        const entries = await searchPosts(query.trim());
+        const items = entries.slice(0, limit);
         if (cancelled) return;
         setResults(
           items.filter(
@@ -234,22 +152,24 @@ export default function SiteControls({ sections }: { sections: NavSection[] }) {
               new URL(item.url, location.origin).origin === location.origin
           )
         );
-        setTotal(response.results.length);
+        setTotal(entries.length);
         setStatus(
-          response.results.length
-            ? `${response.results.length}개의 글을 찾았습니다.`
+          entries.length
+            ? `${entries.length}개의 글을 찾았습니다.`
             : '일치하는 글이 없습니다. 다른 단어로 검색해 보세요.'
         );
       } catch {
-        if (!cancelled)
-          setStatus('검색을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        if (!cancelled) {
+          setSearchFailed(true);
+          setStatus('검색을 불러오지 못했습니다. 다시 시도해 주세요.');
+        }
       }
     }, 140);
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query, limit, open]);
+  }, [query, limit, open, retry]);
   return (
     <div className="ml-auto flex shrink-0 items-center gap-1.5">
       <Dialog open={open} onOpenChange={setOpen}>
@@ -299,6 +219,15 @@ export default function SiteControls({ sections }: { sections: NavSection[] }) {
             >
               {status}
             </p>
+            {searchFailed && (
+              <Button
+                variant="ghost"
+                className="mx-4 mb-2"
+                onClick={() => setRetry((value) => value + 1)}
+              >
+                다시 시도
+              </Button>
+            )}
             <CommandList className="max-h-[55dvh] px-2 pb-2">
               {results.map((data) => (
                 <CommandItem
