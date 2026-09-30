@@ -16,14 +16,18 @@ const markerKey = key.replace('posts/', 'cms-orphans/');
 const start = Date.parse('2026-09-20T00:00:00Z');
 const week = 7 * 24 * 60 * 60 * 1000;
 
-async function run({
+export async function run({
   age,
   referenced = false,
   race = false,
   missing = false,
   fail = false,
   dry = false,
+  imageKey,
+  readReferences,
 }) {
+  const selectedKey = imageKey || key;
+  const selectedMarker = selectedKey.replace('posts/', 'cms-orphans/');
   const calls = [];
   let reads = 0;
   const context = vm.createContext({
@@ -64,8 +68,8 @@ async function run({
         return {
           Contents: [
             command.input.Prefix === 'posts/'
-              ? { Key: key }
-              : { Key: markerKey, LastModified: new Date(start) },
+              ? { Key: selectedKey }
+              : { Key: selectedMarker, LastModified: new Date(start) },
           ],
         };
       if (command.name === 'HeadObject' && missing)
@@ -77,12 +81,16 @@ async function run({
   const adapters = {
     'node:path': path,
     'node:child_process': {
-      execFileSync() {
+      execFileSync(_command, args) {
         if (fail) throw new Error('D1 unavailable');
         reads++;
         return JSON.stringify([
           {
-            results: referenced || (race && reads > 1) ? [{ r2_key: key }] : [],
+            results: readReferences
+              ? readReferences(args[args.indexOf('--command') + 1])
+              : referenced || (race && reads > 1)
+                ? [{ r2_key: selectedKey }]
+                : [],
           },
         ]);
       },

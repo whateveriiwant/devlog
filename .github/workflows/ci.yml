@@ -45,6 +45,7 @@ jobs:
           node --experimental-vm-modules scripts/verify-image-cleanup.mjs
           node scripts/verify-d1-routes.mjs
           node scripts/verify-series-pagination.mjs
+          pnpm verify:content
 
       - name: Build static site
         run: pnpm build
