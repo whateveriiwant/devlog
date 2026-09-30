@@ -46,8 +46,11 @@ jobs:
           node scripts/verify-d1-routes.mjs
           node scripts/verify-series-pagination.mjs
 
-      - name: Build static site and search index
+      - name: Build static site
         run: pnpm build
+
+      - name: Verify D1 search and retired content paths
+        run: pnpm verify:search
 
       - name: Deploy CMS to Cloudflare
         if: >-
