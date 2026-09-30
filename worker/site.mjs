@@ -705,6 +705,42 @@ function authApiPath(path) {
   return null;
 }
 
+async function managementAsset(request, env) {
+  const asset = await env.ASSETS.fetch(request);
+  const headers = new Headers(asset.headers);
+  headers.set('Cache-Control', 'private, no-store');
+  headers.set('X-Frame-Options', 'DENY');
+  headers.set('X-Content-Type-Options', 'nosniff');
+  const nonce = crypto.randomUUID().replaceAll('-', '');
+  headers.set(
+    'Content-Security-Policy',
+    [
+      "default-src 'self'",
+      `script-src 'self' 'nonce-${nonce}'`,
+      "script-src-attr 'none'",
+      // React styles and sanitized Markdown previews use inline styles.
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' https: data: blob:",
+      "font-src 'self' data:",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "base-uri 'none'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+    ].join('; ')
+  );
+  headers.delete('Content-Length');
+  const response = new Response(asset.body, { status: asset.status, headers });
+  if (!headers.get('Content-Type')?.includes('text/html')) return response;
+  return new HTMLRewriter()
+    .on('script', {
+      element(element) {
+        element.setAttribute('nonce', nonce);
+      },
+    })
+    .transform(response);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -841,16 +877,15 @@ export default {
       }
       return env.CMS.fetch(new Request(target, request));
     }
-    if (!protectedPath(url.pathname)) return env.ASSETS.fetch(request);
+    if (path === '/login' || path.startsWith('/login/'))
+      return managementAsset(request, env);
+    if (!protectedPath(path)) return env.ASSETS.fetch(request);
 
     if (
       env.STAGE_EDITOR_PREVIEW === 'true' &&
       ['/write', '/write/'].includes(url.pathname)
     ) {
-      const asset = await env.ASSETS.fetch(request);
-      const headers = new Headers(asset.headers);
-      headers.set('Cache-Control', 'private, no-store');
-      return new Response(asset.body, { status: asset.status, headers });
+      return managementAsset(request, env);
     }
 
     const cookie = request.headers.get('Cookie') || '';
@@ -881,9 +916,6 @@ export default {
       return new Response('로그인 확인에 실패했습니다.', { status: 503 });
     }
 
-    const asset = await env.ASSETS.fetch(request);
-    const headers = new Headers(asset.headers);
-    headers.set('Cache-Control', 'private, no-store');
-    return new Response(asset.body, { status: asset.status, headers });
+    return managementAsset(request, env);
   },
 };

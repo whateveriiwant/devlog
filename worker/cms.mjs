@@ -10,7 +10,7 @@ import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 import GithubSlugger from 'github-slugger';
 
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_REQUEST_BYTES = 10 * 1024 * 1024;
 const SESSION_SECONDS = 12 * 60 * 60;
 const MAX_MARKDOWN_BYTES = 1_500_000;
 const renderSchema = {
@@ -72,6 +72,54 @@ function json(data, status = 200, headers = {}) {
       ...headers,
     },
   });
+}
+
+async function readLimitedBody(request) {
+  const length = request.headers.get('Content-Length');
+  if (length !== null && !/^\d+$/.test(length))
+    throw new Error('Invalid Content-Length');
+  const tooLarge = () =>
+    Object.assign(new Error('Request too large'), { status: 413 });
+  if (length !== null && Number(length) > MAX_REQUEST_BYTES) {
+    await request.body?.cancel();
+    throw tooLarge();
+  }
+  const reader = request.body?.getReader();
+  if (!reader) return new Uint8Array();
+  const chunks = [];
+  let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_REQUEST_BYTES) {
+        await reader.cancel();
+        throw tooLarge();
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
+async function readEditorJson(request) {
+  const input = JSON.parse(
+    new TextDecoder('utf-8', { fatal: true }).decode(
+      await readLimitedBody(request)
+    )
+  );
+  if (!input || typeof input !== 'object' || Array.isArray(input))
+    throw new Error('JSON object required');
+  return input;
 }
 
 function redirect(location) {
@@ -242,9 +290,18 @@ async function editorContent(request, env, url) {
       return json({ error: '글 ID가 올바르지 않습니다.' }, 400, headers);
     let input;
     try {
-      input = await request.json();
-    } catch {
-      return json({ error: 'JSON 요청이 올바르지 않습니다.' }, 400, headers);
+      input = await readEditorJson(request);
+    } catch (error) {
+      return json(
+        {
+          error:
+            error?.status === 413
+              ? '요청 전체 크기는 10MB 이하여야 합니다.'
+              : 'JSON 요청이 올바르지 않습니다.',
+        },
+        error?.status === 413 ? 413 : 400,
+        headers
+      );
     }
     const requestId = String(input.requestId || '');
     const operation = postAction[2] ? 'restore' : 'delete';
@@ -420,9 +477,18 @@ async function editorContent(request, env, url) {
   if (url.pathname === '/editor/posts' && request.method === 'POST') {
     let input;
     try {
-      input = await request.json();
-    } catch {
-      return json({ error: 'JSON 요청이 올바르지 않습니다.' }, 400, headers);
+      input = await readEditorJson(request);
+    } catch (error) {
+      return json(
+        {
+          error:
+            error?.status === 413
+              ? '요청 전체 크기는 10MB 이하여야 합니다.'
+              : 'JSON 요청이 올바르지 않습니다.',
+        },
+        error?.status === 413 ? 413 : 400,
+        headers
+      );
     }
     const id = String(input.id || '');
     const requestId = String(input.requestId || '');
@@ -960,17 +1026,30 @@ async function media(request, env, url) {
     return json({ error: 'Method not allowed' }, 405, headers);
   const type = request.headers.get('Content-Type')?.split(';')[0].toLowerCase();
   const image = types[type];
-  const size = Number(request.headers.get('Content-Length'));
-  if (!image || size > MAX_IMAGE_BYTES)
+  if (!image)
     return json(
       { error: 'PNG, JPEG, GIF, WebP, AVIF만 10MB까지 업로드할 수 있습니다.' },
       400,
       headers
     );
-  const bytes = new Uint8Array(await request.arrayBuffer());
+  let bytes;
+  try {
+    bytes = await readLimitedBody(request);
+  } catch (error) {
+    return json(
+      {
+        error:
+          error?.status === 413
+            ? '이미지는 10MB 이하여야 합니다.'
+            : '이미지 요청을 읽을 수 없습니다.',
+      },
+      error?.status === 413 ? 413 : 400,
+      headers
+    );
+  }
   if (
     !bytes.length ||
-    bytes.length > MAX_IMAGE_BYTES ||
+    bytes.length > MAX_REQUEST_BYTES ||
     !image.magic.every((byte, index) => bytes[index] === byte)
   )
     return json(
