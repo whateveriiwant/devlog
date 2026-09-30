@@ -13,6 +13,8 @@
     "binding": "ASSETS",
     "run_worker_first": [
       "/",
+      "/login",
+      "/login/*",
       "/write",
       "/write/*",
       "/admin",

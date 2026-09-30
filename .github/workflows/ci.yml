@@ -50,8 +50,10 @@ jobs:
       - name: Build static site
         run: pnpm build
 
-      - name: Verify D1 search and retired content paths
-        run: pnpm verify:search
+      - name: Verify D1 search, retired paths and security guards
+        run: |
+          pnpm verify:search
+          pnpm verify:security
 
       - name: Deploy CMS to Cloudflare
         if: >-
