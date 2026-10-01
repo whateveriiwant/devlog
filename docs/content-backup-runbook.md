@@ -69,7 +69,17 @@ node scripts/backup-content.mjs restore /private/restore/snapshot /private/resto
 
 PR의 `CI / build` 필수 상태가 성공한 뒤에만 main에 반영한다. `.github/workflows/ci.yml`은 main push에서 CMS Worker를 먼저 배포하고 사이트 Worker를 배포한 뒤 `node scripts/verify-deployment.mjs`를 실행한다. 마지막 검사는 공개 목록·검색의 HTTP 200, 비로그인 세션·관리 API의 HTTP 401, 로그인 CSP·프레임 차단과 응답 nonce 일치를 확인한다. 본문·토큰은 출력하지 않는다. 배포 검증이 실패하면 Actions 실행의 실패한 단계와 Cloudflare 배포 버전을 기록하고, 글쓰기·이미지 정리 작업을 중지한 후 복구한다.
 
-최근 main 실행은 GitHub 저장소의 **Actions → CI → 해당 main push 실행**에서 본다. `build` job 안의 `Deploy CMS`, `Deploy site`, `Verify production deployment` 단계가 각각 성공했는지 확인한다. Cloudflare 대시보드에서는 Workers & Pages의 `devlog-cms`, `devlog`에서 Deployments/Logs를 확인한다. Wrangler CLI로 현재 production 버전과 후보 버전을 조회한다.
+PR·CI·Actions는 브라우저 대신 GitHub CLI로 확인할 수 있다. `gh auth status`가 로그인 상태인지 확인하고 PR 생성 후 아래 조회 명령을 사용한다. PR 검증 상태가 성공한 뒤에만 머지한다. Cloudflare 대시보드에서는 Workers & Pages의 `devlog-cms`, `devlog`에서 Deployments/Logs를 확인한다. Wrangler CLI로 현재 production 버전과 후보 버전을 조회한다.
+
+```sh
+gh pr view --json number,state,statusCheckRollup,url
+gh pr checks --watch
+gh run list --workflow CI --limit 5 --json name,headSha,status,conclusion,url
+gh run view <run-id> --json status,conclusion,headSha,jobs,url
+gh pr merge --squash --delete-branch
+```
+
+GitHub CLI가 로그인되지 않았으면 `gh auth login`을 한 번 실행한다. `gh pr merge`는 체크가 성공한 PR을 직접 머지할 때만 사용한다.
 
 ```sh
 pnpm exec wrangler deployments status --config wrangler.cms.jsonc
@@ -92,7 +102,7 @@ pnpm exec wrangler deployments status --config wrangler.jsonc
 
 Worker 코드를 바꿔도 D1 데이터는 되돌아가지 않는다. migration이 없는 코드 복구는 DB를 유지한다. 스키마 변경은 구 코드 호환성을 유지하는 확장형 migration을 우선한다. 파괴적 변경·데이터 손상이 있으면 즉시 코드 롤백만으로 해결됐다고 보지 않는다. 콘텐츠 쓰기와 이미지 정리를 중지하고 백업 파일을 새 경로·별도 DB/R2로 복원·검증한 뒤, 담당자가 복구 시점·전환을 결정한다. 수동 backup 절차는 D1 export 중 일시적인 조회 불가 가능성이 있고 SQL과 R2가 원자적 스냅샷이 아니므로 저사용 시간에 실행한다. 백업 복원 자체는 운영 DB/R2를 자동 덮어쓰지 않는다.
 
-2026-10-01 스테이징 훈련에서 이전 사이트 버전 `59237a31-a54f-41ee-9b7b-0185d21ea47f`의 로그인 응답에 CSP가 없어 복구 부적합을 확인했다. CMS `472fbffa-f8cf-4a12-9fa7-bade7fe5016a`와 사이트 `32f4a296-a116-45a5-b0ce-bf52aa308aca`는 각각 스테이징 트래픽으로 복구했으며, 후자는 현재 스테이징 검증 버전이다. 인증된 관리자 조작은 수행하지 않았다. 실제 운영 복구 전에는 A4.1 보호와 인증된 관리 기능을 유지하는 이전 버전 조합을 별도로 검증해야 한다.
+2026-10-01 스테이징 훈련에서 이전 사이트 버전 `59237a31-a54f-41ee-9b7b-0185d21ea47f`의 로그인 응답에 CSP가 없어 복구 부적합을 확인했다. 테스트한 CMS `472fbffa-f8cf-4a12-9fa7-bade7fe5016a`·사이트 `59237a31-a54f-41ee-9b7b-0185d21ea47f` 조합은 되돌렸고, 스테이징 CMS `0dc7f0d4-f5db-4648-b41f-4bb986b60e91`·사이트 `32f4a296-a116-45a5-b0ce-bf52aa308aca`로 복구했다. 인증된 관리자 조작은 수행하지 않았다. 실제 운영 복구 전에는 A4.1 보호와 인증된 관리 기능을 유지하는 이전 버전 조합을 별도로 검증해야 한다.
 
 ## 자동화 연결
 
