@@ -76,3 +76,9 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '4.140.0'
           command: deploy --env=""
+
+      - name: Verify production deployment
+        if: >-
+          github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+          vars.CLOUDFLARE_DEPLOY_ENABLED == 'true'
+        run: node scripts/verify-deployment.mjs
