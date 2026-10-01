@@ -25,7 +25,7 @@ function articleMarkup(post) {
   const tags = post.tags
     .map(
       (tag) =>
-        `<a href="/tags/${encodeURIComponent(tagSlug(tag))}/" data-tag="${escapeHtml(tag)}"><span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold">#${escapeHtml(tag)}</span></a>`
+        `<a href="/tags/${encodeURIComponent(tagSlug(tag))}/" data-tag="${escapeHtml(tag)}"><span class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold">${escapeHtml(tag)}</span></a>`
     )
     .join('');
   const series = post.series_slug
