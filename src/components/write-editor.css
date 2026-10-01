@@ -330,8 +330,8 @@ button:disabled {
 }
 .write-status {
   position: fixed;
-  bottom: 82px;
-  left: 48px;
+  top: 24px;
+  right: 24px;
   max-width: min(570px, calc(100vw - 48px));
   z-index: 20;
   padding: 11px 16px;
@@ -515,8 +515,7 @@ button:disabled {
   display: flex;
   gap: 8px;
 }
-.write-create-series button,
-.write-cover button {
+.write-create-series button {
   flex: none;
   border: 0;
   border-radius: 4px;
@@ -524,31 +523,6 @@ button:disabled {
   background: #e6fcf5;
   color: #0ca678;
   font-weight: 700;
-}
-.write-cover {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 700;
-}
-.write-cover img {
-  width: 80px;
-  height: 55px;
-  object-fit: cover;
-  border-radius: 4px;
-}
-.write-cover-upload {
-  display: inline-flex !important;
-  padding: 8px 12px;
-  border-radius: 4px;
-  background: #e6fcf5;
-  color: #0ca678;
-  cursor: pointer;
-}
-.write-cover-upload input {
-  display: none;
 }
 .write-modal-actions {
   display: flex;
@@ -608,7 +582,7 @@ button:disabled {
     font-size: 13px;
   }
   .write-status {
-    left: 12px;
-    bottom: 78px;
+    top: 12px;
+    right: 12px;
   }
 }

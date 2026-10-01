@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { editorRequest as editorApi } from '../lib/editor-api';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
@@ -99,7 +99,6 @@ export default function WriteEditor() {
   const [seriesId, setSeriesId] = useState('');
   const [newSeriesName, setNewSeriesName] = useState('');
   const [newSeries, setNewSeries] = useState<Series | null>(null);
-  const [thumbnail, setThumbnail] = useState('');
   const [panel, setPanel] = useState<'posts' | 'publish' | null>(null);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
@@ -110,6 +109,38 @@ export default function WriteEditor() {
   const editor = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const openedDeepLink = useRef(false);
+  const savedContent = useRef('');
+  const currentContent = JSON.stringify([
+    title,
+    description,
+    tags,
+    body,
+    seriesId,
+  ]);
+
+  const autoSave = useEffectEvent(() => {
+    if (
+      busy ||
+      uploads > 0 ||
+      !title.trim() ||
+      !body.trim() ||
+      currentContent === savedContent.current
+    )
+      return;
+    void save(false);
+  });
+
+  useEffect(() => {
+    if (!authorized) return;
+    const interval = window.setInterval(() => autoSave(), 60_000);
+    return () => window.clearInterval(interval);
+  }, [authorized]);
+
+  useEffect(() => {
+    if (!status) return;
+    const timeout = window.setTimeout(() => setStatus(''), 5000);
+    return () => window.clearTimeout(timeout);
+  }, [status]);
 
   const slug = titleSlug(title);
   const previewTooLong = body.length > MAX_PREVIEW_CHARS;
@@ -177,6 +208,7 @@ export default function WriteEditor() {
   }, [authorized]);
 
   function reset() {
+    savedContent.current = '';
     setId(null);
     setDraft(null);
     setSource({});
@@ -188,7 +220,6 @@ export default function WriteEditor() {
     setSeriesId('');
     setNewSeriesName('');
     setNewSeries(null);
-    setThumbnail('');
     setPanel(null);
     setStatus('');
   }
@@ -213,6 +244,13 @@ export default function WriteEditor() {
         isDraft: boolean;
       }>(`/posts/${encodeURIComponent(postId)}`);
       setId(post.id);
+      savedContent.current = JSON.stringify([
+        post.title,
+        post.description,
+        post.tags,
+        post.markdown,
+        post.seriesId ?? '',
+      ]);
       setDraft(
         post.isDraft
           ? {
@@ -235,7 +273,6 @@ export default function WriteEditor() {
       setTags(post.tags);
       setBody(post.markdown);
       setSeriesId(post.seriesId ?? '');
-      setThumbnail(post.thumbnail ?? '');
       setNewSeries(post.newSeries);
       const draftSeries = post.newSeries;
       if (draftSeries)
@@ -315,7 +352,7 @@ export default function WriteEditor() {
     return offset;
   }
 
-  async function uploadImage(file: File, at: number, cover = false) {
+  async function uploadImage(file: File, at: number) {
     if (
       ![
         'image/png',
@@ -333,11 +370,9 @@ export default function WriteEditor() {
       return;
     }
     const marker = `![업로드 중: ${file.name}](uploading-${crypto.randomUUID()})`;
-    if (!cover) {
-      setBody(
-        (current) => current.slice(0, at) + marker + '\n' + current.slice(at)
-      );
-    }
+    setBody(
+      (current) => current.slice(0, at) + marker + '\n' + current.slice(at)
+    );
     setUploads((count) => count + 1);
     setStatus('이미지를 R2에 업로드하고 있습니다…');
     try {
@@ -357,17 +392,14 @@ export default function WriteEditor() {
       if (!response.ok) throw new Error(result.error ?? '이미지 업로드 실패');
       if (!result.url) throw new Error('업로드 응답에 이미지 주소가 없습니다.');
       const url = result.url;
-      if (cover) setThumbnail(url);
-      else {
-        const name = file.name
-          .replace(/\.[^.]+$/, '')
-          .replaceAll('[', '')
-          .replaceAll(']', '');
-        setBody((current) => current.replace(marker, `![${name}](${url})`));
-      }
+      const name = file.name
+        .replace(/\.[^.]+$/, '')
+        .replaceAll('[', '')
+        .replaceAll(']', '');
+      setBody((current) => current.replace(marker, `![${name}](${url})`));
       setStatus('이미지가 R2에 업로드되었습니다.');
     } catch (error) {
-      if (!cover) setBody((current) => current.replace(marker + '\n', ''));
+      setBody((current) => current.replace(marker + '\n', ''));
       setStatus((error as Error).message);
     } finally {
       setUploads((count) => count - 1);
@@ -375,6 +407,7 @@ export default function WriteEditor() {
   }
 
   async function save(publish: boolean) {
+    if (busy) return;
     if (!title.trim() || !body.trim()) {
       setStatus('제목과 본문을 입력해 주세요.');
       return;
@@ -395,6 +428,11 @@ export default function WriteEditor() {
       return;
     }
     const clickedAt = new Date().toISOString();
+    const thumbnail =
+      new DOMParser()
+        .parseFromString(previewHtml, 'text/html')
+        .querySelector('img')
+        ?.getAttribute('src') ?? null;
     setBusy(true);
     setStatus(publish ? '발행 준비 중…' : '초안 저장 중…');
     try {
@@ -422,7 +460,7 @@ export default function WriteEditor() {
           tags,
           seriesId: seriesId || null,
           newSeries,
-          thumbnail: thumbnail || null,
+          thumbnail,
           expectedRevision,
           baseRevision,
         }),
@@ -435,11 +473,12 @@ export default function WriteEditor() {
         description: description.trim(),
         tags,
         series: seriesId ? { id: seriesId } : undefined,
-        thumbnail: thumbnail || undefined,
+        thumbnail: thumbnail ?? undefined,
         publishedAt: result.publishedAt ?? current.publishedAt,
         updatedAt: result.updatedAt ?? current.updatedAt,
         revision: result.revision,
       }));
+      savedContent.current = currentContent;
       if (publish) {
         setDraft(null);
         setDrafts((current) => current.filter((item) => item.id !== postId));
@@ -591,7 +630,7 @@ export default function WriteEditor() {
                   title="태그 삭제"
                   onClick={() => setTags(tags.filter((item) => item !== tag))}
                 >
-                  #{tag} ×
+                  {tag} ×
                 </button>
               ))}
               <input
@@ -600,6 +639,11 @@ export default function WriteEditor() {
                 value={tagInput}
                 onChange={(event) => setTagInput(event.target.value)}
                 onKeyDown={(event) => {
+                  if (
+                    event.nativeEvent.isComposing ||
+                    event.nativeEvent.keyCode === 229
+                  )
+                    return;
                   if (event.key === 'Enter' || event.key === ',') {
                     event.preventDefault();
                     addTag();
@@ -762,7 +806,7 @@ export default function WriteEditor() {
             {tags.length > 0 && (
               <div className="write-preview-tags">
                 {tags.map((tag) => (
-                  <span key={tag}>#{tag}</span>
+                  <span key={tag}>{tag}</span>
                 ))}
               </div>
             )}
@@ -903,25 +947,6 @@ export default function WriteEditor() {
                     }}
                   />
                   <button onClick={createSeries}>시리즈 만들기</button>
-                </div>
-                <div className="write-cover">
-                  <span>썸네일</span>
-                  {thumbnail && <img src={thumbnail} alt="썸네일 미리보기" />}
-                  <label className="write-cover-upload">
-                    이미지 선택
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        if (file) void uploadImage(file, 0, true);
-                        event.target.value = '';
-                      }}
-                    />
-                  </label>
-                  {thumbnail && (
-                    <button onClick={() => setThumbnail('')}>제거</button>
-                  )}
                 </div>
                 <div className="write-modal-actions">
                   <button onClick={() => setPanel(null)}>돌아가기</button>
