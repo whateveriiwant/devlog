@@ -65,6 +65,35 @@ node scripts/backup-content.mjs restore /private/restore/snapshot /private/resto
 
 이 절차는 **별도 환경 복구**까지 수행한다. 운영 DB import와 원본 R2 객체 재업로드는 자동 실행하지 않는다. 실제 장애 때는 쓰기·이미지 정리를 중단하고 복구 시점을 선택한 뒤 별도 DB/버킷에서 검증한다. 원래 키·메타데이터 복원, Worker 바인딩 전환, 조회·로그인·발행 확인 후 운영을 재개한다. 원본 버킷의 정리 표식은 복구하지 않는다.
 
+## 배포 확인과 코드 복구
+
+PR의 `CI / build` 필수 상태가 성공한 뒤에만 main에 반영한다. `.github/workflows/ci.yml`은 main push에서 CMS Worker를 먼저 배포하고 사이트 Worker를 배포한 뒤 `node scripts/verify-deployment.mjs`를 실행한다. 마지막 검사는 공개 목록·검색의 HTTP 200, 비로그인 세션·관리 API의 HTTP 401, 로그인 CSP·프레임 차단과 응답 nonce 일치를 확인한다. 본문·토큰은 출력하지 않는다. 배포 검증이 실패하면 Actions 실행의 실패한 단계와 Cloudflare 배포 버전을 기록하고, 글쓰기·이미지 정리 작업을 중지한 후 복구한다.
+
+최근 main 실행은 GitHub 저장소의 **Actions → CI → 해당 main push 실행**에서 본다. `build` job 안의 `Deploy CMS`, `Deploy site`, `Verify production deployment` 단계가 각각 성공했는지 확인한다. Cloudflare 대시보드에서는 Workers & Pages의 `devlog-cms`, `devlog`에서 Deployments/Logs를 확인한다. Wrangler CLI로 현재 production 버전과 후보 버전을 조회한다.
+
+```sh
+pnpm exec wrangler deployments status --config wrangler.cms.jsonc
+pnpm exec wrangler deployments status --config wrangler.jsonc
+pnpm exec wrangler versions list --config wrangler.cms.jsonc
+pnpm exec wrangler versions list --config wrangler.jsonc
+pnpm exec wrangler versions view <version-id> --config wrangler.cms.jsonc
+pnpm exec wrangler versions view <version-id> --config wrangler.jsonc
+```
+
+복구 대상은 마지막 정상 버전이라고 추측하지 말고 `versions view`에서 서비스 바인딩, 환경변수, 비밀 이름, 호환성 날짜와 연결된 D1/R2를 확인한다. A4.1 CSP·nonce·프레임 차단을 포함한 버전인지 별도 환경 또는 배포 검증으로 확인한다. **A4.1 보호가 없는 버전은 운영 복구 후보가 아니다.** 사이트와 CMS 버전이 서로 사용하는 API와 호환되는지 확인한다. 정상 배포 순서는 CMS 다음 사이트다. 롤백은 사이트를 먼저 호환되는 이전 버전으로 되돌린 뒤 CMS를 같은 시점의 호환 버전으로 맞춘다. 각 실행 뒤 `verify-deployment.mjs`와 배포 상태를 확인한다.
+
+```sh
+pnpm exec wrangler versions deploy <site-version-id>@100% --config wrangler.jsonc --yes
+pnpm exec wrangler versions deploy <cms-version-id>@100% --config wrangler.cms.jsonc --yes
+node scripts/verify-deployment.mjs
+pnpm exec wrangler deployments status --config wrangler.cms.jsonc
+pnpm exec wrangler deployments status --config wrangler.jsonc
+```
+
+Worker 코드를 바꿔도 D1 데이터는 되돌아가지 않는다. migration이 없는 코드 복구는 DB를 유지한다. 스키마 변경은 구 코드 호환성을 유지하는 확장형 migration을 우선한다. 파괴적 변경·데이터 손상이 있으면 즉시 코드 롤백만으로 해결됐다고 보지 않는다. 콘텐츠 쓰기와 이미지 정리를 중지하고 백업 파일을 새 경로·별도 DB/R2로 복원·검증한 뒤, 담당자가 복구 시점·전환을 결정한다. 수동 backup 절차는 D1 export 중 일시적인 조회 불가 가능성이 있고 SQL과 R2가 원자적 스냅샷이 아니므로 저사용 시간에 실행한다. 백업 복원 자체는 운영 DB/R2를 자동 덮어쓰지 않는다.
+
+2026-10-01 스테이징 훈련에서 이전 사이트 버전 `59237a31-a54f-41ee-9b7b-0185d21ea47f`의 로그인 응답에 CSP가 없어 복구 부적합을 확인했다. CMS `472fbffa-f8cf-4a12-9fa7-bade7fe5016a`와 사이트 `32f4a296-a116-45a5-b0ce-bf52aa308aca`는 각각 스테이징 트래픽으로 복구했으며, 후자는 현재 스테이징 검증 버전이다. 인증된 관리자 조작은 수행하지 않았다. 실제 운영 복구 전에는 A4.1 보호와 인증된 관리 기능을 유지하는 이전 버전 조합을 별도로 검증해야 한다.
+
 ## 자동화 연결
 
 워크플로: `.github/workflows/content-backup.yml`.

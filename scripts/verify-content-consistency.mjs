@@ -26,6 +26,9 @@ const CONTENT = {
       params,
       first: async () => db.prepare(sql).get(...params) ?? null,
       all: async () => ({ results: db.prepare(sql).all(...params) }),
+      run: async () => ({
+        success: db.prepare(sql).run(...params).changes > 0,
+      }),
     });
     return { ...bound([]), bind: (...params) => bound(params) };
   },
@@ -68,6 +71,15 @@ const env = {
   SITE_ORIGIN: 'https://example.com',
   GITHUB_ALLOWED_LOGIN: 'owner',
   MEDIA_BASE_URL: 'https://media.example.com',
+  MEDIA: {
+    objects: new Map(),
+    async put(key, bytes, options) {
+      this.objects.set(key, { bytes: Buffer.from(bytes), options });
+    },
+    async list() {
+      return { objects: [], truncated: false };
+    },
+  },
 };
 const call = (path, body, method = 'POST') =>
   cms.fetch(
@@ -94,6 +106,48 @@ const write = (extra) => ({
   ...extra,
 });
 const initial = write();
+const png = Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10, 0]);
+const upload = await cms.fetch(
+  new Request('https://cms.example/media', {
+    method: 'POST',
+    headers: {
+      Origin: env.SITE_ORIGIN,
+      Cookie: `__Host-cms_session=${token}`,
+      'Content-Type': 'image/png',
+    },
+    body: png,
+  }),
+  env
+);
+assert.equal(upload.status, 201);
+const uploadedImage = await upload.json();
+assert.match(uploadedImage.key, /^posts\/[0-9a-f-]+\.png$/);
+assert.deepEqual(
+  env.MEDIA.objects.get(uploadedImage.key).bytes,
+  Buffer.from(png)
+);
+const deniedUpload = await cms.fetch(
+  new Request('https://cms.example/media', {
+    method: 'POST',
+    headers: { Origin: env.SITE_ORIGIN, 'Content-Type': 'image/png' },
+    body: png,
+  }),
+  env
+);
+assert.equal(deniedUpload.status, 401, 'Uploads require a live session');
+const invalidUpload = await cms.fetch(
+  new Request('https://cms.example/media', {
+    method: 'POST',
+    headers: {
+      Origin: env.SITE_ORIGIN,
+      Cookie: `__Host-cms_session=${token}`,
+      'Content-Type': 'image/png',
+    },
+    body: 'not a PNG',
+  }),
+  env
+);
+assert.equal(invalidUpload.status, 400, 'Malformed images are rejected');
 const saved = await (await call('/posts', initial)).json();
 assert.equal(saved.revision, 1);
 const replay = await (await call('/posts', initial)).json();
@@ -154,7 +208,7 @@ async function visible(slug, title, present) {
   }
 }
 await visible('draft', initial.title, false);
-const bodyKey = 'posts/00000000-0000-4000-8000-000000000001.png';
+const bodyKey = uploadedImage.key;
 const coverKey = 'posts/00000000-0000-4000-8000-000000000002.png';
 const newKey = 'posts/00000000-0000-4000-8000-000000000003.png';
 async function protectedImage(key, protectedReference = true) {
@@ -209,7 +263,7 @@ assert.deepEqual(
     .prepare('SELECT r2_key FROM post_images ORDER BY r2_key')
     .all()
     .map((r) => r.r2_key),
-  [bodyKey, coverKey]
+  [bodyKey, coverKey].sort()
 );
 const update = write({
   title: '수정 제목',
@@ -425,7 +479,35 @@ try {
 } finally {
   globalThis.fetch = originalFetch;
 }
+const logout = await cms.fetch(
+  new Request('https://cms.example/logout', {
+    method: 'POST',
+    headers: {
+      Origin: env.SITE_ORIGIN,
+      Cookie: `__Host-cms_session=${token}`,
+    },
+  }),
+  env
+);
+assert.equal(logout.status, 204);
+assert.equal(
+  (
+    await cms.fetch(
+      new Request('https://cms.example/session', {
+        headers: { Cookie: `__Host-cms_session=${token}` },
+      }),
+      env
+    )
+  ).status,
+  401,
+  'Logout revokes the server-side session'
+);
+assert.equal(
+  (await call('/posts', write({ id: 'after-logout' }))).status,
+  401,
+  'Revoked sessions cannot write'
+);
 db.close();
 console.log(
-  'PASS: draft/publish/edit/delete/restore public consistency, real SQL CAS/rollback, images, confirmed replay and bounded client retry'
+  'PASS: auth/session revocation, image upload/reference retention, draft/publish/edit/delete/restore consistency, SQL rollback, request replay/conflicts and bounded retry'
 );
