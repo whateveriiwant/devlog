@@ -92,14 +92,14 @@ const mine = tagsFor(post);
         </Expandable>
       </div>
     )}
-    <div class="prose">
+    <div class="prose" data-analytics-body>
       <slot />
     </div>
     <footer data-pagefind-ignore>
       <div class="article-pagination">
         <div>
           {previous && (
-            <a href={postUrl(previous)}>
+            <a href={postUrl(previous)} data-analytics-navigation="previous">
               <span>← {group ? '시리즈 이전 글' : '이전 기록'}</span>
               <strong>{previous.data.title}</strong>
             </a>
@@ -107,7 +107,7 @@ const mine = tagsFor(post);
         </div>
         <div class="text-right">
           {next && (
-            <a href={postUrl(next)}>
+            <a href={postUrl(next)} data-analytics-navigation="next">
               <span>{group ? '시리즈 다음 글' : '다음 기록'} →</span>
               <strong>{next.data.title}</strong>
             </a>

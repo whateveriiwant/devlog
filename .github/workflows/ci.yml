@@ -48,7 +48,21 @@ jobs:
           pnpm verify:content
 
       - name: Build static site
+        env:
+          SITE_URL: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'https://seungjun.sh' || '' }}
+          ALLOW_INDEXING: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ALLOW_INDEXING || '' }}
+          GA4_DEPLOY_TARGET: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'production' || '' }}
+          GA4_PRODUCTION_ENABLED: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GA4_PRODUCTION_ENABLED == 'true' && 'true' || '' }}
+          GA4_PRODUCTION_MEASUREMENT_ID: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GA4_PRODUCTION_ENABLED == 'true' && vars.GA4_PRODUCTION_MEASUREMENT_ID || '' }}
+          PUBLIC_GA_MEASUREMENT_ID: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GA4_PRODUCTION_ENABLED == 'true' && vars.GA4_PRODUCTION_MEASUREMENT_ID || '' }}
         run: pnpm build
+
+      - name: Verify GA4 analytics guards
+        env:
+          GA4_EXPECTED_TARGET: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GA4_PRODUCTION_ENABLED == 'true' && vars.ALLOW_INDEXING == 'true' && 'production' || 'disabled' }}
+        run: |
+          node scripts/verify-analytics.mjs
+          node scripts/verify-analytics-runtime.mjs
 
       - name: Verify D1 search, retired paths and security guards
         run: |

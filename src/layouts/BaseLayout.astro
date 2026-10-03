@@ -18,7 +18,8 @@ const {
   description = '정승준 테크 블로그',
   seriesId,
   postId,
-  image = new URL('/blog-og.png', process.env.SITE_URL || 'https://seungjun.sh').href,
+  image = new URL('/blog-og.png', process.env.SITE_URL || 'https://seungjun.sh')
+    .href,
   publishedAt,
   noindex = false,
 } = Astro.props;
@@ -30,6 +31,44 @@ const canonical =
     : undefined;
 const indexable =
   originConfigured && process.env.ALLOW_INDEXING === 'true' && !noindex;
+const analyticsMeasurementId = process.env.PUBLIC_GA_MEASUREMENT_ID?.trim();
+const analyticsOrigin = Astro.site?.origin;
+const analyticsTarget = process.env.GA4_DEPLOY_TARGET;
+const productionMeasurementId =
+  process.env.GA4_PRODUCTION_MEASUREMENT_ID?.trim();
+const productionConfigurationRequested =
+  analyticsTarget === 'production' &&
+  process.env.GA4_PRODUCTION_ENABLED === 'true';
+if (
+  productionConfigurationRequested &&
+  (!analyticsMeasurementId ||
+    !/^G-[A-Z0-9]+$/.test(analyticsMeasurementId) ||
+    analyticsMeasurementId !== 'G-RQ6456HXLD' ||
+    analyticsMeasurementId !== productionMeasurementId ||
+    analyticsOrigin !== 'https://seungjun.sh')
+)
+  throw new Error('Production GA4 settings do not match the approved build');
+const productionAnalyticsEnabled =
+  productionConfigurationRequested && Boolean(analyticsMeasurementId);
+const stageAnalyticsEnabled =
+  analyticsTarget === 'stage' &&
+  analyticsMeasurementId === 'G-8SFTFGKZ9Y' &&
+  analyticsOrigin === 'https://devlog-site-stage.seungjun-jeong10.workers.dev';
+const analyticsEnabled =
+  !import.meta.env.DEV &&
+  Boolean(postId) &&
+  Astro.url.pathname.startsWith('/blog/') &&
+  Astro.url.pathname !== '/blog/' &&
+  !noindex &&
+  indexable &&
+  (stageAnalyticsEnabled || productionAnalyticsEnabled);
+// Inert build settings: the Worker activates these only on a public D1 article.
+const analyticsTemplateEnabled =
+  !import.meta.env.DEV &&
+  Astro.url.pathname === '/article-template/' &&
+  originConfigured &&
+  process.env.ALLOW_INDEXING === 'true' &&
+  (stageAnalyticsEnabled || productionAnalyticsEnabled);
 const siteTitle =
   title === '테크 블로그'
     ? 'seungjun.sh — 테크 블로그'
@@ -38,7 +77,36 @@ const isHome = Astro.url.pathname === '/';
 ---
 
 <!doctype html>
-<html lang="ko">
+<html
+  lang="ko"
+  data-template-indexable={
+    Astro.url.pathname === '/article-template/' &&
+    originConfigured &&
+    process.env.ALLOW_INDEXING === 'true'
+      ? 'true'
+      : undefined
+  }
+  data-template-analytics-measurement-id={
+    analyticsTemplateEnabled ? analyticsMeasurementId : undefined
+  }
+  data-template-analytics-site-origin={
+    analyticsTemplateEnabled ? analyticsOrigin : undefined
+  }
+  data-template-analytics-environment={
+    analyticsTemplateEnabled ? analyticsTarget : undefined
+  }
+  data-analytics-measurement-id={
+    analyticsEnabled ? analyticsMeasurementId : undefined
+  }
+  data-analytics-site-origin={analyticsEnabled ? Astro.site?.origin : undefined}
+  data-analytics-environment={
+    analyticsEnabled
+      ? stageAnalyticsEnabled
+        ? 'stage'
+        : 'production'
+      : undefined
+  }
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -169,6 +237,7 @@ const isHome = Astro.url.pathname === '/';
     </div>
     <script>
       import '../scripts/ui';
+      import '../scripts/analytics';
     </script>
   </body>
 </html>
