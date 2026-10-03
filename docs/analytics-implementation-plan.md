@@ -1,7 +1,7 @@
 # devlog GA4 프로덕션 모니터링 전환 계획
 
 - 갱신일: 2026-10-03
-- 현재 상태: 기존 분석 변경을 `codex/ga4-completion` 작업 트리에 이어받아 실제 D1 글 렌더링 경로의 분석 누락과 robots 강제 인덱싱을 수정했다. 운영 GA 계정 `410455528` / 속성 `557066996`에서 운영 스트림 `15942609257` / `G-RQ6456HXLD` 연결을 읽기 확인했다. 코드·빌드·Workers 검증은 아래 13절에 기록한다. 운영 정책은 미결정이며 GA 설정 변경·운영 활성화·production 배포는 수행하지 않았다. stage 사이트는 무수집 구성으로 배포하고 noindex와 smoke 검증을 통과했다.
+- 현재 상태: 기존 분석 변경을 `codex/ga4-completion` 작업 트리에 이어받아 실제 D1 글 렌더링 경로의 분석 누락과 robots 강제 인덱싱을 수정했다. 운영 GA 계정 `410455528` / 속성 `557066996`에서 운영 스트림 `15942609257` / `G-RQ6456HXLD` 연결을 읽기 확인했다. 코드·빌드·Workers 검증은 아래 13절에 기록한다. 사용자는 동의 전 태그 차단·동의한 방문자만 수집하는 basic 방식을 선택했다. 동의/거부/철회 UI와 저장 게이트를 구현했으며 운영 개인정보 안내 전체는 아직 확정하지 않았다. GA 설정 변경·운영 활성화·production 배포는 수행하지 않았다. stage 사이트는 무수집 구성으로 배포하고 noindex와 smoke 검증을 통과했다.
 - 목표: 승인된 프로덕션 측정 ID를 프로덕션 사이트에만 연결하고, 글별 조회수·참여 시간·본문 도달·글 이동을 GA4에서 검증·모니터링한다.
 - 진행 제한: 최신 작업은 `/Users/seungjun/.codex/worktrees/ga4-completion/devlog`의 `codex/ga4-completion`에서 수행한다. GA 속성 변경·운영 ID 활성화·production 배포·다음 체크리스트 항목은 사용자의 별도 지시 전까지 수행하지 않는다.
 - 기록 해석: 1–12절의 2026-10-02 결과는 당시 기록이다. 현재 상태와 상충하면 13절의 2026-10-03 직접 확인 결과를 우선한다. stage 글의 index,follow 응답은 이번 stage 배포 후 noindex,nofollow로 수정됐으며 아래 배포 후 증거로 구분한다.
@@ -344,9 +344,26 @@ node scripts/verify-analytics.mjs
 - Chrome stage `#ga_debug`를 새로고침한 뒤 DOM에서도 noindex/nofollow, 활성 GA ID 없음, 본문/이전 글 표식, 외부 Google script 요소 0개를 확인했다. 이번에는 DevTools Network나 DebugView 양성 수신을 확인하지 않았다.
 - 되돌릴 경우 기존 사이트 버전과 stage CMS 바인딩을 조회한 뒤 사이트만 복구한다. 이전 버전은 강제 index,follow 문제를 다시 만들 수 있으므로 이를 정상 noindex 결과라고 기록하지 않는다. DB/R2 복구 작업은 이번 변경에 필요하지 않다.
 
+### 방문자 동의 구현 후속 작업
+
+사용자가 2026-10-03에 **동의 전 태그를 로드하지 않고, 동의한 방문자만 수집**하는 방식을 선택했다. 이를 basic 방식으로 구현했다. 운영 활성화나 배포 승인은 별도로 유지한다.
+
+- `AnalyticsConsent.astro`에 비차단 동의 패널과 페이지 아래 ‘방문 통계 설정’을 추가했다. 허용/거부를 같은 형태로 제공하며, 설정을 다시 열고 철회할 수 있다. 선택이 없을 때 배너는 모든 분석 조건이 맞는 글에서만 표시한다. 저장된 선택은 다른 공개 페이지에서도 변경할 수 있다.
+- 선택은 origin별 `localStorage`의 `devlog.analytics-consent.v1`에 `granted`/`denied`로 저장한다. 선택 없음·거부·알 수 없는 값·저장 실패에는 수집을 시작하지 않는다.
+- 허용한 뒤에만 consent default(모두 denied), consent update(analytics_storage만 granted), js/config를 큐에 넣고 Google 태그를 요청한다. 광고 관련 동의는 계속 denied다. [Google basic consent 안내](https://developers.google.com/tag-platform/security/concepts/consent-mode#basic_consent_mode)
+- 철회하면 저장된 허용을 바꾸고 Google opt-out 표식·플래그를 설정한다. 자체 이벤트 큐를 멈추고 해당 호스트의 GA 쿠키만 만료시킨다. 태그가 실행 중이었다면 새로고침해 완전히 내려받지 않은 문서로 전환하며, denied 상태 측정 ping은 직접 보내지 않는다. GA config의 cookie_domain은 실제 호스트, cookie_path는 `/`로 제한한다.
+- storage 이벤트와 pageshow에서 선택을 재확인해 다른 탭의 철회와 BFCache 복원에도 반영한다. 저장 실패 시 기존 허용 제거를 시도하고 현재 페이지를 무수집으로 유지한다.
+- 모의 검증에 최초 방문/저장된 거부/명시적 허용/중복 허용/철회/쿠키 만료/저장 실패/다른 탭/BFCache/consent 명령 순서를 추가해 통과했다. 최종 `pnpm check`는 85파일, 오류 0·경고 0·기존 hint 6개다.
+- 합성 로컬 브라우저 검증에서 최초 무태그, 거부 후 새로고침 무태그, 키보드 허용 뒤 로컬 태그 대체물 로딩, 철회 뒤 새 문서 무태그, 다른 공개 페이지의 설정 접근을 확인했다. 이 fixture는 origin/protocol을 로컬로 치환하고 Google 태그 대신 로컬 stub을 사용한다. 실제 Google/DebugView 수신 검증이 아니다.
+- 실제 Google tag JavaScript를 읽어 `data-google-analytics-opt-out`와 `ga-disable-` 검사 분기를 확인했다. 실제 철회 전후 Google Network와 쿠키 동작은 격리된 양성 브라우저 검증에 남겨 둔다.
+- 허용 조합 로컬 빌드와 최종 stage 무수집 빌드, GA 모의/Workers 검증, 보안 검사, 변경 파일 포맷 검사를 통과했다. 동의 UI가 있다는 사실을 개인정보 안내나 적용 법률 전체의 확정으로 취급하지 않는다.
+- 동의 구현과 저장 실패 후 재허용 처리를 포함한 최종 stage 사이트 버전은 `37d3e3a2-49b2-4140-9ffc-e3757be88815`다. `deployments status --env stage`에서 traffic 100%를 확인했으며 CMS는 `5be07cf7-bf18-4792-88c1-adcd49a44ab9` 100%로 유지됐다. 배포 후 `verify-deployment.mjs`를 다시 통과했다.
+- 최종 stage 글을 Chrome에서 새로고침해 `robots=noindex,nofollow`, 활성 분석 ID 없음, Google 외부 script 요소 0개, 본문 표식 존재를 확인했다. 동의 패널과 설정 버튼도 숨김 상태였다. noindex 환경에서 동의 UI가 수집 보호를 우회하지 않는다. 실제 Network 수신 검증은 아니다.
+
 ### 아직 완료하지 않은 항목
 
-- [ ] 운영 개인정보 안내·방문자 동의 방식 확정. 현재 코드에는 방문자 동의 선택/철회 UI나 Consent Mode가 없으므로 운영 정책이 결정되기 전 출시하지 않는다.
+- [x] 사용자 선택에 따른 basic 동의·거부·저장·철회 UI와 측정 게이트 구현.
+- [ ] 운영 개인정보 안내의 내용·보관·요청 처리 등 전체 정책 확정. 기술적인 동의 방식 선택만으로 이를 승인받았다고 판단하지 않는다.
 - [ ] 운영 GA의 향상된 측정 조정과 맞춤 측정기준 3개 등록. 자동 수집 범위와 내부 트래픽 정의/사용자 역할도 함께 확인한다.
 - [x] 수정된 stage 사이트 배포, traffic 100%, 글 noindex·분석 제외와 인증/보안 smoke 확인.
 - [ ] noindex 보호를 해제하지 않는 격리 검증 방법을 정한 뒤 긴/짧은/이미지 글·클릭·키보드·BFCache·차단·민감 매개변수를 실제 브라우저에서 확인한다. 이번에는 두 맞춤 이벤트의 Network/DebugView 양성 수신을 확인하지 않았다.

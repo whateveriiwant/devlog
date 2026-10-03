@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import NavigationPanel from '../components/NavigationPanel';
 import SiteControls from '../components/SiteControls';
+import AnalyticsConsent from '../components/AnalyticsConsent.astro';
 import { getNavigation } from '../lib/navigation';
 import { buttonVariants } from '../components/ui/button';
 interface Props {
@@ -239,5 +240,6 @@ const isHome = Astro.url.pathname === '/';
       import '../scripts/ui';
       import '../scripts/analytics';
     </script>
+    <AnalyticsConsent />
   </body>
 </html>

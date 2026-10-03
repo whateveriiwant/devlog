@@ -149,6 +149,8 @@ const javascript = ts.transpileModule(analyticsSource, {
 
 function makeBrowser({
   id = 'G-8SFTFGKZ9Y',
+  consent = 'granted',
+  storageError = false,
   expectedOrigin = 'https://devlog-site-stage.seungjun-jeong10.workers.dev',
   origin = expectedOrigin,
   pathname = '/blog/example/',
@@ -165,6 +167,35 @@ function makeBrowser({
   const windowListeners = new Map();
   const documentListeners = new Map();
   const scripts = [];
+  let storedConsent = consent;
+  let reloads = 0;
+  const cookieWrites = [];
+  const controls = new Map(
+    ['panel', 'open', 'accept', 'deny', 'close', 'status'].map((name) => {
+      const listeners = new Map();
+      return [
+        name,
+        {
+          hidden: true,
+          textContent: '',
+          attrs: {},
+          focused: false,
+          setAttribute(key, value) {
+            this.attrs[key] = value;
+          },
+          focus() {
+            this.focused = true;
+          },
+          addEventListener(type, listener) {
+            listeners.set(type, listener);
+          },
+          fire(type, event = {}) {
+            listeners.get(type)?.(event);
+          },
+        },
+      ];
+    })
+  );
   const articleBody = {
     tagName: 'DIV',
     getBoundingClientRect: () => ({ top: -win.scrollY, height: bodyHeight }),
@@ -172,6 +203,8 @@ function makeBrowser({
   };
   const doc = {
     documentElement: {
+      setAttribute() {},
+      removeAttribute() {},
       dataset: {
         analyticsMeasurementId: id,
         analyticsSiteOrigin: expectedOrigin,
@@ -183,22 +216,43 @@ function makeBrowser({
     head: { appendChild: (script) => scripts.push(script) },
     createElement: (tagName) => ({ tagName, async: false, src: '' }),
     querySelector: (selector) =>
-      selector === 'meta[name="robots"]'
+      controls.get(selector.match(/^\[data-analytics-consent-(.+)\]$/)?.[1]) ??
+      (selector === 'meta[name="robots"]'
         ? robots === null
           ? null
           : { content: robots }
         : selector === '[data-analytics-body]' && hasBody
           ? articleBody
-          : null,
+          : null),
     addEventListener: (type, listener) => {
       const listeners = documentListeners.get(type) ?? [];
       listeners.push(listener);
       documentListeners.set(type, listeners);
     },
   };
+  Object.defineProperty(doc, 'cookie', {
+    get: () => '',
+    set: (value) => cookieWrites.push(value),
+  });
   const page = new URL(`${origin}${pathname}${search}${hash}`);
   const win = {
-    location: page,
+    location: {
+      href: page.href,
+      hostname: page.hostname,
+      reload: () => {
+        reloads++;
+      },
+    },
+    localStorage: {
+      getItem: () => storedConsent,
+      removeItem: () => {
+        storedConsent = null;
+      },
+      setItem: (_key, value) => {
+        if (storageError) throw new Error('Storage unavailable');
+        storedConsent = value;
+      },
+    },
     scrollY: 0,
     innerHeight,
     requestAnimationFrame: (callback) => {
@@ -225,6 +279,20 @@ function makeBrowser({
     window: win,
     scripts,
     articleBody,
+    controls,
+    cookieWrites,
+    get storedConsent() {
+      return storedConsent;
+    },
+    get reloads() {
+      return reloads;
+    },
+    setStorageError(value) {
+      storageError = value;
+    },
+    setStoredConsent(value) {
+      storedConsent = value;
+    },
     fireDocument(type, event = {}) {
       for (const listener of documentListeners.get(type) ?? [])
         listener({ type, ...event });
@@ -236,6 +304,110 @@ function makeBrowser({
   };
 }
 
+const noChoice = makeBrowser({ consent: null });
+assert.equal(noChoice.scripts.length, 0, 'No Google tag before consent');
+assert.equal(
+  noChoice.window.dataLayer,
+  undefined,
+  'No Google commands before consent'
+);
+assert.equal(
+  noChoice.controls.get('panel').hidden,
+  false,
+  'Eligible first visit offers a banner'
+);
+noChoice.controls.get('deny').fire('click');
+assert.equal(noChoice.storedConsent, 'denied');
+assert.equal(noChoice.scripts.length, 0, 'Denying loads no Google tag');
+noChoice.controls.get('open').fire('click');
+noChoice.controls.get('accept').fire('click');
+assert.equal(noChoice.storedConsent, 'granted');
+assert.equal(noChoice.scripts.length, 1, 'A later explicit grant loads once');
+assert.equal(noChoice.window['ga-disable-G-8SFTFGKZ9Y'], false);
+noChoice.controls.get('accept').fire('click');
+noChoice.fireWindow('pageshow', { persisted: true });
+assert.equal(
+  noChoice.scripts.length,
+  1,
+  'Repeat grant and pageshow do not duplicate tags'
+);
+const beforeWithdrawal = noChoice.window.dataLayer.length;
+noChoice.controls.get('deny').fire('click');
+assert.equal(noChoice.storedConsent, 'denied');
+assert.equal(noChoice.window['ga-disable-G-8SFTFGKZ9Y'], true);
+assert.equal(
+  noChoice.reloads,
+  1,
+  'Withdrawal reloads to unload the Google tag'
+);
+noChoice.window.scrollY = 1000;
+noChoice.fireWindow('scroll');
+assert.equal(
+  noChoice.window.dataLayer.length,
+  beforeWithdrawal,
+  'Withdrawal queues no denied ping or custom event'
+);
+assert.ok(
+  noChoice.cookieWrites.every(
+    (value) => value.startsWith('_ga') && value.includes('Max-Age=0')
+  )
+);
+const denied = makeBrowser({ consent: 'denied' });
+assert.equal(
+  denied.scripts.length,
+  0,
+  'Saved refusal remains blocked on another page'
+);
+assert.equal(denied.controls.get('panel').hidden, true);
+const invalidConsent = makeBrowser({ consent: 'invalid' });
+assert.equal(invalidConsent.scripts.length, 0);
+const unavailableStorage = makeBrowser({ consent: null, storageError: true });
+unavailableStorage.controls.get('accept').fire('click');
+assert.equal(
+  unavailableStorage.scripts.length,
+  0,
+  'Storage failure fails closed'
+);
+const failedWithdrawal = makeBrowser({ storageError: true });
+const beforeFailedWithdrawal = failedWithdrawal.window.dataLayer.length;
+failedWithdrawal.controls.get('deny').fire('click');
+failedWithdrawal.controls.get('open').fire('click');
+failedWithdrawal.window.scrollY = 1000;
+failedWithdrawal.fireWindow('scroll');
+assert.equal(
+  failedWithdrawal.storedConsent,
+  null,
+  'Failed persistence removes the old grant'
+);
+assert.equal(
+  failedWithdrawal.window.dataLayer.length,
+  beforeFailedWithdrawal,
+  'A failed withdrawal write still blocks current collection'
+);
+failedWithdrawal.setStorageError(false);
+failedWithdrawal.controls.get('accept').fire('click');
+assert.equal(failedWithdrawal.storedConsent, 'granted');
+assert.equal(
+  failedWithdrawal.reloads,
+  1,
+  'Regrant after a blocked running tag starts a fresh document'
+);
+const anotherTab = makeBrowser();
+anotherTab.setStoredConsent('denied');
+anotherTab.fireWindow('storage', { key: 'devlog.analytics-consent.v1' });
+assert.equal(
+  anotherTab.reloads,
+  1,
+  'Cross-tab withdrawal unloads the current tag'
+);
+const restoredConsent = makeBrowser();
+restoredConsent.setStoredConsent('denied');
+restoredConsent.fireWindow('pageshow', { persisted: true });
+assert.equal(
+  restoredConsent.reloads,
+  1,
+  'BFCache rechecks consent before recording more activity'
+);
 const noId = makeBrowser({ id: '' });
 assert.equal(noId.window.dataLayer, undefined);
 assert.equal(noId.scripts.length, 0, 'Missing ID loads no Google script');
@@ -340,6 +512,20 @@ assert.ok(
   ),
   'Google tag commands use the official Arguments queue format'
 );
+assert.deepEqual(
+  Array.from(commands.slice(0, 3), (args) => [args[0], args[1]]),
+  [
+    ['consent', 'default'],
+    ['consent', 'update'],
+    ['js', commands[2][1]],
+  ]
+);
+assert.equal(commands[0][2].analytics_storage, 'denied');
+assert.equal(commands[1][2].analytics_storage, 'granted');
+for (const key of ['ad_storage', 'ad_user_data', 'ad_personalization']) {
+  assert.equal(commands[0][2][key], 'denied');
+  assert.equal(commands[1][2][key], 'denied');
+}
 const configCalls = commands.filter((args) => args[0] === 'config');
 assert.equal(configCalls.length, 1, 'One config call provides one page view');
 assert.equal(
