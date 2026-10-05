@@ -101,6 +101,34 @@ const templateHtml = fs.readFileSync(
 const templateId = templateHtml.match(
   /data-template-analytics-measurement-id="([^"]+)"/
 )?.[1];
+if (process.env.GA4_EXPECTED_TARGET === 'validation') {
+  assert.equal(enabledPages, 0, 'Validation build does not tag real articles');
+  assert.equal(templateId, undefined, 'Real D1 template remains disabled');
+  const validationTemplate = fs.readFileSync(
+    path.join(dist, 'ga-validation/template/index.html'),
+    'utf8'
+  );
+  assert.match(
+    validationTemplate,
+    /data-template-analytics-environment="validation"/
+  );
+  assert.match(
+    validationTemplate,
+    /data-template-analytics-measurement-id="G-8SFTFGKZ9Y"/
+  );
+  assert.match(validationTemplate, /noindex,nofollow/);
+  assert.doesNotMatch(
+    validationTemplate,
+    /data-analytics-measurement-id=|data-template-indexable/
+  );
+  for (const file of fs
+    .readdirSync(dist)
+    .filter((name) => name.startsWith('sitemap') && name.endsWith('.xml')))
+    assert.doesNotMatch(
+      fs.readFileSync(path.join(dist, file), 'utf8'),
+      /\/ga-validation\//
+    );
+}
 if (process.env.GA4_EXPECTED_TARGET === 'disabled')
   assert.equal(
     templateId,
@@ -157,12 +185,14 @@ function makeBrowser({
   search = '',
   hash = '#ga_debug',
   environment = 'stage',
+  authenticated = undefined,
   bodyHeight = 1000,
   hasBody = true,
   robots = 'index,follow',
   innerHeight = 100,
   visibilityState = 'visible',
   referrer = 'https://previous.example/page?token=private#section',
+  navStore = null,
 } = {}) {
   const windowListeners = new Map();
   const documentListeners = new Map();
@@ -209,6 +239,7 @@ function makeBrowser({
         analyticsMeasurementId: id,
         analyticsSiteOrigin: expectedOrigin,
         analyticsEnvironment: environment,
+        analyticsValidationAuthenticated: authenticated,
       },
     },
     visibilityState,
@@ -236,6 +267,17 @@ function makeBrowser({
   });
   const page = new URL(`${origin}${pathname}${search}${hash}`);
   const win = {
+    sessionStorage: navStore
+      ? {
+          getItem: (key) => navStore[key] ?? null,
+          removeItem: (key) => {
+            delete navStore[key];
+          },
+          setItem: (key, value) => {
+            navStore[key] = value;
+          },
+        }
+      : undefined,
     location: {
       href: page.href,
       hostname: page.hostname,
@@ -371,6 +413,12 @@ assert.equal(
 const failedWithdrawal = makeBrowser({ storageError: true });
 const beforeFailedWithdrawal = failedWithdrawal.window.dataLayer.length;
 failedWithdrawal.controls.get('deny').fire('click');
+assert.ok(
+  failedWithdrawal.cookieWrites.some((value) =>
+    value.includes('Domain=devlog-site-stage.seungjun-jeong10.workers.dev;')
+  ),
+  'Withdrawal also expires explicit current-domain GA cookies'
+);
 failedWithdrawal.controls.get('open').fire('click');
 failedWithdrawal.window.scrollY = 1000;
 failedWithdrawal.fireWindow('scroll');
@@ -468,6 +516,54 @@ for (const robots of ['noindex,nofollow', 'NOINDEX, follow', 'none', null]) {
     'Noindex or missing robots cannot initialize GA'
   );
 }
+const validationOptions = {
+  environment: 'validation',
+  expectedOrigin: 'https://devlog-ga-validation.seungjun-jeong10.workers.dev',
+  pathname: '/blog/ga-validation-long/',
+  hash: '',
+  robots: 'noindex,nofollow',
+  authenticated: 'true',
+};
+const validationBrowser = makeBrowser(validationOptions);
+assert.equal(
+  validationBrowser.scripts.length,
+  1,
+  'Authenticated synthetic noindex document can collect test data'
+);
+assert.equal(
+  validationBrowser.window.dataLayer.find((args) => args[0] === 'config')[2]
+    .debug_mode,
+  true
+);
+validationBrowser.fireWindow('pageshow', { persisted: true });
+assert.equal(
+  validationBrowser.window.dataLayer.filter((args) => args[0] === 'config')
+    .length,
+  1
+);
+for (const options of [
+  { authenticated: undefined },
+  { authenticated: 'false' },
+  { id: 'G-RQ6456HXLD' },
+  { id: 'G-UNKNOWN' },
+  { origin: 'https://seungjun.sh' },
+  { robots: null },
+  { robots: 'index,follow' },
+  { pathname: '/blog/real-article/' },
+  { pathname: '/ga-validation/template/' },
+  { pathname: '/privacy/' },
+  { search: '?token=synthetic-secret' },
+  { hash: '#ga_debug' },
+])
+  assert.equal(
+    makeBrowser({ ...validationOptions, ...options }).scripts.length,
+    0,
+    `Validation rejects ${JSON.stringify(options)}`
+  );
+const validationNoChoice = makeBrowser({ ...validationOptions, consent: null });
+assert.equal(validationNoChoice.scripts.length, 0);
+validationNoChoice.controls.get('deny').fire('click');
+assert.equal(validationNoChoice.scripts.length, 0);
 const production = makeBrowser({
   id: 'G-RQ6456HXLD',
   expectedOrigin: 'https://seungjun.sh',
@@ -540,6 +636,7 @@ assert.equal(
 );
 assert.equal(configCalls[0][2].page_referrer, 'https://previous.example/page');
 assert.equal(configCalls[0][2].page_title, 'devlog');
+assert.equal(configCalls[0][2].cookie_flags, 'SameSite=Lax;Secure');
 assert.equal(configCalls[0][2].debug_mode, true);
 assert.equal(configCalls[0][2].allow_google_signals, false);
 assert.equal(configCalls[0][2].allow_ad_personalization_signals, false);
@@ -623,7 +720,11 @@ browser.fireDocument('click', {
     }),
   },
 });
-assert.equal(navClick.preventDefaultCalls, 0, 'Link navigation stays native');
+assert.equal(
+  navClick.preventDefaultCalls,
+  0,
+  'Non-cancelable navigation stays native'
+);
 assert.deepEqual(
   JSON.parse(
     JSON.stringify(
@@ -639,6 +740,74 @@ assert.deepEqual(
     { navigation_direction: 'previous', target_path: '/blog/previous/' },
   ],
   'Only same-origin article paths and direction are sent'
+);
+
+const navigationKey = 'devlog.analytics-navigation.v1';
+const navStore = {};
+const queuedNavigation = makeBrowser({ navStore });
+queuedNavigation.fireDocument('click', navClick);
+const pending = JSON.parse(navStore[navigationKey]);
+assert.equal(pending.path, '/blog/next/');
+assert.equal(
+  pending.source,
+  'https://devlog-site-stage.seungjun-jeong10.workers.dev/blog/example/'
+);
+assert.equal(
+  queuedNavigation.window.dataLayer.filter(
+    (args) => args[1] === 'article_navigation'
+  ).length,
+  0
+);
+const arrivedNavigation = makeBrowser({ navStore, pathname: '/blog/next/' });
+assert.equal(
+  navStore[navigationKey],
+  undefined,
+  'Read once and remove the tab intent'
+);
+const arrivedEvents = arrivedNavigation.window.dataLayer.filter(
+  (args) => args[1] === 'article_navigation'
+);
+assert.equal(arrivedEvents.length, 1);
+assert.equal(
+  arrivedEvents[0][2].page_location,
+  pending.source,
+  'Attribute to the source click'
+);
+arrivedNavigation.fireWindow('pageshow', { persisted: true });
+assert.equal(
+  arrivedNavigation.window.dataLayer.filter(
+    (args) => args[1] === 'article_navigation'
+  ).length,
+  1
+);
+for (const value of [
+  { ...pending, source: 'https://other.example/blog/source/' },
+  { ...pending, source: pending.source + '?token=secret' },
+  { ...pending, path: '/blog/other/' },
+  { ...pending, time: Date.now() - 11000 },
+]) {
+  const rejected = makeBrowser({
+    navStore: { [navigationKey]: JSON.stringify(value) },
+    pathname: '/blog/next/',
+  });
+  assert.equal(
+    rejected.window.dataLayer.filter((args) => args[1] === 'article_navigation')
+      .length,
+    0
+  );
+}
+const deniedIntent = makeBrowser({
+  consent: 'denied',
+  navStore: { [navigationKey]: JSON.stringify(pending) },
+  pathname: '/blog/next/',
+});
+deniedIntent.controls.get('accept').fire('click');
+assert.equal(
+  deniedIntent.window.dataLayer.filter(
+    (args) => args[1] === 'article_navigation'
+  ).length,
+  0,
+  'A denied arrival discards the earlier intent'
 );
 
 const zeroHeight = makeBrowser({ bodyHeight: 0 });

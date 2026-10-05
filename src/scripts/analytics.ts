@@ -7,9 +7,30 @@ type AnalyticsWindow = Window & {
 
 const progressThresholds = [25, 50, 75, 90] as const;
 const consentKey = 'devlog.analytics-consent.v1';
+const navigationKey = 'devlog.analytics-navigation.v1';
 let consentGranted = false;
 let analyticsStarted = false;
 let consentWriteFailed = false;
+let pendingNavigation: {
+  source: string;
+  path: string;
+  direction: string;
+  time: number;
+} | null = null;
+try {
+  const stored = window.sessionStorage.getItem(navigationKey);
+  window.sessionStorage.removeItem(navigationKey);
+  if (stored && stored.length < 2000) {
+    const value = JSON.parse(stored);
+    if (
+      typeof value.source === 'string' &&
+      typeof value.path === 'string' &&
+      ['previous', 'next'].includes(value.direction) &&
+      typeof value.time === 'number'
+    )
+      pendingNavigation = value;
+  }
+} catch {}
 
 function readConsent(): string | null {
   try {
@@ -21,13 +42,19 @@ function readConsent(): string | null {
 
 function revokeAnalytics(reload = true) {
   consentGranted = false;
+  pendingNavigation = null;
+  try {
+    window.sessionStorage.removeItem(navigationKey);
+  } catch {}
   const analyticsWindow = window as AnalyticsWindow;
   document.documentElement.setAttribute('data-google-analytics-opt-out', '');
   for (const id of ['G-RQ6456HXLD', 'G-8SFTFGKZ9Y'] as const)
     analyticsWindow[`ga-disable-${id}`] = true;
-  // Cookies are scoped to this hostname; leave auth and site preferences alone.
-  for (const name of ['_ga', '_ga_RQ6456HXLD', '_ga_8SFTFGKZ9Y'])
+  // Clear both host-only and explicit current-domain GA cookies; leave auth/theme alone.
+  for (const name of ['_ga', '_ga_RQ6456HXLD', '_ga_8SFTFGKZ9Y']) {
     document.cookie = `${name}=; Max-Age=0; Path=/; Secure; SameSite=Lax`;
+    document.cookie = `${name}=; Max-Age=0; Domain=${window.location.hostname}; Path=/; Secure; SameSite=Lax`;
+  }
   // A fresh document completely unloads the Google tag. Do not send denied pings.
   if (analyticsStarted && reload) window.location.reload();
 }
@@ -58,6 +85,7 @@ function initializeConsent() {
   };
   const sync = () => {
     const choice = consentWriteFailed ? null : readConsent();
+    if (choice !== 'granted') pendingNavigation = null;
     if (choice !== 'granted' && consentGranted) revokeAnalytics();
     consentGranted = choice === 'granted';
     if (choice === 'granted' || choice === 'denied') open.hidden = false;
@@ -131,6 +159,7 @@ function initializeAnalytics(offerOnly = false) {
     analyticsMeasurementId: measurementId,
     analyticsSiteOrigin,
     analyticsEnvironment,
+    analyticsValidationAuthenticated,
   } = document.documentElement.dataset;
   if (
     !measurementId ||
@@ -148,10 +177,21 @@ function initializeAnalytics(offerOnly = false) {
     analyticsEnvironment === 'production' &&
     measurementId === 'G-RQ6456HXLD' &&
     analyticsSiteOrigin === 'https://seungjun.sh';
-  if (!stage && !production) return;
+  const validation =
+    analyticsEnvironment === 'validation' &&
+    measurementId === 'G-8SFTFGKZ9Y' &&
+    analyticsSiteOrigin ===
+      'https://devlog-ga-validation.seungjun-jeong10.workers.dev' &&
+    analyticsValidationAuthenticated === 'true';
+  if (!stage && !production && !validation) return;
 
   const robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
-  if (!robots || /(?:^|[\s,])(?:noindex|none)(?:$|[\s,])/i.test(robots.content))
+  if (
+    !robots ||
+    (validation
+      ? robots.content.toLowerCase() !== 'noindex,nofollow'
+      : /(?:^|[\s,])(?:noindex|none)(?:$|[\s,])/i.test(robots.content))
+  )
     return;
 
   const page = new URL(window.location.href);
@@ -162,6 +202,13 @@ function initializeAnalytics(offerOnly = false) {
     page.pathname === '/blog/' ||
     page.search ||
     (stage ? page.hash !== '#ga_debug' : Boolean(page.hash))
+  )
+    return;
+  if (
+    validation &&
+    !/^\/blog\/ga-validation-(long|short|image|previous|next)\/$/.test(
+      page.pathname
+    )
   )
     return;
 
@@ -212,11 +259,38 @@ function initializeAnalytics(offerOnly = false) {
     page_title: 'devlog',
     cookie_domain: window.location.hostname,
     cookie_path: '/',
+    cookie_flags: 'SameSite=Lax;Secure',
     allow_google_signals: false,
     allow_ad_personalization_signals: false,
-    ...(stage ? { debug_mode: true } : {}),
+    ...(stage || validation ? { debug_mode: true } : {}),
   };
   gtag('config', measurementId, config);
+  // ponytail: one intent per tab, eligible for 10s; no retry queue or persistent history.
+  if (pendingNavigation) {
+    const pending = pendingNavigation;
+    pendingNavigation = null;
+    try {
+      const source = new URL(pending.source);
+      const age = Date.now() - pending.time;
+      if (
+        age >= 0 &&
+        age <= 10000 &&
+        pending.path === page.pathname &&
+        source.origin === page.origin &&
+        cleanPageUrl(source.href) === pending.source &&
+        /^\/blog\/[^/]+\/$/.test(source.pathname) &&
+        (!validation ||
+          /^\/blog\/ga-validation-(long|short|image|previous|next)\/$/.test(
+            source.pathname
+          ))
+      )
+        gtag('event', 'article_navigation', {
+          page_location: pending.source,
+          navigation_direction: pending.direction,
+          target_path: pending.path,
+        });
+    } catch {}
+  }
 
   const script = document.createElement('script');
   script.async = true;
@@ -275,6 +349,8 @@ function initializeAnalytics(offerOnly = false) {
 
   const trackNavigation = (event: MouseEvent) => {
     if (
+      !consentGranted ||
+      event.defaultPrevented ||
       (event.type === 'click' && event.button !== 0) ||
       (event.type === 'auxclick' && event.button !== 1)
     )
@@ -294,6 +370,36 @@ function initializeAnalytics(offerOnly = false) {
         destination.pathname === '/blog/'
       )
         return;
+      if (
+        validation &&
+        !/^\/blog\/ga-validation-(long|short|image|previous|next)\/$/.test(
+          destination.pathname
+        )
+      )
+        return;
+      if (
+        event.type === 'click' &&
+        event.button === 0 &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        !event.shiftKey &&
+        !event.altKey &&
+        (!link.target || link.target === '_self') &&
+        !link.hasAttribute?.('download')
+      ) {
+        try {
+          window.sessionStorage.setItem(
+            navigationKey,
+            JSON.stringify({
+              source: pageLocation,
+              path: destination.pathname,
+              direction,
+              time: Date.now(),
+            })
+          );
+          return;
+        } catch {}
+      }
       gtag('event', 'article_navigation', {
         navigation_direction: direction,
         target_path: destination.pathname,

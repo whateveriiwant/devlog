@@ -48,7 +48,7 @@ function articleMarkup(post) {
   return { tags, series, headings, pagination };
 }
 
-async function renderArticle(request, env, url) {
+export async function renderArticle(request, env, url) {
   const slug = decodeURIComponent(
     url.pathname.slice('/blog/'.length).replace(/\/$/, '')
   );
@@ -103,6 +103,16 @@ async function renderArticle(request, env, url) {
         const target = element.getAttribute(
           'data-template-analytics-environment'
         );
+        const validation =
+          target === 'validation' &&
+          id === 'G-8SFTFGKZ9Y' &&
+          origin ===
+            'https://devlog-ga-validation.seungjun-jeong10.workers.dev' &&
+          env.GA4_VALIDATION_AUTHENTICATED === 'true' &&
+          /^\/blog\/ga-validation-(long|short|image|previous|next)\/$/.test(
+            url.pathname
+          );
+        if (validation) indexable = false;
         const allowed =
           (target === 'stage' &&
             id === 'G-8SFTFGKZ9Y' &&
@@ -116,13 +126,17 @@ async function renderArticle(request, env, url) {
           const value = element.getAttribute(`data-template-analytics-${name}`);
           element.removeAttribute(`data-template-analytics-${name}`);
           if (
-            indexable &&
-            allowed &&
+            ((indexable && allowed) || validation) &&
             origin === env.SITE_ORIGIN &&
             origin === url.origin
           )
             element.setAttribute(`data-analytics-${name}`, value);
         }
+        if (validation && origin === env.SITE_ORIGIN && origin === url.origin)
+          element.setAttribute(
+            'data-analytics-validation-authenticated',
+            'true'
+          );
       },
     })
     .on('title', {
@@ -281,6 +295,8 @@ async function renderArticle(request, env, url) {
     .transform(template);
   const headers = new Headers(html.headers);
   headers.set('Cache-Control', 'no-store');
+  if (env.GA4_VALIDATION_AUTHENTICATED === 'true')
+    headers.set('X-Robots-Tag', 'noindex, nofollow');
   return new Response(html.body, { status: 200, headers });
 }
 
@@ -812,6 +828,7 @@ export default {
     )
       return renderHome(request, env);
     if (
+      url.pathname.startsWith('/ga-validation/') ||
       url.pathname === '/article-template/' ||
       url.pathname === '/article-template'
     )

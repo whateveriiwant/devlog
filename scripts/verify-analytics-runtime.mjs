@@ -6,6 +6,7 @@ import { load } from 'cheerio';
 const require = createRequire(import.meta.url);
 const wranglerRequire = createRequire(require.resolve('wrangler/package.json'));
 const { Miniflare, convertV4MiniflareOptions } = wranglerRequire('miniflare');
+const { build } = wranglerRequire('esbuild');
 const builtTemplate = readFileSync(
   new URL('../dist/article-template/index.html', import.meta.url),
   'utf8'
@@ -45,6 +46,30 @@ const makeRuntime = (siteOrigin) =>
 
 const runtime = makeRuntime(productionOrigin);
 const stageRuntime = makeRuntime(stageOrigin);
+const validationOrigin =
+  'https://devlog-ga-validation.seungjun-jeong10.workers.dev';
+const validationAuth = `Basic ${Buffer.from('ga-validation:synthetic-test-credential-not-a-real-secret').toString('base64')}`;
+const validationBundle = await build({
+  entryPoints: [
+    new URL('../worker/ga-validation.mjs', import.meta.url).pathname,
+  ],
+  bundle: true,
+  write: false,
+  format: 'esm',
+  platform: 'browser',
+});
+const validationRuntime = new Miniflare(
+  convertV4MiniflareOptions({
+    modules: true,
+    script: validationBundle.outputFiles[0].text,
+    compatibilityDate: '2026-09-16',
+    bindings: { VALIDATION_AUTHORIZATION: validationAuth },
+    serviceBindings: {
+      ASSETS: async () =>
+        new Response(template, { headers: { 'Content-Type': 'text/html' } }),
+    },
+  })
+);
 
 function fixture({
   indexable = true,
@@ -180,8 +205,138 @@ try {
       (await runtime.dispatchFetch(`${productionOrigin}${path}`)).status,
       404
     );
+  template = fixture({
+    indexable: false,
+    id: 'G-8SFTFGKZ9Y',
+    origin: validationOrigin,
+    target: 'validation',
+  });
+  for (const path of [
+    '/blog/ga-validation-long/',
+    '/_astro/example.js',
+    '/privacy/',
+    '/robots.txt',
+    '/fixture.svg',
+  ]) {
+    for (const authorization of ['', 'Basic invalid']) {
+      const response = await validationRuntime.dispatchFetch(
+        `${validationOrigin}${path}`,
+        { headers: { Authorization: authorization } }
+      );
+      assert.equal(
+        response.status,
+        401,
+        'All validation HTML and assets need server authentication'
+      );
+      assert.equal(response.headers.get('Cache-Control'), 'no-store');
+      assert.doesNotMatch(
+        await response.text(),
+        /data-analytics-|Synthetic body/
+      );
+    }
+  }
+  for (const kind of ['long', 'short', 'image', 'previous', 'next']) {
+    const response = await validationRuntime.dispatchFetch(
+      `${validationOrigin}/blog/ga-validation-${kind}/`,
+      { headers: { Authorization: validationAuth } }
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+    const $ = load(await response.text());
+    assert.equal($('meta[name="robots"]').attr('content'), 'noindex,nofollow');
+    assert.equal($('html').attr('data-analytics-environment'), 'validation');
+    assert.equal(
+      $('html').attr('data-analytics-measurement-id'),
+      'G-8SFTFGKZ9Y'
+    );
+    assert.equal(
+      $('html').attr('data-analytics-validation-authenticated'),
+      'true'
+    );
+    for (const link of $('a[data-analytics-navigation]').toArray())
+      assert.match(
+        $(link).attr('href'),
+        /^\/blog\/ga-validation-(long|short|image|previous|next)\/$/
+      );
+  }
+  for (const path of [
+    '/blog/real-article/',
+    '/blog/',
+    '/search',
+    '/api/content/search',
+    '/sitemap.xml',
+    '/rss.xml',
+    '/login/',
+    '/write/',
+    '/admin/',
+    '/article-template/',
+    '/ga-validation/template/',
+  ]) {
+    const response = await validationRuntime.dispatchFetch(
+      `${validationOrigin}${path}`,
+      { headers: { Authorization: validationAuth } }
+    );
+    assert.equal(
+      response.status,
+      404,
+      'Validation exposes only synthetic allowlisted routes'
+    );
+    assert.doesNotMatch(await response.text(), /data-analytics-/);
+  }
+  assert.equal(
+    (
+      await validationRuntime.dispatchFetch(
+        'https://seungjun.sh/blog/ga-validation-long/',
+        { headers: { Authorization: validationAuth } }
+      )
+    ).status,
+    403
+  );
+  assert.equal(
+    (
+      await validationRuntime.dispatchFetch(
+        `${validationOrigin}/blog/ga-validation-long/`,
+        { method: 'POST', headers: { Authorization: validationAuth } }
+      )
+    ).status,
+    405
+  );
+  // A validation build/config alone cannot activate a normal site Worker.
+  cmsStatus = 200;
+  assert.equal(
+    (await article())('html').attr('data-analytics-measurement-id'),
+    undefined
+  );
+  for (const config of [
+    { id: 'G-RQ6456HXLD' },
+    { id: '' },
+    { origin: stageOrigin },
+    { target: 'stage' },
+  ]) {
+    template = fixture({
+      indexable: false,
+      id: 'G-8SFTFGKZ9Y',
+      origin: validationOrigin,
+      target: 'validation',
+      ...config,
+    });
+    const response = await validationRuntime.dispatchFetch(
+      `${validationOrigin}/blog/ga-validation-long/`,
+      { headers: { Authorization: validationAuth } }
+    );
+    const $ = load(await response.text());
+    assert.equal($('html').attr('data-analytics-measurement-id'), undefined);
+    assert.equal(
+      $('html').attr('data-analytics-validation-authenticated'),
+      undefined
+    );
+  }
 } finally {
-  await Promise.all([runtime.dispose(), stageRuntime.dispose()]);
+  await Promise.all([
+    runtime.dispose(),
+    stageRuntime.dispose(),
+    validationRuntime.dispose(),
+  ]);
 }
 console.log(
   'PASS: real Workers D1 HTMLRewriter, built settings, synthetic enabled/disabled guards, noindex, navigation and 404/503 exclusions (no Google requests)'

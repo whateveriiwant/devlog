@@ -1,0 +1,51 @@
+---
+import '../../styles/global.css';
+import AnalyticsConsent from '../../components/AnalyticsConsent.astro';
+
+export function getStaticPaths() {
+  return process.env.GA4_DEPLOY_TARGET === 'validation'
+    ? [{ params: { fixture: 'template' } }]
+    : [];
+}
+const enabled =
+  !import.meta.env.DEV &&
+  process.env.GA4_DEPLOY_TARGET === 'validation' &&
+  process.env.PUBLIC_GA_MEASUREMENT_ID === 'G-8SFTFGKZ9Y' &&
+  process.env.SITE_URL ===
+    'https://devlog-ga-validation.seungjun-jeong10.workers.dev' &&
+  process.env.ALLOW_INDEXING !== 'true';
+if (!enabled)
+  throw new Error('Validation build settings must match the isolated origin');
+---
+
+<!doctype html>
+<html
+  lang="ko"
+  data-template-analytics-measurement-id="G-8SFTFGKZ9Y"
+  data-template-analytics-site-origin="https://devlog-ga-validation.seungjun-jeong10.workers.dev"
+  data-template-analytics-environment="validation"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <title>GA 합성 검증</title>
+  </head>
+  <body>
+    <main class="mx-auto max-w-3xl px-6 py-12">
+      <p>인증된 GA 합성 검증 · 실제 운영 콘텐츠 없음</p>
+      <h1 class="my-6 text-3xl" data-template-title></h1>
+      <div class="prose" data-template-body data-analytics-body></div>
+      <nav
+        class="article-pagination my-8"
+        data-template-pagination
+        aria-label="이전·다음 합성 글"
+      ></nav>
+    </main>
+    <AnalyticsConsent />
+    <script>
+      import '../../scripts/analytics';
+    </script>
+  </body>
+</html>
