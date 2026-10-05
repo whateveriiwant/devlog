@@ -39,16 +39,16 @@ function articleMarkup(post) {
     .join('');
   const pagination = [
     post.previous_slug
-      ? `<a href="/blog/${encodeURIComponent(post.previous_slug)}/"><span>← ${post.series_id ? '시리즈 이전 글' : '이전 기록'}</span><strong>${escapeHtml(post.previous_title)}</strong></a>`
+      ? `<a href="/blog/${encodeURIComponent(post.previous_slug)}/" data-analytics-navigation="previous"><span>← ${post.series_id ? '시리즈 이전 글' : '이전 기록'}</span><strong>${escapeHtml(post.previous_title)}</strong></a>`
       : '<span></span>',
     post.next_slug
-      ? `<a class="text-right" href="/blog/${encodeURIComponent(post.next_slug)}/"><span>${post.series_id ? '시리즈 다음 글' : '다음 기록'} →</span><strong>${escapeHtml(post.next_title)}</strong></a>`
+      ? `<a class="text-right" href="/blog/${encodeURIComponent(post.next_slug)}/" data-analytics-navigation="next"><span>${post.series_id ? '시리즈 다음 글' : '다음 기록'} →</span><strong>${escapeHtml(post.next_title)}</strong></a>`
       : '<span></span>',
   ].join('');
   return { tags, series, headings, pagination };
 }
 
-async function renderArticle(request, env, url) {
+export async function renderArticle(request, env, url) {
   const slug = decodeURIComponent(
     url.pathname.slice('/blog/'.length).replace(/\/$/, '')
   );
@@ -89,7 +89,56 @@ async function renderArticle(request, env, url) {
     timeZone: 'UTC',
   }).format(published);
   const markup = articleMarkup(post);
+  let indexable = false;
   const html = new HTMLRewriter()
+    .on('html', {
+      element(element) {
+        indexable = element.getAttribute('data-template-indexable') === 'true';
+        const id = element.getAttribute(
+          'data-template-analytics-measurement-id'
+        );
+        const origin = element.getAttribute(
+          'data-template-analytics-site-origin'
+        );
+        const target = element.getAttribute(
+          'data-template-analytics-environment'
+        );
+        const validation =
+          target === 'validation' &&
+          id === 'G-8SFTFGKZ9Y' &&
+          origin ===
+            'https://devlog-ga-validation.seungjun-jeong10.workers.dev' &&
+          env.GA4_VALIDATION_AUTHENTICATED === 'true' &&
+          /^\/blog\/ga-validation-(long|short|image|previous|next)\/$/.test(
+            url.pathname
+          );
+        if (validation) indexable = false;
+        const allowed =
+          (target === 'stage' &&
+            id === 'G-8SFTFGKZ9Y' &&
+            origin ===
+              'https://devlog-site-stage.seungjun-jeong10.workers.dev') ||
+          (target === 'production' &&
+            id === 'G-RQ6456HXLD' &&
+            origin === 'https://seungjun.sh');
+        element.removeAttribute('data-template-indexable');
+        for (const name of ['measurement-id', 'site-origin', 'environment']) {
+          const value = element.getAttribute(`data-template-analytics-${name}`);
+          element.removeAttribute(`data-template-analytics-${name}`);
+          if (
+            ((indexable && allowed) || validation) &&
+            origin === env.SITE_ORIGIN &&
+            origin === url.origin
+          )
+            element.setAttribute(`data-analytics-${name}`, value);
+        }
+        if (validation && origin === env.SITE_ORIGIN && origin === url.origin)
+          element.setAttribute(
+            'data-analytics-validation-authenticated',
+            'true'
+          );
+      },
+    })
     .on('title', {
       element(element) {
         element.setInnerContent(`${post.title} · seungjun.sh`);
@@ -105,7 +154,10 @@ async function renderArticle(request, env, url) {
     })
     .on('meta[name="robots"]', {
       element(element) {
-        element.setAttribute('content', 'index,follow');
+        element.setAttribute(
+          'content',
+          indexable ? 'index,follow' : 'noindex,nofollow'
+        );
       },
     })
     .on('link[data-template-canonical]', {
@@ -243,6 +295,8 @@ async function renderArticle(request, env, url) {
     .transform(template);
   const headers = new Headers(html.headers);
   headers.set('Cache-Control', 'no-store');
+  if (env.GA4_VALIDATION_AUTHENTICATED === 'true')
+    headers.set('X-Robots-Tag', 'noindex, nofollow');
   return new Response(html.body, { status: 200, headers });
 }
 
@@ -774,6 +828,7 @@ export default {
     )
       return renderHome(request, env);
     if (
+      url.pathname.startsWith('/ga-validation/') ||
       url.pathname === '/article-template/' ||
       url.pathname === '/article-template'
     )

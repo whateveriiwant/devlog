@@ -14,7 +14,12 @@ const date = new Date('2000-01-01T00:00:00.000Z');
   noindex
 >
   <link slot="head" rel="canonical" data-template-canonical href="/" />
-  <meta slot="head" property="article:modified_time" data-template-updated-meta content="" />
+  <meta
+    slot="head"
+    property="article:modified_time"
+    data-template-updated-meta
+    content=""
+  />
   <article>
     <header class="article-heading">
       <div data-template-breadcrumb>
@@ -29,7 +34,7 @@ const date = new Date('2000-01-01T00:00:00.000Z');
       <div class="article-tags" data-template-tags></div>
     </header>
     <div class="mb-8 xl:hidden" data-template-mobile-toc></div>
-    <div class="prose" data-template-body></div>
+    <div class="prose" data-template-body data-analytics-body></div>
     <footer data-template-footer>
       <div class="article-pagination" data-template-pagination></div>
       <div data-template-series>

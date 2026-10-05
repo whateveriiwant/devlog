@@ -82,7 +82,14 @@ export default defineConfig({
         rehypePlugins: [rehypeContent, highlight],
       }),
     }),
-    ...(configuredSite ? [sitemap()] : []),
+    ...(configuredSite
+      ? [
+          sitemap({
+            filter: (page) =>
+              !new URL(page).pathname.startsWith('/ga-validation/'),
+          }),
+        ]
+      : []),
   ],
   markdown: {
     syntaxHighlight: false,
