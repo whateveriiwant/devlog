@@ -922,3 +922,11 @@ KST **20:21:21–20:22:22**의 별도 일반 창 핵심 재검증에서도 긴 �
 추가 화면은 `/tmp/devlog-ga4-test-debugview-{long,image}-progress-20261005.jpg`, `/tmp/devlog-ga4-test-debugview-native-previous-20261005.jpg`다. 마지막 전용 validation 배포 버전은 **e6cfd7d7-77fc-4dde-abbc-4d43d54da4cb**다. 수신 검증 버전 `10239908-3c05-45ab-8664-e6eb8d864664` 이후 변경은 임시 저장 안내에 ‘시각’을 명시한 문구이며 수집 로직은 동일하다. 최종 check는 0 errors/0 warnings/6 hints이며 최종 disabled 빌드·두 분석 스크립트를 다시 통과시킨 후 Git을 정리한다.
 
 최종 HTTP 재검사에서도 인증 없는 글은 401이고 인증한 최종 안내는 200/noindex/활성 분석 설정 없음이었다. ‘운영 ID 없음’의 범위는 활성 HTML 설정과 실제 Google tag/collect ID 검사다. 공유하는 분석 JS의 기존 production 가드·철회 상수에는 운영 ID 문자열이 남아 있지만 validation의 활성 설정/태그/수집은 테스트 ID만 사용한다. 이를 ‘모든 자산에서 운영 ID 문자열 제거’ 검사로 표현하지 않는다.
+
+#### 코드 push와 해당 커밋 CI — 2026-10-05 종료 정리
+
+14개 scoped 파일을 **be1b2b7046138d0bb530636117377d40690e9206** (`feat(analytics): add authenticated GA4 validation`)로 커밋하고 `origin/codex/ga4-completion`에 push했다. 이전 개인정보 준비 변경도 이 범위의 문서/동의 UI로 포함했으며 기본 폴더에는 쓰지 않았다. 실제 검증 자격 증명이 변경 파일에 없음을 값 출력 없이 검사했다.
+
+[해당 커밋 CI 37304450343](https://github.com/whateveriiwant/devlog/actions/runs/37304450343/job/111744645915)는 **SUCCESS**다. PR을 [#34](https://github.com/whateveriiwant/devlog/pull/34)의 최신 구현·실제 수신·남은 출시 조건으로 다시 작성했고 OPEN/draft·동일 head를 확인했다. 이 단락 이후 증거를 기록하는 문서 커밋과 해당 CI는 구현 커밋 CI와 구분한다. 최종 head는 종료 요약 및 다음 인계 파일에서 실제 값을 제공한다.
+
+merge·GA4_PRODUCTION_ENABLED/ALLOW_INDEXING 설정·stage/production 배포는 하지 않았다. 전용 validation 환경만 남아 있고 기존 출시 조건/실제 BFCache/지연 보고 대기를 유지한다. 기본 폴더용 추가 기록은 `/tmp/devlog-ga4-minimal-base-plan-appendix-20261005.md`이며 기본 계획에 자동 적용하지 않았다. 다음 체크리스트나 자동 후속 작업을 시작하지 않는다.

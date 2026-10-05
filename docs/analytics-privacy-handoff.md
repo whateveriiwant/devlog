@@ -131,3 +131,7 @@ devlog GA4의 원래 목표는 운영 GA에서 글별 조회수·본문 도달·
 
 남은 출시 조건을 해결하기 전에는 공유·약관·필터 임의 변경, 운영 수집·인덱싱 변수 변경, PR merge/stage·production 배포, 실제 방문자·메일 조회/삭제를 하지 마. 결과·공식 근거·미확인을 계획 원문 뒤에 추가하고 인계를 갱신한 뒤 멈춰. 다음 체크리스트는 자동 시작하지 마.
 ```
+
+### 코드 커밋과 CI의 기준
+
+구현·준비 문서 반영 커밋은 `be1b2b7046138d0bb530636117377d40690e9206`이며 [해당 CI](https://github.com/whateveriiwant/devlog/actions/runs/37304450343/job/111744645915)가 SUCCESS다. 이 증거를 추가하는 문서 커밋은 별도다. PR은 OPEN/draft로 유지하며 최신 head는 종료 요약과 `/tmp/devlog-ga4-minimal-handoff-final-20261005.md`를 기준으로 실제 재확인한다. 기본 트리용 계획 추가분은 `/tmp/devlog-ga4-minimal-base-plan-appendix-20261005.md`다. 운영 활성화·merge·운영 배포와 다음 체크리스트는 실행하지 않았다.
