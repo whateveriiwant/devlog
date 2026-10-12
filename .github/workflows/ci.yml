@@ -48,7 +48,14 @@ jobs:
           pnpm verify:content
 
       - name: Build static site
+        env:
+          SITE_URL: https://seungjun.sh
+          MEDIA_BASE_URL: https://media.seungjun.sh
+          ALLOW_INDEXING: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
         run: pnpm build
+
+      - name: Verify SEO and preview indexing guards
+        run: pnpm verify:seo
 
       - name: Verify D1 search, retired paths and security guards
         run: |

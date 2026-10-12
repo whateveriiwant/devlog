@@ -37,6 +37,7 @@ const mine = tagsFor(post);
   seriesId={group?.id}
   postId={post.id}
   publishedAt={post.data.publishedAt}
+  updatedAt={post.data.updatedAt}
   image={imageUrl(post.data.thumbnail)}
 >
   <article data-pagefind-body>
@@ -57,6 +58,9 @@ const mine = tagsFor(post);
         </p>
       )}
       <div class="article-meta">
+        <a href="/profile/" rel="author">
+          정승준
+        </a>
         <time
           datetime={post.data.publishedAt.toISOString()}
           data-pagefind-meta="publishedAt[datetime]"

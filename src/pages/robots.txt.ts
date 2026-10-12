@@ -1,5 +1,7 @@
+import { canIndex } from '../../worker/seo.mjs';
+
 export function GET() {
-  const enabled = process.env.SITE_URL && process.env.ALLOW_INDEXING === 'true';
+  const enabled = canIndex(process.env.SITE_URL, process.env.ALLOW_INDEXING);
   return new Response(
     enabled
       ? `User-agent: *\nAllow: /\nSitemap: ${process.env.SITE_URL!.replace(/\/$/, '')}/sitemap-index.xml\n`
