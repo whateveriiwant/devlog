@@ -4,6 +4,11 @@ import NavigationPanel from '../components/NavigationPanel';
 import SiteControls from '../components/SiteControls';
 import { getNavigation } from '../lib/navigation';
 import { buttonVariants } from '../components/ui/button';
+import {
+  canIndex,
+  serializeJsonLd,
+  structuredData,
+} from '../../worker/seo.mjs';
 interface Props {
   title: string;
   description?: string;
@@ -11,6 +16,7 @@ interface Props {
   postId?: string;
   image?: string;
   publishedAt?: Date;
+  updatedAt?: Date;
   noindex?: boolean;
 }
 const {
@@ -18,8 +24,10 @@ const {
   description = '정승준 테크 블로그',
   seriesId,
   postId,
-  image = new URL('/blog-og.png', process.env.SITE_URL || 'https://seungjun.sh').href,
+  image = new URL('/blog-og.png', process.env.SITE_URL || 'https://seungjun.sh')
+    .href,
   publishedAt,
+  updatedAt,
   noindex = false,
 } = Astro.props;
 const sections = await getNavigation(Astro.url.pathname, seriesId, postId);
@@ -29,12 +37,28 @@ const canonical =
     ? new URL(Astro.url.pathname, Astro.site).href
     : undefined;
 const indexable =
-  originConfigured && process.env.ALLOW_INDEXING === 'true' && !noindex;
+  canIndex(process.env.SITE_URL, process.env.ALLOW_INDEXING) && !noindex;
 const siteTitle =
   title === '테크 블로그'
     ? 'seungjun.sh — 테크 블로그'
     : `${title} · seungjun.sh`;
 const isHome = Astro.url.pathname === '/';
+const schema = indexable
+  ? structuredData({
+      origin: process.env.SITE_URL!,
+      pathname: Astro.url.pathname,
+      title,
+      description,
+      post:
+        postId && publishedAt
+          ? {
+              published_at: publishedAt.toISOString(),
+              updated_at: updatedAt?.toISOString(),
+              thumbnail: Astro.props.image,
+            }
+          : undefined,
+    })
+  : undefined;
 ---
 
 <!doctype html>
@@ -50,9 +74,20 @@ const isHome = Astro.url.pathname === '/';
     />
     <meta
       name="robots"
-      content={indexable ? 'index,follow' : 'noindex,nofollow'}
+      content={
+        indexable ? 'index,follow,max-image-preview:large' : 'noindex,nofollow'
+      }
     />
     {canonical && <link rel="canonical" href={canonical} />}
+    {schema && (
+      <script
+        is:inline
+        type="application/ld+json"
+        data-seo
+        set:html={serializeJsonLd(schema)}
+      ></script>
+    )}
+    <meta name="author" content="정승준" />
     <meta property="og:title" content={title} />
     <meta
       property="og:description"
@@ -67,6 +102,12 @@ const isHome = Astro.url.pathname === '/';
       <meta
         property="article:published_time"
         content={publishedAt.toISOString()}
+      />
+    )}
+    {updatedAt && (
+      <meta
+        property="article:modified_time"
+        content={updatedAt.toISOString()}
       />
     )}
     <meta

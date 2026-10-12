@@ -12,7 +12,10 @@ export async function getStaticPaths() {
 const { tag } = Astro.props;
 ---
 
-<BaseLayout title={`#${tag.name}`}>
+<BaseLayout
+  title={`#${tag.name}`}
+  description={`${tag.name}에 관한 개발 기록 ${tag.posts.length}개를 모았습니다.`}
+>
   <header class="page-heading">
     <a href="/tags/" class="eyebrow block">
       태그
