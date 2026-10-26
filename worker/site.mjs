@@ -1,3 +1,5 @@
+import { canIndex, publicRewriter } from './seo.mjs';
+
 const protectedPath = (path) =>
   path === '/write' ||
   path.startsWith('/write/') ||
@@ -39,16 +41,16 @@ function articleMarkup(post) {
     .join('');
   const pagination = [
     post.previous_slug
-      ? `<a href="/blog/${encodeURIComponent(post.previous_slug)}/"><span>← ${post.series_id ? '시리즈 이전 글' : '이전 기록'}</span><strong>${escapeHtml(post.previous_title)}</strong></a>`
+      ? `<a href="/blog/${encodeURIComponent(post.previous_slug)}/" data-analytics-navigation="previous"><span>← ${post.series_id ? '시리즈 이전 글' : '이전 기록'}</span><strong>${escapeHtml(post.previous_title)}</strong></a>`
       : '<span></span>',
     post.next_slug
-      ? `<a class="text-right" href="/blog/${encodeURIComponent(post.next_slug)}/"><span>${post.series_id ? '시리즈 다음 글' : '다음 기록'} →</span><strong>${escapeHtml(post.next_title)}</strong></a>`
+      ? `<a class="text-right" href="/blog/${encodeURIComponent(post.next_slug)}/" data-analytics-navigation="next"><span>${post.series_id ? '시리즈 다음 글' : '다음 기록'} →</span><strong>${escapeHtml(post.next_title)}</strong></a>`
       : '<span></span>',
   ].join('');
   return { tags, series, headings, pagination };
 }
 
-async function renderArticle(request, env, url) {
+export async function renderArticle(request, env, url) {
   const slug = decodeURIComponent(
     url.pathname.slice('/blog/'.length).replace(/\/$/, '')
   );
@@ -79,7 +81,6 @@ async function renderArticle(request, env, url) {
   );
   if (!template.ok)
     return new Response('Article template unavailable', { status: 503 });
-  const canonical = `${url.origin}/blog/${encodeURIComponent(post.slug)}/`;
   const published = new Date(post.published_at);
   const updated = post.updated_at ? new Date(post.updated_at) : null;
   const formattedDate = new Intl.DateTimeFormat('ko-KR', {
@@ -89,79 +90,61 @@ async function renderArticle(request, env, url) {
     timeZone: 'UTC',
   }).format(published);
   const markup = articleMarkup(post);
-  const html = new HTMLRewriter()
-    .on('title', {
+  let indexable = false;
+  const html = publicRewriter(env, url, {
+    title: post.title,
+    description: post.description || `${post.title}에 관한 개발 기록입니다.`,
+    post,
+  })
+    .on('html', {
       element(element) {
-        element.setInnerContent(`${post.title} · seungjun.sh`);
-      },
-    })
-    .on('meta[name="description"]', {
-      element(element) {
-        element.setAttribute(
-          'content',
-          post.description || '정승준 테크 블로그'
+        indexable =
+          element.getAttribute('data-template-indexable') === 'true' &&
+          canIndex(env.SITE_ORIGIN, env.ALLOW_INDEXING) &&
+          url.origin === env.SITE_ORIGIN;
+        const id = element.getAttribute(
+          'data-template-analytics-measurement-id'
         );
-      },
-    })
-    .on('meta[name="robots"]', {
-      element(element) {
-        element.setAttribute('content', 'index,follow');
-      },
-    })
-    .on('link[data-template-canonical]', {
-      element(element) {
-        element.setAttribute('href', canonical);
-      },
-    })
-    .on('meta[property="og:title"]', {
-      element(element) {
-        element.setAttribute('content', post.title);
-      },
-    })
-    .on('meta[property="og:description"]', {
-      element(element) {
-        element.setAttribute(
-          'content',
-          post.description || '정승준 테크 블로그'
+        const origin = element.getAttribute(
+          'data-template-analytics-site-origin'
         );
-      },
-    })
-    .on('meta[property="og:url"]', {
-      element(element) {
-        element.setAttribute('content', canonical);
-      },
-    })
-    .on('meta[property="og:image"]', {
-      element(element) {
-        if (post.thumbnail) element.setAttribute('content', post.thumbnail);
-      },
-    })
-    .on('meta[property="article:published_time"]', {
-      element(element) {
-        element.setAttribute('content', post.published_at);
-      },
-    })
-    .on('meta[data-template-updated-meta]', {
-      element(element) {
-        if (updated) element.setAttribute('content', post.updated_at);
-      },
-    })
-    .on('meta[name="twitter:title"]', {
-      element(element) {
-        element.setAttribute('content', post.title);
-      },
-    })
-    .on('meta[name="twitter:description"]', {
-      element(element) {
-        element.setAttribute(
-          'content',
-          post.description || '정승준 테크 블로그'
+        const target = element.getAttribute(
+          'data-template-analytics-environment'
         );
-      },
-    })
-    .on('meta[name="twitter:image"]', {
-      element(element) {
-        if (post.thumbnail) element.setAttribute('content', post.thumbnail);
+        const validation =
+          target === 'validation' &&
+          id === 'G-8SFTFGKZ9Y' &&
+          origin ===
+            'https://devlog-ga-validation.seungjun-jeong10.workers.dev' &&
+          env.GA4_VALIDATION_AUTHENTICATED === 'true' &&
+          /^\/blog\/ga-validation-(long|short|image|previous|next)\/$/.test(
+            url.pathname
+          );
+        if (validation) indexable = false;
+        const allowed =
+          (target === 'stage' &&
+            id === 'G-8SFTFGKZ9Y' &&
+            origin ===
+              'https://devlog-site-stage.seungjun-jeong10.workers.dev') ||
+          (target === 'production' &&
+            id === 'G-RQ6456HXLD' &&
+            origin === 'https://seungjun.sh');
+        element.removeAttribute('data-template-indexable');
+        for (const name of ['measurement-id', 'site-origin', 'environment']) {
+          const value = element.getAttribute(`data-template-analytics-${name}`);
+          element.removeAttribute(`data-template-analytics-${name}`);
+          if (
+            ((indexable && allowed) || validation) &&
+            origin === env.SITE_ORIGIN &&
+            origin === url.origin
+          )
+            element.setAttribute(`data-analytics-${name}`, value);
+        }
+        if (validation && origin === env.SITE_ORIGIN && origin === url.origin)
+          element.setAttribute(
+            'data-analytics-validation-authenticated',
+            'true'
+          );
       },
     })
     .on('[data-template-title]', {
@@ -243,6 +226,8 @@ async function renderArticle(request, env, url) {
     .transform(template);
   const headers = new Headers(html.headers);
   headers.set('Cache-Control', 'no-store');
+  if (env.GA4_VALIDATION_AUTHENTICATED === 'true')
+    headers.set('X-Robots-Tag', 'noindex, nofollow');
   return new Response(html.body, { status: 200, headers });
 }
 
@@ -294,7 +279,7 @@ function tagSlugForRoute(tag) {
     .replace(/^-|-$/g, '');
 }
 
-async function renderHome(request, env) {
+async function renderHome(request, env, url) {
   let posts, series, tags, stats;
   try {
     [posts, series, tags, stats] = await Promise.all([
@@ -309,7 +294,11 @@ async function renderHome(request, env) {
   const featured =
     posts.entries.find((post) => post.thumbnail) || posts.entries[0];
   const asset = await env.ASSETS.fetch(request);
-  let page = new HTMLRewriter()
+  let page = publicRewriter(env, url, {
+    title: '정승준의 개발 블로그',
+    description:
+      '웹 프론트엔드 개발자 정승준의 블로그. JavaScript, React, 웹 개발과 컴퓨터공학을 공부하며 직접 해결한 문제와 프로젝트 경험을 기록합니다.',
+  })
     .on('[data-home-feature]', {
       element(element) {
         if (!featured) element.remove();
@@ -470,7 +459,7 @@ async function renderCollection(request, env, url) {
       if (!tag) return new Response('Not found', { status: 404 });
       collection = {
         title: `#${tag.name}`,
-        description: `${tag.post_count}개의 글`,
+        description: `${tag.name}에 관한 개발 기록 ${tag.post_count}개를 모았습니다.`,
         count: tag.post_count,
         root: '/tags/',
         rootLabel: '태그',
@@ -485,7 +474,11 @@ async function renderCollection(request, env, url) {
         cursor: result.nextCursor,
       });
     } else {
-      return env.ASSETS.fetch(request);
+      const asset = await env.ASSETS.fetch(request);
+      return publicRewriter(env, url, {
+        title: '개발 태그',
+        description: '기술과 키워드로 관련 개발 글을 찾아보세요.',
+      }).transform(asset);
     }
   } catch {
     return new Response('Content temporarily unavailable', { status: 503 });
@@ -502,43 +495,7 @@ async function renderCollection(request, env, url) {
       new Request(new URL('/collection-template/', request.url))
     );
     if (!template.ok) return asset;
-    const canonical = `${url.origin}${url.pathname}`;
-    const page = new HTMLRewriter()
-      .on('title', {
-        element(element) {
-          element.setInnerContent(`${collection.title} · seungjun.sh`);
-        },
-      })
-      .on('meta[name="description"]', {
-        element(element) {
-          element.setAttribute('content', collection.description);
-        },
-      })
-      .on('meta[name="robots"]', {
-        element(element) {
-          element.setAttribute('content', 'index,follow');
-        },
-      })
-      .on('link[data-collection-canonical]', {
-        element(element) {
-          element.setAttribute('href', canonical);
-        },
-      })
-      .on('meta[property="og:title"]', {
-        element(element) {
-          element.setAttribute('content', collection.title);
-        },
-      })
-      .on('meta[property="og:description"]', {
-        element(element) {
-          element.setAttribute('content', collection.description);
-        },
-      })
-      .on('meta[property="og:url"]', {
-        element(element) {
-          element.setAttribute('content', canonical);
-        },
-      })
+    const page = publicRewriter(env, url, collection)
       .on('[data-collection-root]', {
         element(element) {
           element.setAttribute('href', collection.root);
@@ -570,7 +527,14 @@ async function renderCollection(request, env, url) {
     headers.set('Cache-Control', 'no-store');
     return new Response(page.body, { status: 200, headers });
   }
-  let rewriter = new HTMLRewriter().on(selector, {
+  const metadata = collection || {
+    title: path === '/blog' ? '개발 글 모음' : '개발 시리즈',
+    description:
+      path === '/blog'
+        ? 'JavaScript, React, 웹 개발과 컴퓨터공학에 관한 정승준의 개발 기록을 최신순으로 읽어보세요.'
+        : '기술 주제와 프로젝트, 학습 과정별로 정리한 정승준의 개발 시리즈입니다.',
+  };
+  const rewriter = publicRewriter(env, url, metadata).on(selector, {
     element(element) {
       if (
         url.pathname.startsWith('/series/') &&
@@ -580,24 +544,6 @@ async function renderCollection(request, env, url) {
       element.setInnerContent(markup, { html: true });
     },
   });
-  if (path === '/blog') {
-    rewriter = rewriter
-      .on('title', {
-        element(element) {
-          element.setInnerContent('글 · seungjun.sh');
-        },
-      })
-      .on('meta[name="robots"]', {
-        element(element) {
-          element.setAttribute('content', 'index,follow');
-        },
-      })
-      .on('link[data-list-canonical]', {
-        element(element) {
-          element.setAttribute('href', `${url.origin}/blog/`);
-        },
-      });
-  }
   const rewritten = rewriter.transform(asset);
   const headers = new Headers(rewritten.headers);
   headers.set('Cache-Control', 'no-store');
@@ -660,7 +606,7 @@ async function renderSitemap(request, env, url) {
       ),
       ...series.map(
         (item) =>
-          `<url><loc>${xmlEscape(`${url.origin}/series/${encodeURIComponent(item.slug)}/`)}</loc><lastmod>${new Date(item.latest_at).toISOString()}</lastmod></url>`
+          `<url><loc>${xmlEscape(`${url.origin}/series/${encodeURIComponent(item.slug)}/`)}</loc></url>`
       ),
       ...tags.map(
         (item) =>
@@ -744,6 +690,22 @@ async function managementAsset(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/robots.txt') {
+      const allowed =
+        canIndex(env.SITE_ORIGIN, env.ALLOW_INDEXING) &&
+        url.origin === env.SITE_ORIGIN;
+      return new Response(
+        allowed
+          ? `User-agent: *\nAllow: /\nSitemap: ${env.SITE_ORIGIN}/sitemap-index.xml\n`
+          : 'User-agent: *\nDisallow: /\n',
+        {
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'no-store',
+          },
+        }
+      );
+    }
     // Reject retired assets even if an old deployment still contains them.
     let path;
     try {
@@ -751,6 +713,14 @@ export default {
     } catch {
       return new Response('Invalid path', { status: 400 });
     }
+    if (
+      ['/index.html', '/profile', '/profile/index.html'].includes(url.pathname)
+    )
+      return Response.redirect(
+        new URL(path.startsWith('/profile') ? '/profile/' : '/', url.origin)
+          .href,
+        301
+      );
     if (
       path === '/search-index.json' ||
       path.startsWith('/search-index.json/') ||
@@ -772,8 +742,9 @@ export default {
       request.method === 'GET' &&
       url.pathname === '/'
     )
-      return renderHome(request, env);
+      return renderHome(request, env, url);
     if (
+      url.pathname.startsWith('/ga-validation/') ||
       url.pathname === '/article-template/' ||
       url.pathname === '/article-template'
     )
@@ -879,7 +850,14 @@ export default {
     }
     if (path === '/login' || path.startsWith('/login/'))
       return managementAsset(request, env);
-    if (!protectedPath(path)) return env.ASSETS.fetch(request);
+    if (!protectedPath(path)) {
+      const asset = await env.ASSETS.fetch(request);
+      if (asset.status === 200 && path === '/profile')
+        return publicRewriter(env, url, {
+          title: '정승준 | 프론트엔드 개발자',
+        }).transform(asset);
+      return asset;
+    }
 
     if (
       env.STAGE_EDITOR_PREVIEW === 'true' &&

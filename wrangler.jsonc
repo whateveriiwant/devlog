@@ -6,6 +6,7 @@
   "vars": {
     "SITE_ORIGIN": "https://seungjun.sh",
     "CONTENT_READS": "true",
+    "ALLOW_INDEXING": "true",
   },
   "services": [{ "binding": "CMS", "service": "devlog-cms" }],
   "assets": {
@@ -13,6 +14,10 @@
     "binding": "ASSETS",
     "run_worker_first": [
       "/",
+      "/index.html",
+      "/robots.txt",
+      "/profile",
+      "/profile/*",
       "/login",
       "/login/*",
       "/write",
@@ -46,6 +51,7 @@
       "vars": {
         "SITE_ORIGIN": "https://devlog-site-stage.seungjun-jeong10.workers.dev",
         "CONTENT_READS": "true",
+        "ALLOW_INDEXING": "false",
         "STAGE_EDITOR_PREVIEW": "true",
       },
       "services": [{ "binding": "CMS", "service": "devlog-cms-stage" }],
