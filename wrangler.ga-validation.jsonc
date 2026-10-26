@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "devlog-ga-validation",
+  "main": "./worker/ga-validation.mjs",
+  "compatibility_date": "2026-09-16",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./.wrangler/ga-validation-assets/",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "html_handling": "auto-trailing-slash",
+  },
+}

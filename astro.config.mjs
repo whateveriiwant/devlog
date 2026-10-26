@@ -82,7 +82,16 @@ export default defineConfig({
         rehypePlugins: [rehypeContent, highlight],
       }),
     }),
-    ...(configuredSite ? [sitemap()] : []),
+    ...(configuredSite
+      ? [
+          sitemap({
+            filter: (page) =>
+              !/\/(?:ga-validation|login|write|admin|article-template|collection-template|list-template|404)(?:\/|$)/.test(
+                new URL(page).pathname
+              ),
+          }),
+        ]
+      : []),
   ],
   markdown: {
     syntaxHighlight: false,

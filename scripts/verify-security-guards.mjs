@@ -8,6 +8,7 @@ const { Request, Response, ReadableStream, TextEncoder } = globalThis;
 const require = createRequire(import.meta.url);
 const wranglerRequire = createRequire(require.resolve('wrangler/package.json'));
 const { Miniflare, convertV4MiniflareOptions } = wranglerRequire('miniflare');
+const { build } = wranglerRequire('esbuild');
 const limit = 10 * 1024 * 1024;
 let puts = 0;
 const env = {
@@ -160,10 +161,17 @@ for (const size of [4, limit]) {
 assert.equal(puts, 2);
 
 // Use Wrangler's installed Workers runtime for real HTMLRewriter behavior.
+const siteBundle = await build({
+  entryPoints: [new URL('../worker/site.mjs', import.meta.url).pathname],
+  bundle: true,
+  write: false,
+  format: 'esm',
+  platform: 'browser',
+});
 const runtime = new Miniflare(
   convertV4MiniflareOptions({
     modules: true,
-    scriptPath: new URL('../worker/site.mjs', import.meta.url).pathname,
+    script: siteBundle.outputFiles[0].text,
     compatibilityDate: '2026-09-16',
     bindings: { SITE_ORIGIN: env.SITE_ORIGIN },
     serviceBindings: {
