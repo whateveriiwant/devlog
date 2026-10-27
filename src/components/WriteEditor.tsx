@@ -1,6 +1,8 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { editorRequest as editorApi } from '../lib/editor-api';
 import DOMPurify from 'dompurify';
+import { toast } from 'sonner';
+import { Toaster } from './ui/sonner';
 import { marked } from 'marked';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -107,7 +109,6 @@ export default function WriteEditor() {
   const [newSeries, setNewSeries] = useState<Series | null>(null);
   const [panel, setPanel] = useState<'posts' | 'publish' | null>(null);
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
   const [uploads, setUploads] = useState(0);
   const [dragging, setDragging] = useState(false);
@@ -141,12 +142,6 @@ export default function WriteEditor() {
     const interval = window.setInterval(() => autoSave(), 60_000);
     return () => window.clearInterval(interval);
   }, [authorized]);
-
-  useEffect(() => {
-    if (!status) return;
-    const timeout = window.setTimeout(() => setStatus(''), 5000);
-    return () => window.clearTimeout(timeout);
-  }, [status]);
 
   const slug = titleSlug(title);
   const previewTooLong = body.length > MAX_PREVIEW_CHARS;
@@ -227,7 +222,7 @@ export default function WriteEditor() {
     setNewSeriesName('');
     setNewSeries(null);
     setPanel(null);
-    setStatus('');
+    toast.dismiss('write-status');
   }
 
   async function openPost(postId: string) {
@@ -288,9 +283,9 @@ export default function WriteEditor() {
             : [...current, draftSeries]
         );
       setPanel(null);
-      setStatus('');
+      toast.dismiss('write-status');
     } catch (error) {
-      setStatus((error as Error).message);
+      toast.error((error as Error).message, { id: 'write-status' });
     } finally {
       setBusy(false);
     }
@@ -302,12 +297,34 @@ export default function WriteEditor() {
     setTagInput('');
   }
 
-  function insertText(before: string, after = '', placeholder = '') {
+  function insertText(
+    before: string,
+    after = '',
+    placeholder = '',
+    toggle = false
+  ) {
     const element = editor.current;
     if (!element) return;
     const start = element.selectionStart;
     const end = element.selectionEnd;
     const selected = body.slice(start, end) || placeholder;
+    if (
+      toggle &&
+      start !== end &&
+      body.slice(start - before.length, start) === before &&
+      body.slice(end, end + after.length) === after
+    ) {
+      setBody(
+        body.slice(0, start - before.length) +
+          selected +
+          body.slice(end + after.length)
+      );
+      requestAnimationFrame(() => {
+        element.focus();
+        element.setSelectionRange(start - before.length, end - before.length);
+      });
+      return;
+    }
     setBody(body.slice(0, start) + before + selected + after + body.slice(end));
     requestAnimationFrame(() => {
       element.focus();
@@ -322,7 +339,9 @@ export default function WriteEditor() {
     const name = newSeriesName.trim();
     if (!name) return;
     if (series.some((item) => item.name === name)) {
-      setStatus('이미 같은 이름의 시리즈가 있습니다.');
+      toast.error('이미 같은 이름의 시리즈가 있습니다.', {
+        id: 'write-status',
+      });
       return;
     }
     const next = {
@@ -335,7 +354,7 @@ export default function WriteEditor() {
     setNewSeries(next);
     setSeriesId(next.id);
     setNewSeriesName('');
-    setStatus('');
+    toast.dismiss('write-status');
   }
 
   function imageAtDrop(event: React.DragEvent<HTMLTextAreaElement>) {
@@ -385,11 +404,13 @@ export default function WriteEditor() {
         'image/avif',
       ].includes(file.type)
     ) {
-      setStatus('PNG, JPEG, WebP, GIF, AVIF 이미지만 업로드할 수 있습니다.');
+      toast.error('PNG, JPEG, WebP, GIF, AVIF 이미지만 업로드할 수 있습니다.', {
+        id: 'write-status',
+      });
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setStatus('이미지는 10MB 이하여야 합니다.');
+      toast.error('이미지는 10MB 이하여야 합니다.', { id: 'write-status' });
       return;
     }
     const marker = `![업로드 중: ${file.name}](uploading-${crypto.randomUUID()})`;
@@ -397,7 +418,7 @@ export default function WriteEditor() {
       (current) => current.slice(0, at) + marker + '\n' + current.slice(at)
     );
     setUploads((count) => count + 1);
-    setStatus('이미지를 R2에 업로드하고 있습니다…');
+    toast.loading('이미지를 R2에 업로드하고 있습니다…', { id: 'write-status' });
     try {
       const optimized = await optimizeImage(file);
       const response = await fetch('/api/content/editor/media', {
@@ -420,10 +441,10 @@ export default function WriteEditor() {
         .replaceAll('[', '')
         .replaceAll(']', '');
       setBody((current) => current.replace(marker, `![${name}](${url})`));
-      setStatus('이미지가 R2에 업로드되었습니다.');
+      toast.success('이미지가 R2에 업로드되었습니다.', { id: 'write-status' });
     } catch (error) {
       setBody((current) => current.replace(marker + '\n', ''));
-      setStatus((error as Error).message);
+      toast.error((error as Error).message, { id: 'write-status' });
     } finally {
       setUploads((count) => count - 1);
     }
@@ -432,22 +453,26 @@ export default function WriteEditor() {
   async function save(publish: boolean) {
     if (busy) return;
     if (!title.trim() || !body.trim()) {
-      setStatus('제목과 본문을 입력해 주세요.');
+      toast.error('제목과 본문을 입력해 주세요.', { id: 'write-status' });
       return;
     }
     if (!slug) {
-      setStatus('제목으로 주소를 만들 수 없습니다.');
+      toast.error('제목으로 주소를 만들 수 없습니다.', { id: 'write-status' });
       return;
     }
     if (uploads) {
-      setStatus('이미지 업로드가 끝난 뒤 저장해 주세요.');
+      toast.error('이미지 업로드가 끝난 뒤 저장해 주세요.', {
+        id: 'write-status',
+      });
       return;
     }
     const duplicate = posts.find(
       (post) => post.slug === slug && post.id !== id
     );
     if (duplicate) {
-      setStatus('같은 주소를 쓰는 글이 있습니다. 제목을 바꿔 주세요.');
+      toast.error('같은 주소를 쓰는 글이 있습니다. 제목을 바꿔 주세요.', {
+        id: 'write-status',
+      });
       return;
     }
     const clickedAt = new Date().toISOString();
@@ -457,7 +482,9 @@ export default function WriteEditor() {
         .querySelector('img')
         ?.getAttribute('src') ?? null;
     setBusy(true);
-    setStatus(publish ? '발행 준비 중…' : '초안 저장 중…');
+    toast.loading(publish ? '발행 준비 중…' : '초안 저장 중…', {
+      id: 'write-status',
+    });
     try {
       const postId = id ?? crypto.randomUUID();
       setId(postId);
@@ -524,7 +551,9 @@ export default function WriteEditor() {
           setNewSeries(null);
         }
         setPanel(null);
-        setStatus(`발행했습니다. 공개 URL: ${result.url}`);
+        toast.success(`발행했습니다. 공개 URL: ${result.url}`, {
+          id: 'write-status',
+        });
         return;
       }
       const nextDraft = {
@@ -538,11 +567,12 @@ export default function WriteEditor() {
         nextDraft,
         ...current.filter((item) => item.id !== postId),
       ]);
-      setStatus(
-        '초안을 D1에 저장했습니다. 공개 글에는 아직 반영되지 않았습니다.'
+      toast.success(
+        '초안을 D1에 저장했습니다. 공개 글에는 아직 반영되지 않았습니다.',
+        { id: 'write-status' }
       );
     } catch (error) {
-      setStatus((error as Error).message);
+      toast.error((error as Error).message, { id: 'write-status' });
     } finally {
       setBusy(false);
     }
@@ -567,9 +597,12 @@ export default function WriteEditor() {
           ...current.filter((post) => post.id !== result.id),
         ]);
       setPanel('posts');
-      setStatus('글을 휴지통으로 이동했습니다. 언제든 복구할 수 있습니다.');
+      toast.success(
+        '글을 휴지통으로 이동했습니다. 언제든 복구할 수 있습니다.',
+        { id: 'write-status' }
+      );
     } catch (error) {
-      setStatus((error as Error).message);
+      toast.error((error as Error).message, { id: 'write-status' });
     } finally {
       setBusy(false);
     }
@@ -587,9 +620,11 @@ export default function WriteEditor() {
         post,
         ...current.filter((item) => item.id !== post.id),
       ]);
-      setStatus(`“${post.title}” 글을 복구했습니다.`);
+      toast.success(`“${post.title}” 글을 복구했습니다.`, {
+        id: 'write-status',
+      });
     } catch (error) {
-      setStatus((error as Error).message);
+      toast.error((error as Error).message, { id: 'write-status' });
     } finally {
       setBusy(false);
     }
@@ -720,21 +755,21 @@ export default function WriteEditor() {
               <span className="write-toolbar-line" />
               <Button
                 variant="ghost"
-                title="굵게"
+                title="굵게 (⌘/Ctrl+B)"
                 onClick={() => insertText('**', '**', '굵은 글씨')}
               >
                 <strong>B</strong>
               </Button>
               <Button
                 variant="ghost"
-                title="기울임"
+                title="기울임 (⌘/Ctrl+I)"
                 onClick={() => insertText('*', '*', '기울임')}
               >
                 <em>I</em>
               </Button>
               <Button
                 variant="ghost"
-                title="취소선"
+                title="취소선 (⌘/Ctrl+Shift+X)"
                 onClick={() => insertText('~~', '~~', '취소선')}
               >
                 <s>S</s>
@@ -748,7 +783,7 @@ export default function WriteEditor() {
               </Button>
               <Button
                 variant="ghost"
-                title="링크"
+                title="링크 (⌘/Ctrl+K)"
                 onClick={() => insertText('[', '](https://)', '링크 텍스트')}
               >
                 🔗
@@ -790,6 +825,30 @@ export default function WriteEditor() {
                 }
                 value={body}
                 onChange={(event) => setBody(event.target.value)}
+                onKeyDown={(event) => {
+                  if (
+                    (!event.metaKey && !event.ctrlKey) ||
+                    event.altKey ||
+                    event.nativeEvent.isComposing
+                  )
+                    return;
+                  const key = event.code.startsWith('Key')
+                    ? event.code.slice(3).toLowerCase()
+                    : event.key.toLowerCase();
+                  if (!event.shiftKey && key === 'b') {
+                    event.preventDefault();
+                    insertText('**', '**', '굵은 글씨', true);
+                  } else if (!event.shiftKey && key === 'i') {
+                    event.preventDefault();
+                    insertText('*', '*', '기울임', true);
+                  } else if (event.shiftKey && key === 'x') {
+                    event.preventDefault();
+                    insertText('~~', '~~', '취소선', true);
+                  } else if (!event.shiftKey && key === 'k') {
+                    event.preventDefault();
+                    insertText('[', '](https://)', '링크 텍스트');
+                  }
+                }}
                 onDragOver={(event) => {
                   if (event.dataTransfer.types.includes('Files')) {
                     event.preventDefault();
@@ -879,11 +938,7 @@ export default function WriteEditor() {
           </Button>
         </div>
       </footer>
-      {status && (
-        <div className="write-status" role="status">
-          {status}
-        </div>
-      )}
+      {!panel && <Toaster position="top-right" duration={5000} />}
       <Dialog
         open={panel !== null}
         onOpenChange={(open) => {
@@ -892,6 +947,7 @@ export default function WriteEditor() {
       >
         <DialogContent className="write-modal" aria-describedby={undefined}>
           <DialogTitle>{panel === 'posts' ? '내 글' : '출간 설정'}</DialogTitle>
+          <Toaster position="top-right" duration={5000} />
           {panel === 'posts' ? (
             <>
               <Button
