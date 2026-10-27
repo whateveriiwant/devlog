@@ -7,8 +7,7 @@
   display: flex;
   justify-content: center;
   gap: 4px;
-  padding: 8px;
-  border-bottom: 1px solid var(--border);
+  padding: 0;
 }
 .write-view-switch button {
   border: 0;
@@ -45,7 +44,7 @@
 }
 .write-head {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   height: 54px;
   padding: 0 48px;
@@ -55,11 +54,6 @@
   border: 0;
   background: transparent;
   color: var(--muted-foreground);
-}
-.write-wordmark {
-  font-size: 20px !important;
-  font-weight: 800;
-  letter-spacing: -0.06em;
 }
 .write-head-actions {
   display: flex;
@@ -76,13 +70,13 @@
   flex-direction: column;
   min-height: 0;
   flex: 1;
-  padding: 0 48px;
+  padding: 0 0 0 30px;
 }
 .write-title {
   width: 100%;
   min-height: 68px;
-  max-height: 150px;
-  resize: vertical;
+  resize: none;
+  overflow: hidden;
   padding: 10px 0;
   border: 0;
   background: transparent;
@@ -466,16 +460,19 @@
     padding: 0 22px;
   }
   .write-fields {
-    padding: 0 22px;
+    padding: 0 0 0 22px;
   }
   .write-title {
     font-size: 32px;
   }
   .write-footer {
     padding: 9px 15px;
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .write-footer-actions {
     gap: 3px;
+    flex-wrap: wrap;
   }
   .write-footer button {
     padding: 9px;
@@ -496,4 +493,9 @@
   height: auto;
   justify-content: flex-start;
   white-space: normal;
+}
+
+.write-footer .write-view-switch button[aria-pressed='true'] {
+  background: var(--secondary);
+  color: var(--foreground);
 }
