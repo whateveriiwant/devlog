@@ -1,4 +1,5 @@
 ---
+import '../styles/global.css';
 import WriteEditor from '../components/WriteEditor';
 ---
 
@@ -9,6 +10,18 @@ import WriteEditor from '../components/WriteEditor';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>글쓰기 · devlog</title>
+    <script is:inline>
+      let theme;
+      try {
+        theme = localStorage.getItem('theme');
+      } catch {}
+      const dark =
+        theme === 'dark' ||
+        (theme !== 'light' &&
+          matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.classList.toggle('dark', dark);
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    </script>
   </head>
   <body>
     <WriteEditor client:only="react" />
