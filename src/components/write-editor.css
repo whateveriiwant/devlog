@@ -261,19 +261,6 @@
   margin: 0 0 38px;
   color: var(--primary);
 }
-.write-status {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  max-width: min(570px, calc(100vw - 48px));
-  z-index: 60;
-  padding: 11px 16px;
-  background: var(--foreground);
-  color: var(--background);
-  border-radius: 6px;
-  box-shadow: 0 5px 18px rgb(0 0 0 / 15%);
-  font-size: 13px;
-}
 .write-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -493,10 +480,6 @@
   .write-footer button {
     padding: 9px;
     font-size: 13px;
-  }
-  .write-status {
-    top: 12px;
-    right: 12px;
   }
 }
 
