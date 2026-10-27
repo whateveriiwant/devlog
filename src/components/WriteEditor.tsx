@@ -111,7 +111,7 @@ export default function WriteEditor() {
   const [busy, setBusy] = useState(false);
   const [uploads, setUploads] = useState(0);
   const [dragging, setDragging] = useState(false);
-  const [preview, setPreview] = useState(false);
+  const [view, setView] = useState<'editor' | 'preview' | 'both'>('both');
   const editor = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const openedDeepLink = useRef(false);
@@ -589,7 +589,25 @@ export default function WriteEditor() {
 
   return (
     <div className="write-shell">
-      <main className="write-layout">
+      <div className="write-view-switch" role="group" aria-label="화면 보기">
+        {(
+          [
+            ['editor', '에디터 보기'],
+            ['preview', '미리보기'],
+            ['both', '둘 다 보기'],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={view === value}
+            onClick={() => setView(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <main className={`write-layout view-${view}`}>
         <section className="write-pane" aria-label="마크다운 글쓰기">
           <div className="write-head">
             <Button
@@ -784,61 +802,23 @@ export default function WriteEditor() {
               )}
             </div>
           </div>
-          <footer className="write-footer">
-            <Button variant="ghost" asChild>
-              <a href="/">← 나가기</a>
-            </Button>
-            <div className="write-footer-actions">
-              <Button
-                variant="ghost"
-                className="write-mobile-preview"
-                onClick={() => setPreview(!preview)}
-              >
-                {preview ? '편집' : '미리보기'}
-              </Button>
-              <Button
-                variant="ghost"
-                disabled={busy || uploads > 0}
-                onClick={() => void save(false)}
-              >
-                임시저장
-              </Button>
-              {id && posts.some((post) => post.id === id) && (
-                <Button
-                  variant="ghost"
-                  disabled={busy || uploads > 0}
-                  onClick={moveToTrash}
-                >
-                  휴지통으로
-                </Button>
-              )}
-              <Button
-                className="write-publish-button"
-                disabled={busy || uploads > 0}
-                onClick={() => setPanel('publish')}
-              >
-                {busy ? '처리 중…' : '출간하기'}
-              </Button>
-            </div>
-          </footer>
         </section>
-        <section
-          className={`write-preview ${preview ? 'is-visible' : ''}`}
-          aria-label="글 미리보기"
-        >
+        <section className="write-preview" aria-label="글 미리보기">
           <div className="write-preview-content">
-            {title ? (
-              <h1>{title}</h1>
-            ) : (
-              <p className="write-preview-placeholder">미리보기</p>
-            )}
-            {tags.length > 0 && (
-              <div className="write-preview-tags">
-                {tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </div>
-            )}
+            <header className="article-heading">
+              {title ? (
+                <h1>{title}</h1>
+              ) : (
+                <p className="write-preview-placeholder">미리보기</p>
+              )}
+              {tags.length > 0 && (
+                <div className="write-preview-tags">
+                  {tags.map((tag) => (
+                    <span key={tag}>{tag}</span>
+                  ))}
+                </div>
+              )}
+            </header>
             {previewTooLong ? (
               <p className="write-preview-placeholder">
                 본문이 100,000자를 넘어 미리보기를 생략했습니다. 임시저장과
@@ -846,13 +826,43 @@ export default function WriteEditor() {
               </p>
             ) : (
               <div
-                className="write-markdown"
+                className="prose"
                 dangerouslySetInnerHTML={{ __html: previewHtml }}
               />
             )}
           </div>
         </section>
       </main>
+      <footer className="write-footer">
+        <Button variant="ghost" asChild>
+          <a href="/">← 나가기</a>
+        </Button>
+        <div className="write-footer-actions">
+          <Button
+            variant="ghost"
+            disabled={busy || uploads > 0}
+            onClick={() => void save(false)}
+          >
+            임시저장
+          </Button>
+          {id && posts.some((post) => post.id === id) && (
+            <Button
+              variant="ghost"
+              disabled={busy || uploads > 0}
+              onClick={moveToTrash}
+            >
+              휴지통으로
+            </Button>
+          )}
+          <Button
+            className="write-publish-button"
+            disabled={busy || uploads > 0}
+            onClick={() => setPanel('publish')}
+          >
+            {busy ? '처리 중…' : '출간하기'}
+          </Button>
+        </div>
+      </footer>
       {status && (
         <div className="write-status" role="status">
           {status}
