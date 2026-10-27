@@ -136,7 +136,11 @@ export default function WriteEditor() {
       const width = context.measureText(input.value || input.placeholder).width;
       const spacing = parseFloat(style.letterSpacing) || 0;
       const textWidth = width + spacing * Math.max(0, input.value.length - 1);
-      input.style.fontSize = `${String(Math.max(20, Math.min(maxSize, (maxSize * input.clientWidth) / Math.max(textWidth, 1))))}px`;
+      const availableWidth =
+        input.clientWidth -
+        parseFloat(style.paddingLeft) -
+        parseFloat(style.paddingRight);
+      input.style.fontSize = `${String(Math.max(20, Math.min(maxSize, (maxSize * availableWidth) / Math.max(textWidth, 1))))}px`;
       input.style.height = 'auto';
       input.style.height = `${String(input.scrollHeight)}px`;
     };

@@ -66,18 +66,19 @@
   color: var(--primary);
 }
 .write-fields {
+  --write-inset: 30px;
   display: flex;
   flex-direction: column;
   min-height: 0;
   flex: 1;
-  padding: 0 0 0 30px;
+  padding: 0 0 0 var(--write-inset);
 }
 .write-title {
   width: 100%;
   min-height: 68px;
   resize: none;
   overflow: hidden;
-  padding: 10px 0;
+  padding: 10px var(--write-inset) 10px 0;
   border: 0;
   background: transparent;
   font-size: clamp(32px, 3vw, 46px);
@@ -460,7 +461,7 @@
     padding: 0 22px;
   }
   .write-fields {
-    padding: 0 0 0 22px;
+    --write-inset: 22px;
   }
   .write-title {
     font-size: 32px;
