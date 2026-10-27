@@ -342,19 +342,36 @@ export default function WriteEditor() {
     const element = event.currentTarget;
     const rect = element.getBoundingClientRect();
     const style = getComputedStyle(element);
-    const lineHeight = Number.parseFloat(style.lineHeight);
-    const paddingTop = Number.parseFloat(style.paddingTop);
-    const line = Math.max(
-      0,
-      Math.floor(
-        (event.clientY - rect.top - paddingTop + element.scrollTop) / lineHeight
-      )
-    );
-    const lines = body.split('\n');
+    const mirror = document.createElement('div');
+    Object.assign(mirror.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      visibility: 'hidden',
+      width: `${element.clientWidth - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight)}px`,
+      font: style.font,
+      lineHeight: style.lineHeight,
+      letterSpacing: style.letterSpacing,
+      tabSize: style.tabSize,
+      whiteSpace: 'pre-wrap',
+      overflowWrap: 'anywhere',
+    });
+    document.body.appendChild(mirror);
+    const targetY =
+      event.clientY -
+      rect.top -
+      Number.parseFloat(style.paddingTop) +
+      element.scrollTop;
     let offset = 0;
-    for (let index = 0; index < Math.min(line, lines.length); index++) {
-      offset += lines[index].length + 1;
+    for (const line of body.split('\n')) {
+      const row = document.createElement('div');
+      row.textContent = line || '\u200b';
+      mirror.appendChild(row);
+      if (row.offsetTop + row.offsetHeight > targetY) break;
+      offset += line.length + 1;
     }
+    mirror.remove();
+    offset = Math.min(offset, body.length);
     return offset;
   }
 
@@ -772,7 +789,6 @@ export default function WriteEditor() {
                   '당신의 이야기를 적어보세요…\n\n이미지를 여기에 끌어다 놓을 수 있습니다.'
                 }
                 value={body}
-                wrap="off"
                 onChange={(event) => setBody(event.target.value)}
                 onDragOver={(event) => {
                   if (event.dataTransfer.types.includes('Files')) {
