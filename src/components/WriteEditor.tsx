@@ -1,4 +1,11 @@
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
+import {
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { editorRequest as editorApi } from '../lib/editor-api';
 import DOMPurify from 'dompurify';
 import { toast } from 'sonner';
@@ -113,6 +120,31 @@ export default function WriteEditor() {
   const [uploads, setUploads] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [view, setView] = useState<'editor' | 'preview' | 'both'>('both');
+  const titleInput = useRef<HTMLTextAreaElement>(null);
+  useLayoutEffect(() => {
+    const input = titleInput.current;
+    if (!input?.parentElement) return;
+    const container = input.parentElement;
+    const fit = () => {
+      input.style.fontSize = '';
+      const style = getComputedStyle(input);
+      const maxSize = parseFloat(style.fontSize);
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      context.font = `${style.fontWeight} ${String(maxSize)}px ${style.fontFamily}`;
+      const width = context.measureText(input.value || input.placeholder).width;
+      const spacing = parseFloat(style.letterSpacing) || 0;
+      const textWidth = width + spacing * Math.max(0, input.value.length - 1);
+      input.style.fontSize = `${String(Math.max(20, Math.min(maxSize, (maxSize * input.clientWidth) / Math.max(textWidth, 1))))}px`;
+      input.style.height = 'auto';
+      input.style.height = `${String(input.scrollHeight)}px`;
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [title, authorized, view]);
   const editor = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const openedDeepLink = useRef(false);
@@ -641,34 +673,9 @@ export default function WriteEditor() {
 
   return (
     <div className="write-shell">
-      <div className="write-view-switch" role="group" aria-label="화면 보기">
-        {(
-          [
-            ['editor', '에디터 보기'],
-            ['preview', '미리보기'],
-            ['both', '둘 다 보기'],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            aria-pressed={view === value}
-            onClick={() => setView(value)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
       <main className={`write-layout view-${view}`}>
         <section className="write-pane" aria-label="마크다운 글쓰기">
           <div className="write-head">
-            <Button
-              variant="ghost"
-              className="write-wordmark"
-              onClick={() => setPanel('posts')}
-            >
-              devlog
-            </Button>
             <div className="write-head-actions">
               <Button variant="ghost" asChild>
                 <a href="/admin/">글 관리</a>
@@ -693,6 +700,7 @@ export default function WriteEditor() {
           </div>
           <div className="write-fields">
             <Textarea
+              ref={titleInput}
               className="write-title"
               aria-label="제목"
               placeholder="제목을 입력하세요"
@@ -912,6 +920,24 @@ export default function WriteEditor() {
         <Button variant="ghost" asChild>
           <a href="/">← 나가기</a>
         </Button>
+        <div className="write-view-switch" role="group" aria-label="화면 보기">
+          {(
+            [
+              ['editor', '에디터 보기'],
+              ['preview', '미리보기'],
+              ['both', '둘 다 보기'],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={view === value}
+              onClick={() => setView(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <div className="write-footer-actions">
           <Button
             variant="ghost"
