@@ -17,6 +17,7 @@ import {
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { NativeSelect } from './ui/native-select';
 
 type Status = 'published' | 'drafts' | 'trash';
 interface Post {
@@ -274,7 +275,8 @@ export default function AdminDashboard() {
             aria-label="글 상태"
           >
             {tabs.map((tab) => (
-              <button
+              <Button
+                variant="ghost"
                 key={tab.id}
                 type="button"
                 role="tab"
@@ -289,7 +291,7 @@ export default function AdminDashboard() {
                 <span className="rounded-full bg-muted px-2 py-0.5 text-xs tabular-nums">
                   {counts[tab.id]}
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -309,9 +311,9 @@ export default function AdminDashboard() {
             </div>
             <label className="flex h-9 items-center gap-2 rounded-md border bg-background px-3 text-sm text-muted-foreground sm:w-56">
               <FolderOpen className="size-4 shrink-0" />
-              <select
+              <NativeSelect
                 aria-label="시리즈 선택"
-                className="w-full bg-transparent text-foreground outline-none"
+                className="w-full border-0 bg-transparent px-0 text-foreground shadow-none"
                 value={seriesId}
                 onChange={(event) => {
                   setSeriesId(event.target.value);
@@ -324,13 +326,13 @@ export default function AdminDashboard() {
                     {item.name}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
           </div>
 
           {message && (
             <p
-              className="border-b bg-emerald-50 px-5 py-3 text-sm text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200"
+              className="border-b bg-muted px-5 py-3 text-sm text-foreground"
               role="status"
             >
               {message}

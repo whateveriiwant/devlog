@@ -13,6 +13,18 @@ const title = '글 관리 · devlog';
     <meta name="robots" content="noindex, nofollow" />
     <meta name="color-scheme" content="light dark" />
     <title>{title}</title>
+    <script is:inline>
+      let theme;
+      try {
+        theme = localStorage.getItem('theme');
+      } catch {}
+      const dark =
+        theme === 'dark' ||
+        (theme !== 'light' &&
+          matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.classList.toggle('dark', dark);
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    </script>
   </head>
   <body>
     <AdminDashboard client:only="react" />

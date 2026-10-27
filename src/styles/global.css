@@ -1,6 +1,12 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+@font-face {
+  font-family: 'Pretendard';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2');
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
 @custom-variant dark (&:where(.dark, .dark *));
 @theme {
   --font-sans:

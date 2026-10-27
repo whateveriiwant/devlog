@@ -2,6 +2,12 @@ import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { editorRequest as editorApi } from '../lib/editor-api';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { NativeSelect } from './ui/native-select';
+import { Dialog, DialogContent, DialogTitle } from './ui/dialog';
 import './write-editor.css';
 
 const MAX_PREVIEW_CHARS = 100_000;
@@ -586,16 +592,22 @@ export default function WriteEditor() {
       <main className="write-layout">
         <section className="write-pane" aria-label="마크다운 글쓰기">
           <div className="write-head">
-            <button
+            <Button
+              variant="ghost"
               className="write-wordmark"
               onClick={() => setPanel('posts')}
             >
               devlog
-            </button>
+            </Button>
             <div className="write-head-actions">
-              <a href="/admin/">글 관리</a>
-              <button onClick={() => setPanel('posts')}>내 글</button>
-              <button
+              <Button variant="ghost" asChild>
+                <a href="/admin/">글 관리</a>
+              </Button>
+              <Button variant="ghost" onClick={() => setPanel('posts')}>
+                내 글
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => {
                   void fetch('/api/auth/logout', {
                     method: 'POST',
@@ -606,11 +618,11 @@ export default function WriteEditor() {
                 }}
               >
                 로그아웃
-              </button>
+              </Button>
             </div>
           </div>
           <div className="write-fields">
-            <textarea
+            <Textarea
               className="write-title"
               aria-label="제목"
               placeholder="제목을 입력하세요"
@@ -624,16 +636,17 @@ export default function WriteEditor() {
             <div className="write-title-rule" />
             <div className="write-tags">
               {tags.map((tag) => (
-                <button
+                <Button
+                  variant="ghost"
                   key={tag}
                   className="write-tag"
                   title="태그 삭제"
                   onClick={() => setTags(tags.filter((item) => item !== tag))}
                 >
                   {tag} ×
-                </button>
+                </Button>
               ))}
-              <input
+              <Input
                 aria-label="태그 추가"
                 placeholder="태그를 입력하고 Enter"
                 value={tagInput}
@@ -658,7 +671,8 @@ export default function WriteEditor() {
               aria-label="마크다운 서식"
             >
               {(['H1', 'H2', 'H3', 'H4'] as const).map((level, index) => (
-                <button
+                <Button
+                  variant="ghost"
                   key={level}
                   title={level}
                   onClick={() =>
@@ -666,52 +680,59 @@ export default function WriteEditor() {
                   }
                 >
                   {level}
-                </button>
+                </Button>
               ))}
               <span className="write-toolbar-line" />
-              <button
+              <Button
+                variant="ghost"
                 title="굵게"
                 onClick={() => insertText('**', '**', '굵은 글씨')}
               >
                 <strong>B</strong>
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 title="기울임"
                 onClick={() => insertText('*', '*', '기울임')}
               >
                 <em>I</em>
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 title="취소선"
                 onClick={() => insertText('~~', '~~', '취소선')}
               >
                 <s>S</s>
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 title="인용문"
                 onClick={() => insertText('> ', '', '인용문')}
               >
                 ❞
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 title="링크"
                 onClick={() => insertText('[', '](https://)', '링크 텍스트')}
               >
                 🔗
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 title="이미지"
                 onClick={() => imageInput.current?.click()}
               >
                 ▣
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 title="코드 블록"
                 onClick={() => insertText('\n```\n', '\n```\n', '코드')}
               >
                 〈〉
-              </button>
-              <input
+              </Button>
+              <Input
                 ref={imageInput}
                 hidden
                 type="file"
@@ -725,7 +746,7 @@ export default function WriteEditor() {
               />
             </div>
             <div className={`write-body-wrap ${dragging ? 'is-dragging' : ''}`}>
-              <textarea
+              <Textarea
                 ref={editor}
                 className="write-body"
                 aria-label="마크다운 본문"
@@ -764,32 +785,40 @@ export default function WriteEditor() {
             </div>
           </div>
           <footer className="write-footer">
-            <a href="/">← 나가기</a>
+            <Button variant="ghost" asChild>
+              <a href="/">← 나가기</a>
+            </Button>
             <div className="write-footer-actions">
-              <button
+              <Button
+                variant="ghost"
                 className="write-mobile-preview"
                 onClick={() => setPreview(!preview)}
               >
                 {preview ? '편집' : '미리보기'}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 disabled={busy || uploads > 0}
                 onClick={() => void save(false)}
               >
                 임시저장
-              </button>
+              </Button>
               {id && posts.some((post) => post.id === id) && (
-                <button disabled={busy || uploads > 0} onClick={moveToTrash}>
+                <Button
+                  variant="ghost"
+                  disabled={busy || uploads > 0}
+                  onClick={moveToTrash}
+                >
                   휴지통으로
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 className="write-publish-button"
                 disabled={busy || uploads > 0}
                 onClick={() => setPanel('publish')}
               >
                 {busy ? '처리 중…' : '출간하기'}
-              </button>
+              </Button>
             </div>
           </footer>
         </section>
@@ -829,140 +858,142 @@ export default function WriteEditor() {
           {status}
         </div>
       )}
-      {panel && (
-        <div
-          className="write-modal-backdrop"
-          onMouseDown={() => setPanel(null)}
-        >
-          <section
-            className="write-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label={panel === 'posts' ? '내 글' : '출간 설정'}
-            onMouseDown={(event) => event.stopPropagation()}
-          >
-            <div className="write-modal-head">
-              <h2>{panel === 'posts' ? '내 글' : '출간 설정'}</h2>
-              <button aria-label="닫기" onClick={() => setPanel(null)}>
-                ×
-              </button>
-            </div>
-            {panel === 'posts' ? (
-              <>
-                <button className="write-new-post" onClick={reset}>
-                  + 새 글 쓰기
-                </button>
-                <input
-                  className="write-search"
-                  placeholder="글 제목 검색"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-                <div className="write-post-list">
-                  {drafts.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => void openPost(item.id)}
-                    >
-                      <span className="write-draft-badge">초안</span>{' '}
-                      {item.title}
-                    </button>
-                  ))}
-                  {visiblePosts.map((post) => (
-                    <button
-                      key={post.id}
-                      onClick={() => void openPost(post.id)}
-                    >
-                      <strong>{post.title}</strong>
-                      <small>
-                        {new Date(post.publishedAt).toLocaleDateString('ko-KR')}
-                      </small>
-                    </button>
-                  ))}
-                  {visibleTrash.length > 0 && (
-                    <div className="write-trash-list" aria-label="휴지통">
-                      <h3>휴지통</h3>
-                      {visibleTrash.map((post) => (
-                        <div className="write-trash-row" key={post.id}>
-                          <span>
-                            <strong>{post.title}</strong>
-                            <small>
-                              삭제{' '}
-                              {new Date(
-                                post.deletedAt || ''
-                              ).toLocaleDateString('ko-KR')}
-                            </small>
-                          </span>
-                          <button
-                            disabled={busy}
-                            onClick={() => void restoreFromTrash(post)}
-                          >
-                            복구
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <div className="write-publish-form">
-                <label>
-                  글 설명
-                  <textarea
-                    rows={3}
-                    value={description}
-                    placeholder="목록과 검색 결과에 표시할 설명"
-                    onChange={(event) => setDescription(event.target.value)}
-                  />
-                </label>
-                <label>
-                  주소
-                  <output>/blog/{slug || '제목'}/</output>
-                </label>
-                <label>
-                  시리즈
-                  <select
-                    value={seriesId}
-                    onChange={(event) => setSeriesId(event.target.value)}
+      <Dialog
+        open={panel !== null}
+        onOpenChange={(open) => {
+          if (!open) setPanel(null);
+        }}
+      >
+        <DialogContent className="write-modal" aria-describedby={undefined}>
+          <DialogTitle>{panel === 'posts' ? '내 글' : '출간 설정'}</DialogTitle>
+          {panel === 'posts' ? (
+            <>
+              <Button
+                variant="ghost"
+                className="write-new-post"
+                onClick={reset}
+              >
+                + 새 글 쓰기
+              </Button>
+              <Input
+                className="write-search"
+                placeholder="글 제목 검색"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+              <div className="write-post-list">
+                {drafts.map((item) => (
+                  <Button
+                    variant="ghost"
+                    key={item.id}
+                    onClick={() => void openPost(item.id)}
                   >
-                    <option value="">시리즈 없음</option>
-                    {series.map((item) => (
-                      <option value={item.id} key={item.id}>
-                        {item.name}
-                      </option>
+                    <Badge variant="secondary" className="write-draft-badge">
+                      초안
+                    </Badge>{' '}
+                    {item.title}
+                  </Button>
+                ))}
+                {visiblePosts.map((post) => (
+                  <Button
+                    variant="ghost"
+                    key={post.id}
+                    onClick={() => void openPost(post.id)}
+                  >
+                    <strong>{post.title}</strong>
+                    <small>
+                      {new Date(post.publishedAt).toLocaleDateString('ko-KR')}
+                    </small>
+                  </Button>
+                ))}
+                {visibleTrash.length > 0 && (
+                  <div className="write-trash-list" aria-label="휴지통">
+                    <h3>휴지통</h3>
+                    {visibleTrash.map((post) => (
+                      <div className="write-trash-row" key={post.id}>
+                        <span>
+                          <strong>{post.title}</strong>
+                          <small>
+                            삭제{' '}
+                            {new Date(post.deletedAt || '').toLocaleDateString(
+                              'ko-KR'
+                            )}
+                          </small>
+                        </span>
+                        <Button
+                          variant="ghost"
+                          disabled={busy}
+                          onClick={() => void restoreFromTrash(post)}
+                        >
+                          복구
+                        </Button>
+                      </div>
                     ))}
-                  </select>
-                </label>
-                <div className="write-create-series">
-                  <input
-                    placeholder="새 시리즈 이름"
-                    value={newSeriesName}
-                    onChange={(event) => setNewSeriesName(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault();
-                        createSeries();
-                      }
-                    }}
-                  />
-                  <button onClick={createSeries}>시리즈 만들기</button>
-                </div>
-                <div className="write-modal-actions">
-                  <button onClick={() => setPanel(null)}>돌아가기</button>
-                  <button
-                    className="write-publish-button"
-                    disabled={busy || uploads > 0}
-                    onClick={() => void save(true)}
-                  >
-                    {busy ? '발행 중…' : '출간하기'}
-                  </button>
-                </div>
+                  </div>
+                )}
               </div>
-            )}
-          </section>
-        </div>
-      )}
+            </>
+          ) : (
+            <div className="write-publish-form">
+              <label>
+                글 설명
+                <Textarea
+                  rows={3}
+                  value={description}
+                  placeholder="목록과 검색 결과에 표시할 설명"
+                  onChange={(event) => setDescription(event.target.value)}
+                />
+              </label>
+              <label>
+                주소
+                <output>/blog/{slug || '제목'}/</output>
+              </label>
+              <label>
+                시리즈
+                <NativeSelect
+                  value={seriesId}
+                  onChange={(event) => setSeriesId(event.target.value)}
+                >
+                  <option value="">시리즈 없음</option>
+                  {series.map((item) => (
+                    <option value={item.id} key={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </label>
+              <div className="write-create-series">
+                <Input
+                  placeholder="새 시리즈 이름"
+                  value={newSeriesName}
+                  onChange={(event) => setNewSeriesName(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      createSeries();
+                    }
+                  }}
+                />
+                <Button variant="ghost" onClick={createSeries}>
+                  시리즈 만들기
+                </Button>
+              </div>
+              <div className="write-modal-actions">
+                <Button variant="ghost" onClick={() => setPanel(null)}>
+                  돌아가기
+                </Button>
+                <Button
+                  className="write-publish-button"
+                  disabled={busy || uploads > 0}
+                  onClick={() => void save(true)}
+                >
+                  {busy ? '발행 중…' : '출간하기'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
