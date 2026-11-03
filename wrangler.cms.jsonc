@@ -4,6 +4,13 @@
   "main": "./worker/cms.mjs",
   "compatibility_date": "2026-09-16",
   "routes": [{ "pattern": "cms-api.seungjun.sh", "custom_domain": true }],
+  "ratelimits": [
+    {
+      "name": "PUBLIC_API_RATE_LIMIT",
+      "namespace_id": "100260201",
+      "simple": { "limit": 100, "period": 10 },
+    },
+  ],
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "devlog-assets" }],
   "d1_databases": [
     {
