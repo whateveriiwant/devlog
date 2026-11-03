@@ -11,7 +11,7 @@ import { visit } from 'unist-util-visit';
 import GithubSlugger from 'github-slugger';
 
 const MAX_REQUEST_BYTES = 10 * 1024 * 1024;
-const SESSION_SECONDS = 12 * 60 * 60;
+const SESSION_SECONDS = 30 * 24 * 60 * 60;
 const MAX_MARKDOWN_BYTES = 1_500_000;
 const renderSchema = {
   ...defaultSchema,
