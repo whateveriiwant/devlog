@@ -33,10 +33,11 @@ function articleMarkup(post) {
   const series = post.series_slug
     ? `<span class="mx-2 text-muted-foreground">/</span><a href="/series/${encodeURIComponent(post.series_slug)}/">${escapeHtml(post.series_name)}</a>`
     : '';
+  const minimumDepth = Math.min(...post.headings.map((heading) => heading.depth));
   const headings = post.headings
     .map(
       (heading) =>
-        `<li><a href="#${encodeURIComponent(heading.slug)}">${escapeHtml(heading.text)}</a></li>`
+        `<li style="--depth:${heading.depth - minimumDepth}"><a href="#${encodeURIComponent(heading.slug)}">${escapeHtml(heading.text)}</a></li>`
     )
     .join('');
   const pagination = [
@@ -217,7 +218,7 @@ export async function renderArticle(request, env, url) {
       element(element) {
         if (post.headings.length)
           element.setInnerContent(
-            `<nav aria-label="이 글의 목차"><h2 class="rail-heading mb-5">이 글에서</h2><ol class="toc-list">${markup.headings}</ol></nav>`,
+            `<nav aria-label="이 글의 목차"><ol class="toc-list">${markup.headings}</ol></nav>`,
             { html: true }
           );
         else element.remove();
