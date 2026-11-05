@@ -349,7 +349,7 @@ async function renderHome(request, env, url) {
             .slice(0, 4)
             .map(
               (tag) =>
-                `<span class="rounded-md border px-2.5 py-0.5 text-xs">#${escapeHtml(tag)}</span>`
+                `<a href="/tags/${encodeURIComponent(tagSlug(tag))}/" class="rounded-md border px-2.5 py-0.5 text-xs hover:bg-accent">#${escapeHtml(tag)}</a>`
             )
             .join(''),
           { html: true }
@@ -384,7 +384,7 @@ async function renderHome(request, env, url) {
       element(element) {
         element.setInnerContent(
           tags.entries
-            .slice(0, 18)
+            .slice(0, 8)
             .map(
               (tag) =>
                 `<a href="/tags/${encodeURIComponent(tagSlug(tag.name))}/" class="rounded-md border bg-background px-3 py-1.5 text-sm hover:bg-accent">#${escapeHtml(tag.name)} <span class="ml-1 text-muted-foreground">${tag.post_count}</span></a>`
