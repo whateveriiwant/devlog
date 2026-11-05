@@ -58,6 +58,8 @@ jobs:
           PUBLIC_GA_MEASUREMENT_ID: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GA4_PRODUCTION_ENABLED == 'true' && vars.GA4_PRODUCTION_MEASUREMENT_ID || '' }}
         run: pnpm build
 
+      - name: Verify home rendering
+        run: node scripts/verify-home.mjs
       - name: Verify GA4 analytics guards
         env:
           GA4_EXPECTED_TARGET: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.GA4_PRODUCTION_ENABLED == 'true' && vars.ALLOW_INDEXING == 'true' && 'production' || 'disabled' }}

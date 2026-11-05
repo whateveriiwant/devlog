@@ -34,7 +34,7 @@ const recentSeries = [...content.series]
       latestImage: imageUrl(latestPost.data.thumbnail),
     };
   });
-const popularTags = content.tags.slice(0, 18);
+const popularTags = content.tags.slice(0, 8);
 ---
 
 <BaseLayout
@@ -70,7 +70,7 @@ const popularTags = content.tags.slice(0, 18);
 
         <div class="flex flex-col justify-center p-6 sm:p-8">
           <div class="mb-5 flex flex-wrap items-center gap-2">
-            <Badge>추천 글</Badge>
+            <Badge>함께 읽을 글</Badge>
           </div>
 
           <h1 class="text-3xl leading-tight font-semibold tracking-tight text-balance sm:text-4xl">
@@ -101,7 +101,11 @@ const popularTags = content.tags.slice(0, 18);
           {featured.data.tags.length > 0 && (
             <div data-home-feature-tags class="mt-4 flex flex-wrap gap-2">
               {featured.data.tags.slice(0, 4).map((tag) => (
-                <Badge variant="outline">#{tag}</Badge>
+                <a href={tagUrl(tag)}>
+                  <Badge variant="outline" className="hover:bg-accent">
+                    #{tag}
+                  </Badge>
+                </a>
               ))}
             </div>
           )}
@@ -120,7 +124,7 @@ const popularTags = content.tags.slice(0, 18);
     <section class="mt-14 grid gap-12 xl:grid-cols-[minmax(0,1.5fr)_minmax(18rem,.5fr)] xl:gap-16">
       <div>
         <div class="flex items-end justify-between gap-4 border-b pb-4">
-          <h2 class="text-2xl font-semibold tracking-tight">최근 업데이트</h2>
+          <h2 class="text-2xl font-semibold tracking-tight">최근 발행한 글</h2>
           <a
             href="/blog/"
             class="text-sm font-medium underline-offset-4 hover:underline"
@@ -176,7 +180,7 @@ const popularTags = content.tags.slice(0, 18);
     <section class="mt-24">
       <div class="mb-7 flex items-end justify-between gap-4">
         <h2 class="text-2xl font-semibold tracking-tight">
-          최근 업데이트된 시리즈
+          최근 글이 발행된 시리즈
         </h2>
         <a
           href="/series/"
@@ -225,6 +229,12 @@ const popularTags = content.tags.slice(0, 18);
         <p class="mt-3 text-sm leading-6 text-muted-foreground">
           작성한 글의 수를 기준으로 자주 등장한 주제를 모았습니다.
         </p>
+        <a
+          href="/tags/"
+          class="mt-4 inline-block text-sm font-medium underline-offset-4 hover:underline"
+        >
+          모든 키워드
+        </a>
       </div>
       <div data-home-tags class="flex content-start flex-wrap gap-2">
         {popularTags.map((tag) => (
