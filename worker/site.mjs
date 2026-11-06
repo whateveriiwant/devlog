@@ -33,7 +33,9 @@ function articleMarkup(post) {
   const series = post.series_slug
     ? `<span class="mx-2 text-muted-foreground">/</span><a href="/series/${encodeURIComponent(post.series_slug)}/">${escapeHtml(post.series_name)}</a>`
     : '';
-  const minimumDepth = Math.min(...post.headings.map((heading) => heading.depth));
+  const minimumDepth = Math.min(
+    ...post.headings.map((heading) => heading.depth)
+  );
   const headings = post.headings
     .map(
       (heading) =>
@@ -254,7 +256,7 @@ function postRows(entries, { numbered = false, endpoint, cursor } = {}) {
         : '';
       const series = post.series_name || '개별 기록';
       const tags = (post.tags || []).slice(0, 3).join(' · ');
-      return `<li data-published-at="${escapeHtml(post.published_at)}"><a href="/blog/${encodeURIComponent(post.slug)}/" class="post-row group grid grid-cols-[96px_minmax(0,1fr)] items-start gap-3 rounded-none px-2 py-4 transition-colors hover:bg-accent/60 md:grid-cols-[160px_minmax(0,1fr)] md:gap-4"><div class="row-span-2 aspect-[5/3] self-center overflow-hidden rounded-md bg-muted">${image}</div><div class="min-w-0"><div class="post-row-index pt-0.5 text-xs text-muted-foreground tabular-nums">${numbered ? String(index + 1).padStart(2, '0') : `<time datetime="${escapeHtml(post.published_at)}">${date}</time>`}</div><strong class="block text-sm leading-6 font-medium wrap-anywhere">${escapeHtml(post.title)}</strong><div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"><span class="rounded-md bg-secondary px-2 py-0.5">${escapeHtml(series)}</span><span>${escapeHtml(tags)}</span>${numbered ? `<time datetime="${escapeHtml(post.published_at)}">${date}</time>` : ''}</div></div></a></li>`;
+      return `<li data-published-at="${escapeHtml(post.published_at)}"><a href="/blog/${encodeURIComponent(post.slug)}/" class="post-row group grid grid-cols-[96px_minmax(0,1fr)] items-start gap-3 rounded-none px-2 py-4 transition-colors hover:bg-accent/60 md:grid-cols-[160px_minmax(0,1fr)] md:gap-4"><div class="row-span-2 aspect-[5/3] self-center overflow-hidden rounded-md bg-muted">${image}</div><div class="min-w-0"><div class="post-row-index pt-0.5 text-xs text-muted-foreground tabular-nums">${numbered ? String(index + 1).padStart(2, '0') : `<time datetime="${escapeHtml(post.published_at)}">${date}</time>`}</div><strong class="block text-sm leading-6 font-medium wrap-anywhere">${escapeHtml(post.title)}</strong><div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"><span data-post-series class="rounded-md bg-secondary px-2 py-0.5">${escapeHtml(series)}</span><span>${escapeHtml(tags)}</span>${numbered ? `<time datetime="${escapeHtml(post.published_at)}">${date}</time>` : ''}</div></div></a></li>`;
     })
     .join('');
   const more = cursor
@@ -415,9 +417,14 @@ async function renderCollection(request, env, url) {
   let selector;
   let markup;
   let collection;
+  let postCount;
   try {
     if (path === '/blog') {
-      const result = await cmsJson(env, '/posts?limit=20');
+      const [result, stats] = await Promise.all([
+        cmsJson(env, '/posts?limit=20'),
+        cmsJson(env, '/stats').catch(() => null),
+      ]);
+      postCount = stats?.posts;
       selector = '[data-d1-collection="posts"]';
       markup = postRows(result.entries, {
         endpoint: '/api/content/posts?limit=20',
@@ -482,6 +489,30 @@ async function renderCollection(request, env, url) {
       }).transform(asset);
     }
   } catch {
+    if (path === '/blog') {
+      const template = await env.ASSETS.fetch(
+        new Request(new URL('/list-template/', request.url))
+      );
+      if (template.ok) {
+        const page = publicRewriter(env, url, {
+          title: '개발 글 모음',
+          description: '모든 개발 기록을 모아둔 글 페이지입니다.',
+        })
+          .on('[data-d1-collection="posts"]', {
+            element(element) {
+              element.setInnerContent(
+                '<div role="alert" class="border-y py-8"><p>글 목록을 불러오지 못했습니다.</p><p class="mt-2 text-sm text-muted-foreground">잠시 후 다시 시도해 주세요.</p><div class="mt-4 flex gap-4 text-sm font-medium"><a class="underline underline-offset-4" href="/blog/">다시 시도</a><a class="underline underline-offset-4" href="/">홈으로</a></div></div>',
+                { html: true }
+              );
+            },
+          })
+          .transform(template);
+        const headers = new Headers(page.headers);
+        headers.set('Cache-Control', 'no-store');
+        headers.set('X-Robots-Tag', 'noindex');
+        return new Response(page.body, { status: 503, headers });
+      }
+    }
     return new Response('Content temporarily unavailable', { status: 503 });
   }
 
@@ -545,6 +576,14 @@ async function renderCollection(request, env, url) {
       element.setInnerContent(markup, { html: true });
     },
   });
+  if (path === '/blog')
+    rewriter.on('[data-blog-count]', {
+      element(element) {
+        element.setInnerContent(
+          Number.isInteger(postCount) ? `· ${postCount}개의 글` : ''
+        );
+      },
+    });
   const rewritten = rewriter.transform(asset);
   const headers = new Headers(rewritten.headers);
   headers.set('Cache-Control', 'no-store');

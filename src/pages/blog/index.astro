@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostList from '../../components/PostList.astro';
+import BlogListHeader from '../../components/BlogListHeader.astro';
 import { getContent } from '../../lib/content';
 const { posts } = await getContent();
 ---
@@ -9,10 +10,11 @@ const { posts } = await getContent();
   title="개발 글 모음"
   description="JavaScript, React, 웹 개발과 컴퓨터공학에 관한 정승준의 개발 기록을 최신순으로 읽어보세요."
 >
-  <header class="page-heading">
-    <h1>전체 글</h1>
-  </header>
-  <div data-d1-collection="posts">
+  <BlogListHeader count={posts.length} />
+  <div
+    data-d1-collection="posts"
+    class="[&_[data-post-series]]:bg-transparent [&_[data-post-series]]:p-0 [&_[data-post-series]]:border-0"
+  >
     <PostList posts={posts} />
   </div>
 </BaseLayout>
