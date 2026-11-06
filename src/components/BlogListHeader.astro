@@ -1,0 +1,35 @@
+---
+interface Props {
+  count?: number;
+}
+const { count } = Astro.props;
+---
+
+<header class="page-heading">
+  <h1>전체 글</h1>
+  <p class="mt-3 text-sm text-muted-foreground">
+    최신 발행순{' '}
+    <span data-blog-count>{count !== undefined && `· ${count}개의 글`}</span>
+  </p>
+  <nav aria-label="글 탐색" class="mt-5 flex flex-wrap gap-2">
+    <button
+      type="button"
+      data-search-open
+      class="rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    >
+      글 검색
+    </button>
+    <a
+      href="/tags/"
+      class="rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent"
+    >
+      태그 둘러보기
+    </a>
+    <a
+      href="/series/"
+      class="rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent"
+    >
+      시리즈 둘러보기
+    </a>
+  </nav>
+</header>

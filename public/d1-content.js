@@ -18,24 +18,30 @@ document.addEventListener('click', async (event) => {
       li.dataset.publishedAt = post.published_at;
       const link = document.createElement('a');
       link.href = `/blog/${encodeURIComponent(post.slug)}/`;
-      link.className = 'post-row group grid grid-cols-[96px_minmax(0,1fr)] items-start gap-3 rounded-none px-2 py-4 transition-colors hover:bg-accent/60 md:grid-cols-[160px_minmax(0,1fr)] md:gap-4';
+      link.className =
+        'post-row group grid grid-cols-[96px_minmax(0,1fr)] items-start gap-3 rounded-none px-2 py-4 transition-colors hover:bg-accent/60 md:grid-cols-[160px_minmax(0,1fr)] md:gap-4';
       const imageBox = document.createElement('div');
-      imageBox.className = 'row-span-2 aspect-[5/3] self-center overflow-hidden rounded-md bg-muted';
+      imageBox.className =
+        'row-span-2 aspect-[5/3] self-center overflow-hidden rounded-md bg-muted';
       if (post.thumbnail) {
         const image = document.createElement('img');
         image.src = post.thumbnail;
         image.alt = '';
         image.loading = 'lazy';
-        image.className = 'size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]';
+        image.className =
+          'size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]';
         imageBox.append(image);
       }
       const content = document.createElement('div');
       content.className = 'min-w-0';
       const date = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' })
-        .format(new Date(post.published_at)).replaceAll('-', '.');
+        .format(new Date(post.published_at))
+        .replaceAll('-', '.');
       const indexLabel = document.createElement('div');
-      indexLabel.className = 'post-row-index pt-0.5 text-xs text-muted-foreground tabular-nums';
-      if (numbered) indexLabel.textContent = String(start + index + 1).padStart(2, '0');
+      indexLabel.className =
+        'post-row-index pt-0.5 text-xs text-muted-foreground tabular-nums';
+      if (numbered)
+        indexLabel.textContent = String(start + index + 1).padStart(2, '0');
       else {
         const time = document.createElement('time');
         time.dateTime = post.published_at;
@@ -46,8 +52,10 @@ document.addEventListener('click', async (event) => {
       title.className = 'block text-sm leading-6 font-medium wrap-anywhere';
       title.textContent = post.title;
       const details = document.createElement('div');
-      details.className = 'mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground';
+      details.className =
+        'mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground';
       const series = document.createElement('span');
+      series.setAttribute('data-post-series', '');
       series.className = 'rounded-md bg-secondary px-2 py-0.5';
       series.textContent = post.series_name || '개별 기록';
       const tags = document.createElement('span');
@@ -64,15 +72,26 @@ document.addEventListener('click', async (event) => {
       li.append(link);
       list.append(li);
     }
+    if (status)
+      status.textContent = `${result.entries.length}개의 글을 더 불러왔습니다.${result.nextCursor ? '' : ' 마지막 글입니다.'}`;
     if (result.nextCursor) {
       button.dataset.cursor = result.nextCursor;
       button.disabled = false;
       button.textContent = '더 보기';
-    } else button.remove();
-    if (status) status.textContent = '';
+    } else {
+      button.hidden = true;
+      if (status) {
+        status.tabIndex = -1;
+        status.focus();
+      }
+    }
   } catch (error) {
     button.disabled = false;
     button.textContent = '다시 시도';
-    if (status) status.textContent = error instanceof Error ? error.message : '다음 글을 불러오지 못했습니다.';
+    if (status)
+      status.textContent =
+        error instanceof Error
+          ? error.message
+          : '다음 글을 불러오지 못했습니다.';
   }
 });

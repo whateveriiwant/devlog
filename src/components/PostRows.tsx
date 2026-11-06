@@ -59,6 +59,7 @@ export default function PostRows({
                 {!compact && (
                   <ItemDescription className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                     <Badge
+                      data-post-series
                       variant="secondary"
                       className="rounded-md font-normal"
                     >
