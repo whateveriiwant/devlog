@@ -102,8 +102,8 @@ const popularTags = content.tags.slice(0, 8);
             <div data-home-feature-tags class="mt-4 flex flex-wrap gap-2">
               {featured.data.tags.slice(0, 4).map((tag) => (
                 <a href={tagUrl(tag)}>
-                  <Badge variant="outline" className="hover:bg-accent">
-                    #{tag}
+                  <Badge variant="secondary" className="hover:bg-accent">
+                    {tag}
                   </Badge>
                 </a>
               ))}
@@ -239,12 +239,11 @@ const popularTags = content.tags.slice(0, 8);
       <div data-home-tags class="flex content-start flex-wrap gap-2">
         {popularTags.map((tag) => (
           <a href={tagUrl(tag.name)}>
-            <Badge
-              variant="outline"
-              className="bg-background px-3 py-1.5 text-sm hover:bg-accent"
-            >
-              #{tag.name}{' '}
-              <span class="ml-1 text-muted-foreground">{tag.posts.length}</span>
+            <Badge variant="secondary" className="hover:bg-accent">
+              {tag.name}
+              <span class="tabular-nums text-muted-foreground">
+                {tag.posts.length}
+              </span>
             </Badge>
           </a>
         ))}

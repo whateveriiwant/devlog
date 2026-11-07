@@ -295,7 +295,7 @@ export default function SiteControls({ sections }: { sections: NavSection[] }) {
         </SheetTrigger>
         <SheetContent side="left" className="gap-0">
           <SheetHeader className="border-b p-5">
-            <SheetTitle>seungjun.dev</SheetTitle>
+            <SheetTitle>seungjun.sh</SheetTitle>
             <SheetDescription>주제와 시리즈로 기록 찾기</SheetDescription>
           </SheetHeader>
           <div className="overflow-y-auto p-3">

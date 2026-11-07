@@ -4,7 +4,7 @@ import type { APIContext } from 'astro';
 export async function GET(context: APIContext) {
   const { posts } = await getContent();
   return rss({
-    title: 'seungjun.dev',
+    title: 'seungjun.sh',
     description: '웹 개발과 컴퓨터 기초, 배움의 기록',
     site: context.site!,
     items: posts.map((post) => ({
