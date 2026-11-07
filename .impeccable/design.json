@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-07T00:00:00Z",
+  "title": "Design System: seungjun.sh",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "oklch(1 0 0)", "tonalRamp": ["oklch(0.15 0.005 286)", "oklch(0.25 0.006 286)", "oklch(0.40 0.01 286)", "oklch(0.55 0.016 286)", "oklch(0.70 0.015 286)", "oklch(0.85 0.008 286)", "oklch(0.94 0.003 286)", "oklch(1 0 0)"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "oklch(0.141 0.005 285.823)", "tonalRamp": ["oklch(0.141 0.005 286)", "oklch(0.21 0.006 286)", "oklch(0.30 0.008 286)", "oklch(0.45 0.012 286)", "oklch(0.60 0.015 286)", "oklch(0.75 0.012 286)", "oklch(0.88 0.006 286)", "oklch(0.95 0.002 286)"] },
+      "graphite": { "role": "primary", "displayName": "Graphite", "canonical": "oklch(0.21 0.006 285.885)", "tonalRamp": ["oklch(0.15 0.005 286)", "oklch(0.21 0.006 286)", "oklch(0.274 0.006 286)", "oklch(0.40 0.01 286)", "oklch(0.552 0.016 286)", "oklch(0.705 0.015 286)", "oklch(0.92 0.004 286)", "oklch(0.967 0.001 286)"] },
+      "mist": { "role": "neutral", "displayName": "Mist", "canonical": "oklch(0.967 0.001 286.375)", "tonalRamp": ["oklch(0.274 0.006 286)", "oklch(0.40 0.01 286)", "oklch(0.552 0.016 286)", "oklch(0.705 0.015 286)", "oklch(0.85 0.008 286)", "oklch(0.92 0.004 286)", "oklch(0.967 0.001 286)", "oklch(0.985 0.001 286)"] },
+      "alarm-red": { "role": "semantic", "displayName": "Alarm Red", "canonical": "oklch(0.577 0.245 27.325)", "tonalRamp": ["oklch(0.25 0.09 27)", "oklch(0.35 0.14 27)", "oklch(0.45 0.19 27)", "oklch(0.577 0.245 27)", "oklch(0.68 0.2 27)", "oklch(0.78 0.12 27)", "oklch(0.88 0.06 27)", "oklch(0.95 0.02 27)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "글 제목과 페이지 제목(h1). 30px에서 sm 이상 36px." },
+      "headline": { "displayName": "Headline", "purpose": "본문 h2. 위 구분선으로 장을 나눈다." },
+      "body": { "displayName": "Body", "purpose": "글 본문. 790px 열, 행간 1.85." },
+      "label": { "displayName": "Label", "purpose": "날짜, 건수, 메타, 칩, 목차." }
+    },
+    "shadows": [
+      { "name": "none", "value": "none", "purpose": "시스템 전체가 평평하다. 깊이는 1px 테두리와 mist 면으로 표현한다." }
+    ],
+    "motion": [
+      { "name": "theme-transition", "value": "100ms ease-out", "purpose": "라이트·다크 전환 시 color, background, border에만 적용." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "기본 동작 버튼. 짙은 graphite 면.",
+      "html": "<button class=\"ds-btn-primary\">발행</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:8px 16px;border:0;border-radius:8px;background:var(--primary,#27272a);color:var(--primary-foreground,#fafafa);font:500 14px/1 Pretendard,sans-serif;cursor:pointer;transition:background .15s}.ds-btn-primary:hover{opacity:.9}.ds-btn-primary:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in oklch,var(--ring,#a1a1aa) 50%,transparent)}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "보조 동작. 얇은 테두리.",
+      "html": "<button class=\"ds-btn-outline\">취소</button>",
+      "css": ".ds-btn-outline{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:8px 16px;border:1px solid var(--border,#e4e4e7);border-radius:8px;background:var(--background,#fff);color:var(--foreground,#18181b);font:500 14px/1 Pretendard,sans-serif;cursor:pointer}.ds-btn-outline:hover{background:var(--accent,#f4f4f5)}.ds-btn-outline:focus-visible{outline:none;box-shadow:0 0 0 3px color-mix(in oklch,var(--ring,#a1a1aa) 50%,transparent)}"
+    },
+    {
+      "name": "Topic Pill",
+      "kind": "chip",
+      "refersTo": "topic-pill",
+      "description": "태그와 주제 필터 칩.",
+      "html": "<a class=\"ds-pill\" href=\"#\">Astro <span>12</span></a>",
+      "css": ".ds-pill{display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border:1px solid var(--border,#e4e4e7);border-radius:8px;background:var(--secondary,#f4f4f5);color:var(--foreground,#18181b);font:500 12px/1.5 Pretendard,sans-serif;text-decoration:none}.ds-pill:hover{background:var(--accent,#f4f4f5)}.ds-pill span{color:var(--muted-foreground,#71717a);font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Post Row",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "글 목록의 기본 행. 제목 왼쪽, 날짜 오른쪽.",
+      "html": "<a class=\"ds-row\" href=\"#\"><span>Astro로 블로그 만들기</span><time>2026.09.25</time></a>",
+      "css": ".ds-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 8px;border-bottom:1px solid var(--border,#e4e4e7);color:var(--foreground,#18181b);font:400 14px/1.5 Pretendard,sans-serif;text-decoration:none;transition:background .15s}.ds-row:hover{background:var(--accent,#f4f4f5)}.ds-row time{color:var(--muted-foreground,#71717a);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}"
+    },
+    {
+      "name": "Table of Contents",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "heading 기반 목차. 현재 위치는 선과 굵은 글자로 표시.",
+      "html": "<ul class=\"ds-toc\"><li><a href=\"#\" aria-current=\"location\">개요</a></li><li><a href=\"#\">설치</a></li><li><a href=\"#\" style=\"--depth:1\">설정 파일</a></li></ul>",
+      "css": ".ds-toc{margin:0;padding:0;list-style:none;border-left:1px solid var(--border,#e4e4e7);font-family:Pretendard,sans-serif}.ds-toc a{display:block;margin-left:-1px;padding:6px 0 6px calc(12px + var(--depth,0) * 10px);border-left:1px solid transparent;color:var(--muted-foreground,#71717a);font-size:12px;line-height:20px;text-decoration:none}.ds-toc a:hover{border-color:var(--primary,#27272a);color:var(--foreground,#18181b)}.ds-toc a[aria-current=location]{border-color:var(--primary,#27272a);color:var(--foreground,#18181b);font-weight:500}"
+    },
+    {
+      "name": "Code Block",
+      "kind": "custom",
+      "refersTo": "code-block",
+      "description": "본문 코드 블록.",
+      "html": "<pre class=\"ds-code\"><code>pnpm build</code></pre>",
+      "css": ".ds-code{margin:0;padding:21px;overflow-x:auto;border:1px solid var(--border,#e4e4e7);border-radius:10px;background:var(--background,#fff);color:var(--foreground,#18181b);font:400 13px/1.8 SFMono-Regular,Consolas,monospace}"
+    }
+  ],
+  "narrative": {
+    "northStar": "조용한 서재",
+    "overview": "글이 주인공이고 인터페이스는 한 걸음 물러난다. 흰 종이와 짙은 잉크, 그 사이의 옅은 회색만으로 화면을 구성한다. 색은 정보를 전달하는 데만 쓰고, 분위기를 만들려고 쓰지 않는다.",
+    "keyCharacteristics": [
+      "무채색 단일 팔레트, 강조색 없음",
+      "그림자 없이 1px 선과 옅은 회색 면으로 계층 구성",
+      "본문 열 790px, 한글에 맞춘 행간 1.85",
+      "작은 글씨의 조밀한 탐색 UI와 큰 본문의 대비",
+      "라이트·다크 대칭, prefers-reduced-motion 존중"
+    ],
+    "rules": [
+      { "name": "The No Accent Rule", "body": "강조색은 없다. 강조는 굵기, 크기, 반전으로 만든다.", "section": "colors" },
+      { "name": "The Hairline Rule", "body": "구분은 1px border와 mist 면이 맡는다.", "section": "colors" },
+      { "name": "The Tabular Rule", "body": "날짜, 건수, 통계 숫자에는 tabular-nums를 쓴다.", "section": "typography" },
+      { "name": "The Korean Measure Rule", "body": "본문 행간은 1.85 아래로 내리지 않는다.", "section": "typography" },
+      { "name": "The Flat Rule", "body": "새 컴포넌트에 box-shadow를 추가하지 않는다.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do 모든 색을 CSS 변수로 쓰고 라이트·다크를 함께 정의한다.",
+      "Do 새 목록은 행 문법으로 만든다.",
+      "Do 본문은 790px 열, 16px, 행간 1.85를 지킨다.",
+      "Do 상호작용 요소에 3px 포커스 링을 유지한다.",
+      "Do 한국어 UI 문구를 기본으로 쓴다."
+    ],
+    "donts": [
+      "Don't 강조색, 그라데이션, 장식용 그림자를 추가하지 않는다.",
+      "Don't 글 목록을 카드 그리드나 큰 썸네일 격자로 바꾸지 않는다.",
+      "Don't 본문 행간을 1.85 아래로 낮추거나 본문 열을 790px 넘게 넓히지 않는다.",
+      "Don't prefers-reduced-motion에서 애니메이션을 남기지 않는다.",
+      "Don't 오류 이외의 용도로 alarm-red를 쓰지 않는다."
+    ]
+  }
+}
