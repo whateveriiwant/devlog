@@ -40,7 +40,8 @@ const runtime = new Miniflare(
                     slug: 'a',
                     title: 'A',
                     published_at: '2026-01-01T00:00:00Z',
-                    tags: [],
+                    series_name: 'React',
+                    tags: ['React', 'hooks', '상태', '렌더링'],
                   },
                 ],
                 nextCursor: 'next',
@@ -68,6 +69,10 @@ try {
   ])
     assert.ok(html.includes(phrase), phrase);
   assert.match(html, /data-search-open/);
+  assert.match(
+    html,
+    /<span data-post-series[^>]*>React<\/span><span>#hooks · #상태 · #렌더링<\/span>/
+  );
   failStats = true;
   response = await runtime.dispatchFetch('https://example.com/blog/');
   assert.equal(response.status, 200, 'stats failure does not block posts');
@@ -84,6 +89,7 @@ try {
 }
 
 let handler;
+let blogMetadata = true;
 const makeElement = () => ({
   dataset: {},
   children: [],
@@ -102,7 +108,7 @@ const button = {
   parentElement: {
     querySelector: (selector) =>
       selector === '[data-post-list]' ? list : status,
-    hasAttribute: () => false,
+    hasAttribute: (name) => name === 'data-blog-metadata' && blogMetadata,
   },
 };
 const context = {
@@ -147,16 +153,34 @@ context.fetch = async () => ({
   ok: true,
   json: async () => ({
     entries: [
-      { slug: 'a', title: 'A', published_at: '2026-01-01T00:00:00Z', tags: [] },
+      {
+        slug: 'a',
+        title: 'A',
+        published_at: '2026-01-01T00:00:00Z',
+        series_name: 'React',
+        tags: ['React', 'hooks', '상태', '렌더링'],
+      },
     ],
     nextCursor: null,
   }),
 });
 await handler({ target: { closest: () => button } });
 assert.equal(list.children.length, 1);
+assert.equal(
+  list.children[0].children[0].children[1].children[2].children[1].textContent,
+  '#hooks · #상태 · #렌더링'
+);
 assert.equal(button.hidden, true);
 assert.equal(status.focused, true);
 assert.match(status.textContent, /1개의 글.*마지막 글/);
+blogMetadata = false;
+button.hidden = false;
+button.disabled = false;
+await handler({ target: { closest: () => button } });
+assert.equal(
+  list.children[1].children[0].children[1].children[2].children[1].textContent,
+  'React · hooks · 상태'
+);
 console.log(
   'PASS: blog discovery, CMS failure recovery and final page announcement'
 );

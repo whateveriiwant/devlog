@@ -59,7 +59,20 @@ document.addEventListener('click', async (event) => {
       series.className = 'rounded-md bg-secondary px-2 py-0.5';
       series.textContent = post.series_name || '개별 기록';
       const tags = document.createElement('span');
-      tags.textContent = (post.tags || []).slice(0, 3).join(' · ');
+      const blogMetadata =
+        button.parentElement.hasAttribute('data-blog-metadata');
+      tags.textContent = (
+        blogMetadata
+          ? (post.tags || []).filter(
+              (tag) =>
+                tag.trim().toLowerCase() !==
+                series.textContent.trim().toLowerCase()
+            )
+          : post.tags || []
+      )
+        .slice(0, 3)
+        .map((tag) => (blogMetadata && !tag.startsWith('#') ? `#${tag}` : tag))
+        .join(' · ');
       details.append(series, tags);
       if (numbered) {
         const time = document.createElement('time');
