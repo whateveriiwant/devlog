@@ -153,7 +153,7 @@
     @apply flex items-center gap-2.5 text-sm font-semibold tracking-tight whitespace-nowrap;
   }
   .brand-mark {
-    @apply flex size-8 items-center justify-center rounded-lg bg-primary font-mono text-sm font-bold text-primary-foreground;
+    @apply flex size-8 items-center justify-center rounded-lg bg-primary font-mono text-sm font-bold text-primary-foreground dark:border dark:bg-card dark:text-foreground;
   }
   .page-heading {
     @apply pb-4;
