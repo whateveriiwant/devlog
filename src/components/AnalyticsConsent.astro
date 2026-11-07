@@ -1,22 +1,35 @@
 ---
 import { buttonVariants } from './ui/button';
+interface Props {
+  isHome?: boolean;
+}
+const { isHome = false } = Astro.props;
 ---
 
 <div data-analytics-consent-controls data-pagefind-ignore>
-  <div class="mx-auto flex max-w-[1540px] flex-wrap items-center gap-2 px-5.25 pb-6 md:px-8">
-    <a href="/privacy/" class={buttonVariants({ variant: 'link', size: 'sm' })}>
-      개인정보 안내
-    </a>
-    <button
-      type="button"
-      data-analytics-consent-open
-      aria-controls="analytics-consent-panel"
-      aria-expanded="false"
-      class={buttonVariants({ variant: 'link', size: 'sm' })}
-      hidden
-    >
-      방문 통계 설정
-    </button>
+  <div
+    class={`mx-auto max-w-[1540px] px-5.25 pb-6 md:px-8 ${isHome ? '' : 'md:grid md:grid-cols-[210px_minmax(0,1fr)] md:gap-[34px] xl:grid-cols-[220px_minmax(0,1fr)_216px] xl:gap-12 2xl:grid-cols-[232px_minmax(0,1fr)_220px] 2xl:gap-14'}`}
+  >
+    <div class={isHome ? '' : 'mx-auto w-full max-w-[790px] md:col-start-2'}>
+      <div class="-ml-3 flex flex-wrap items-center gap-2">
+        <a
+          href="/privacy/"
+          class={buttonVariants({ variant: 'link', size: 'sm' })}
+        >
+          개인정보 안내
+        </a>
+        <button
+          type="button"
+          data-analytics-consent-open
+          aria-controls="analytics-consent-panel"
+          aria-expanded="false"
+          class={buttonVariants({ variant: 'link', size: 'sm' })}
+          hidden
+        >
+          방문 통계 설정
+        </button>
+      </div>
+    </div>
   </div>
   <section
     id="analytics-consent-panel"
