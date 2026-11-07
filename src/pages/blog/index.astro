@@ -13,8 +13,9 @@ const { posts } = await getContent();
   <BlogListHeader count={posts.length} />
   <div
     data-d1-collection="posts"
+    data-blog-metadata
     class="[&_[data-post-series]]:bg-transparent [&_[data-post-series]]:p-0 [&_[data-post-series]]:border-0"
   >
-    <PostList posts={posts} />
+    <PostList posts={posts} blogMetadata />
   </div>
 </BaseLayout>

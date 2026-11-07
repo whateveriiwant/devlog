@@ -18,10 +18,12 @@ export default function PostRows({
   rows,
   numbered = false,
   compact = false,
+  blogMetadata = false,
 }: {
   rows: Row[];
   numbered?: boolean;
   compact?: boolean;
+  blogMetadata?: boolean;
 }) {
   return (
     <ol className="m-0 list-none divide-y p-0" data-post-list>
@@ -65,7 +67,21 @@ export default function PostRows({
                     >
                       {row.series}
                     </Badge>
-                    <span>{row.tags.slice(0, 3).join(' · ')}</span>
+                    <span>
+                      {(blogMetadata
+                        ? row.tags.filter(
+                            (tag) =>
+                              tag.trim().toLowerCase() !==
+                              row.series.trim().toLowerCase()
+                          )
+                        : row.tags
+                      )
+                        .slice(0, 3)
+                        .map((tag) =>
+                          blogMetadata && !tag.startsWith('#') ? `#${tag}` : tag
+                        )
+                        .join(' · ')}
+                    </span>
                     {numbered && <time dateTime={row.iso}>{row.date}</time>}
                   </ItemDescription>
                 )}
